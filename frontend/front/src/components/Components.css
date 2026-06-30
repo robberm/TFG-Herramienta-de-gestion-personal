@@ -1,0 +1,40 @@
+.error-box {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  border-radius: 5px;
+  margin-bottom: 16px;
+  padding: 10px;
+  position: relative;
+  max-width: 400px;
+  display: flex;
+  justify-content: space-between; /* Esto coloca el texto a la izquierda y la "X" a la derecha */
+  align-items: center; /* Centra el contenido verticalmente */
+  transition: opacity 0.3s ease-in-out;
+
+  animation: slideDown 0.5s ease-out;
+  /*No mover elementos*/
+  transform-origin: top center;
+}
+
+
+/*HOW TO CENTER A DIV 101*/
+.error-close-button {
+  position: absolute;
+  right: 10px;
+  top: 50%; /* Posiciona el borde superior en el medio vertical */
+  transform: translateY(-50%); /* Desplaza hacia arriba la mitad de su altura */
+  background: transparent;
+  border: none;
+  font-weight: bold;
+  color: #721c24;
+  cursor: pointer;
+  font-size: 18px;
+  z-index: 1;
+
+  transition: transform 0.2s, color 0.2s;
+ 
+}
+.error-close-button:hover {
+ color:#a8222f
+}

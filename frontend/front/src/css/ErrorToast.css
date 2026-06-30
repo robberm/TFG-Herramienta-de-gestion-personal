@@ -1,0 +1,64 @@
+/**
+ * Estilos compartidos para toasts de error.
+ * Los separamos para no acoplar feedback visual al módulo Block.
+ */
+.error-toast {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: var(--danger-color);
+  color: white;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 30;
+  max-width: min(420px, calc(100% - 2rem));
+  animation: errorToastSlideIn 0.3s ease;
+}
+
+.error-toast span {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 768px) {
+  .error-toast {
+    left: 1rem;
+    right: 1rem;
+    top: 1rem;
+    max-width: none;
+  }
+}
+
+@keyframes errorToastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.error-toast-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  transition: background var(--transition-fast);
+}
+
+.error-toast-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}

@@ -1,0 +1,1483 @@
+.objectivesPage {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  color: var(--text-main);
+  padding: 0.5rem;
+}
+
+/* Header */
+.objectivesHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.objectivesHeader h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.5px;
+}
+
+.objectivesHeader p {
+  margin: 0.25rem 0 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.adminScopeSelector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  max-width: 320px;
+  padding: 0.85rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  background: var(--card-background);
+}
+
+.adminScopeSelector label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.adminScopeSelector select {
+  border: 1px solid var(--border-color);
+  background: var(--bg-main);
+  color: var(--text-main);
+  border-radius: 8px;
+  padding: 0.45rem 0.6rem;
+}
+
+/* Buttons */
+.refreshButton,
+.addButton,
+.saveButton,
+.cancelButton {
+  padding: 10px 20px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.refreshButton {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  backdrop-filter: blur(10px);
+}
+
+.refreshButton:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  transform: translateY(-1px);
+}
+
+.refreshButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.addButton {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.addButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+.saveButton {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(56, 239, 125, 0.3);
+}
+
+.saveButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(56, 239, 125, 0.4);
+}
+
+.saveButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.cancelButton {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.cancelButton:hover {
+  color: var(--text-main);
+  border-color: var(--text-secondary);
+}
+
+/* Loading State */
+.objectivesLoadingState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 4rem 2rem;
+  border-radius: 20px;
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+}
+
+.loaderDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  animation: pulse 0.8s infinite alternate;
+}
+
+@keyframes pulse {
+  from {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* ========================================
+   DASHBOARD
+   ======================================== */
+
+.objectivesDashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Summary Cards Grid */
+.summaryCardsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.summaryCard {
+  position: relative;
+  padding: 1.5rem;
+  border-radius: 20px;
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.summaryCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.summaryCard::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 20px 20px 0 0;
+}
+
+.summaryCard:nth-child(1)::before {
+  background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+}
+
+.summaryCard:nth-child(2)::before {
+  background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.summaryCard:nth-child(3)::before {
+  background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.summaryCard:nth-child(4)::before {
+  background: linear-gradient(90deg, #fa709a 0%, #fee140 100%);
+}
+
+.summaryCardContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.summaryTextBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.summaryLabel {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+.summaryValue {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1;
+  letter-spacing: -1px;
+}
+
+.summarySubLabel {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Ring Progress */
+.summaryRing {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+}
+
+.summaryRing svg {
+  transform: rotate(-90deg);
+  width: 60px;
+  height: 60px;
+}
+
+.summaryRing circle {
+  fill: none;
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.ringBg {
+  stroke: var(--border-color);
+}
+
+.ringProgress {
+  transition: stroke-dashoffset 0.6s ease;
+}
+
+.ringPercent {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+/* Dashboard Grid */
+.dashboardGrid {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 1rem;
+}
+
+.dashboardCard {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 1.5rem;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.dashboardCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.cardHeader {
+  margin-bottom: 1.5rem;
+}
+
+.cardHeader h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.weeklyActivityHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.weeklyActivityHeader h3 {
+  min-width: 150px;
+  text-align: center;
+  text-transform: capitalize;
+}
+
+.weeklyNavButton {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-main);
+  cursor: pointer;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1;
+  transition:
+    transform 0.15s ease,
+    background-color 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.weeklyNavButton:hover:not(:disabled) {
+  background-color: var(--bg-hover);
+}
+
+.weeklyNavButton:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.weeklyNavButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+/* Goals Summary Panel */
+.goalsSummaryPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.goalsSummaryTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.goalsSummaryMainMetric {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.goalsSummaryLabel {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.goalsSummaryBigValue {
+  color: var(--text-main);
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -1px;
+}
+
+.goalsSummaryRingWrap {
+  flex-shrink: 0;
+}
+
+.goalsSummaryProgressBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.goalsSummaryProgressBar {
+  height: 10px;
+}
+
+.goalsMetricsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.85rem;
+}
+
+.goalsMetricCard {
+  background: var(--bg-main);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.goalsMetricLabel {
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.goalsMetricValue {
+  color: var(--text-main);
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* Donut Chart */
+.donutChartLayout {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.goalsDonut {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.goalsDonutCenter {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: var(--background-color);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: var(--text-main);
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.goalsDonutCenter span {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.goalsDonutCenter small {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.donutLegend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.legendColor {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.legendText {
+  color: var(--text-main);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Weekly Bars */
+.weeklyBars,
+.habitBarChart {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  align-items: end;
+  gap: 0.75rem;
+  height: 200px;
+  padding-top: 1rem;
+}
+
+.weeklyBarItem {
+  border: 0;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  height: 100%;
+  cursor: pointer;
+}
+
+.weeklyBarItem:focus {
+  outline: none;
+}
+
+.weeklyBarItem:focus-visible {
+  border-radius: 10px;
+  box-shadow: 0 0 0 2px var(--link-active-bg);
+}
+
+.weeklyBarItem:disabled {
+  cursor: not-allowed;
+}
+
+.habitBarMiniChart {
+  width: 100%;
+  max-width: 40px;
+  flex: 1;
+  min-height: 0;
+}
+
+.habitBarMiniChart .recharts-wrapper {
+  pointer-events: none;
+}
+
+.habitBarMiniChart .recharts-wrapper:focus,
+.habitBarMiniChart .recharts-wrapper:focus-visible,
+.habitBarMiniChart .recharts-surface:focus,
+.habitBarMiniChart .recharts-surface:focus-visible {
+  outline: none !important;
+}
+
+.weeklyBarTrack {
+  fill: var(--bg-page);
+}
+
+.weeklyBarCell {
+  transition: opacity 0.2s ease;
+}
+
+.weeklyBarValue {
+  color: var(--text-main);
+  fill: var(--text-main);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.weeklyBarLabel {
+  color: var(--text-secondary);
+  fill: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+/* ========================================
+   SECTIONS (Goals & Habits)
+   ======================================== */
+
+.objectivesContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.objectivesSection {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 1.5rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.objectivesSection:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.sectionHeader h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.sectionHeader p {
+  margin: 0.25rem 0 0;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.completedGoalsBlock {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.completedGoalsToggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-main);
+  color: var(--text-main);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.completedGoalsToggle:hover {
+  transform: translateY(-1px);
+  border-color: var(--text-secondary);
+}
+
+/* ========================================
+   TABLE STYLES
+   ======================================== */
+
+.tableWrapper {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+.tableWrapper.hasOverflow {
+  overflow-x: auto;
+}
+
+.todoTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  display: table;
+  table-layout: fixed;
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+.tableHeader {
+  display: table-row;
+  background: var(--bg-page);
+}
+
+.tableHeader .tableCell {
+  background: transparent;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tableHeader .tableCell:first-child {
+  border-top-left-radius: 14px;
+}
+
+.tableHeader .tableCell:last-child {
+  border-top-right-radius: 14px;
+}
+
+.tableRow {
+  display: table-row;
+  transition: background 0.2s ease;
+  background: var(--bg-main);
+}
+
+.tableRow:hover {
+  background: var(--bg-page);
+}
+
+.completedTableRow {
+  display: table-row;
+  opacity: 0.5;
+}
+
+.completedText {
+  text-decoration: line-through;
+  color: var(--text-secondary);
+}
+
+.tableCell {
+  display: table-cell;
+  padding: 10px;
+  font-size: 0.9rem;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-main);
+  background: transparent;
+}
+
+.tableCell,
+.tableHeader .tableCell {
+  overflow-wrap: anywhere;
+}
+
+.tableCell strong {
+  font-weight: 600;
+}
+
+/* ========================================
+   BADGES
+   ======================================== */
+
+.priorityBadge,
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.streakBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 50px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+}
+
+.streakBadge.secondary {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  box-shadow: 0 2px 10px rgba(240, 147, 251, 0.3);
+}
+
+/* ========================================
+   GOAL PROGRESS
+   ======================================== */
+
+.goalProgressBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.progressBarContainer {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.progressBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);
+  border-radius: 6px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progressText,
+.mutedDash {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* ========================================
+   ACTIONS
+   ======================================== */
+
+.actionsCell {
+  white-space: nowrap;
+  width: 90px;
+}
+
+.actionButton {
+  width: 36px;
+  height: 36px;
+  margin-right: 0.5rem;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: var(--card-background);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actionButton:last-child {
+  margin-right: 0;
+}
+
+.actionButton:hover {
+  transform: translateY(-1px);
+}
+
+.editButton:hover {
+  background: rgba(79, 172, 254, 0.15);
+  color: #4facfe;
+  border-color: rgba(79, 172, 254, 0.3);
+}
+
+.deleteButton:hover {
+  background: rgba(245, 87, 108, 0.15);
+  color: #f5576c;
+  border-color: rgba(245, 87, 108, 0.3);
+}
+
+/* Empty State */
+.emptyState {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.emptyState p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* ========================================
+   HABIT CHECKBOX
+   ======================================== */
+
+.checkboxCell {
+  width: 60px;
+  text-align: center;
+}
+
+.habitCheckbox {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.habitCheckbox input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.habitCheckboxVisual {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  border: 2px solid var(--border-color);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.habitCheckbox:hover .habitCheckboxVisual {
+  border-color: #43e97b;
+}
+
+.habitCheckbox input:checked + .habitCheckboxVisual {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  border-color: transparent;
+  box-shadow: 0 0 0 3px rgba(67, 233, 123, 0.2);
+}
+
+.habitCheckbox input:checked + .habitCheckboxVisual::after {
+  content: "";
+  width: 8px;
+  height: 12px;
+  border: solid #fff;
+  border-width: 0 2.5px 2.5px 0;
+  transform: rotate(45deg) translateY(-1px);
+}
+
+.habitCheckbox input:disabled + .habitCheckboxVisual {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   FORM STYLES
+   ======================================== */
+
+.objectiveForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.formRow.singleColumn {
+  grid-template-columns: 1fr;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.formGroup label {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-main);
+  padding: 14px 16px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  outline: none;
+  font-family: inherit;
+}
+
+.formGroup input:focus,
+.formGroup select:focus,
+.formGroup textarea:focus {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.formGroup input::placeholder,
+.formGroup textarea::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+
+.formGroup select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
+}
+
+.formGroup select option {
+  background-color: var(--background-color);
+  color: var(--text-main);
+}
+
+.formGroup textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.checkboxRow {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  font-size: 0.9rem !important;
+  color: var(--text-main) !important;
+  cursor: pointer;
+}
+
+.checkboxRow input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  accent-color: #667eea;
+  cursor: pointer;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+/* ========================================
+   MODAL STYLES
+   ======================================== */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.editModal {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  max-width: 700px;
+  width: min(92vw, 700px);
+  max-height: 85vh;
+  overflow-y: auto;
+  animation: slideUpFade 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+}
+
+.habitModal {
+  max-width: 600px;
+}
+
+.modalHeader {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    transparent 100%
+  );
+  border-radius: 24px 24px 0 0;
+}
+
+.modalHeader h3 {
+  color: var(--text-main);
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.closeButton {
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.closeButton:hover {
+  background: rgba(245, 87, 108, 0.15);
+  color: #f5576c;
+}
+
+.modalForm {
+  padding: 2rem;
+}
+
+/* Translucent table overrides */
+body.translucent .todoTable {
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+body.translucent .todoTable .tableRow {
+  background: rgba(17, 25, 40, 0.38) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+body.translucent .todoTable .tableHeader {
+  background: rgba(17, 25, 40, 0.52) !important;
+}
+
+body.translucent .todoTable .tableCell {
+  background: transparent !important;
+  color: rgba(255, 255, 255, 0.96) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+body.translucent .todoTable .tableCell strong,
+body.translucent .todoTable .tableCell span,
+body.translucent .progressText,
+body.translucent .mutedDash,
+body.translucent .actionsCell,
+body.translucent .actionsCell i {
+  color: rgba(255, 255, 255, 0.96) !important;
+}
+
+body.translucent .completedText {
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+
+body.translucent .todoTable .tableRow:hover {
+  background: rgba(24, 34, 54, 0.48) !important;
+}
+
+/* Dark mode table tweak */
+body.dark .tableHeader {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+body.dark .tableRow {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+body.dark .tableRow:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Scrollbar for modal */
+.editModal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.editModal::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.editModal::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.editModal::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* Scrollbar styles */
+.tableWrapper::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.tableWrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tableWrapper::-webkit-scrollbar-thumb {
+  background-color: rgba(150, 150, 150, 0.4);
+  border-radius: 4px;
+}
+
+.tableWrapper::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(150, 150, 150, 0.7);
+}
+
+.objectivesSection::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.objectivesSection::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.objectivesSection::-webkit-scrollbar-thumb {
+  background-color: rgba(150, 150, 150, 0.4);
+  border-radius: 4px;
+}
+
+.objectivesSection::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(150, 150, 150, 0.7);
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 1200px) {
+  .summaryCardsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dashboardGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .objectivesPage {
+    padding: 0.25rem;
+    gap: 1.5rem;
+  }
+
+  .objectivesHeader,
+  .sectionHeader,
+  .goalsSummaryTop {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .objectivesHeader h1 {
+    font-size: 1.5rem;
+  }
+
+  .summaryCardsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .summaryCard {
+    padding: 1.25rem;
+  }
+
+  .summaryValue {
+    font-size: 1.75rem;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+
+  .formActions {
+    flex-direction: column;
+  }
+
+  .formActions button {
+    width: 100%;
+  }
+
+  .weeklyBars,
+  .habitBarChart {
+    gap: 0.5rem;
+    height: 160px;
+  }
+
+  .habitBarMiniChart {
+    max-width: 30px;
+  }
+
+
+  .donutChartLayout {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .goalsDonut {
+    width: 140px;
+    height: 140px;
+  }
+
+  .goalsDonutCenter {
+    width: 88px;
+    height: 88px;
+  }
+
+  .goalsDonutCenter span {
+    font-size: 1.5rem;
+  }
+
+  .donutLegend {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .goalsMetricsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .summaryRing {
+    width: 50px;
+    height: 50px;
+  }
+
+  .summaryRing svg {
+    width: 50px;
+    height: 50px;
+  }
+
+  .objectivesSection {
+    padding: 1.25rem;
+  }
+
+  .tableCell {
+    padding: 12px 10px;
+    font-size: 0.85rem;
+  }
+
+  .tableHeader .tableCell {
+    padding: 10px;
+    font-size: 0.65rem;
+  }
+
+  .editModal {
+    border-radius: 20px;
+    max-height: 90vh;
+  }
+
+  .modalHeader {
+    padding: 1.25rem 1.5rem;
+    border-radius: 20px 20px 0 0;
+  }
+
+  .modalForm {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .summaryRing {
+    display: none;
+  }
+
+  .actionButton {
+    width: 32px;
+    height: 32px;
+    margin-right: 0.35rem;
+  }
+
+  .streakBadge {
+    min-width: 40px;
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  .priorityBadge,
+  .statusBadge {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+  }
+}
+
+
+.ownerTag.assigned {
+  margin-left: 8px;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(66, 153, 225, 0.15);
+  color: #2b6cb0;
+  font-weight: 700;
+}
+
+.goalMetaText {
+  margin-top: 4px;
+  font-size: 11px;
+  opacity: 0.75;
+}
+
+.weeklyBarItem {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+}
+
+.weeklyBarItem:focus {
+  outline: none;
+}
+
+.weeklyBarItem:focus-visible .habitBarMiniChart,
+.weeklyBarItem:not(:disabled):hover .habitBarMiniChart,
+.selectedWeeklyBarItem .habitBarMiniChart {
+  outline: 1px solid color-mix(in srgb, var(--text-main) 18%, transparent);
+  outline-offset: 2px;
+}
+
+.selectedWeeklyBarItem .habitBarMiniChart {
+  opacity: 0.88;
+}
+
+.selectedWeeklyBarItem .weeklyBarLabel,
+.selectedWeeklyBarItem .weeklyBarValue {
+  color: color-mix(in srgb, var(--text-main) 82%, transparent);
+  fill: color-mix(in srgb, var(--text-main) 82%, transparent);
+  font-weight: 600;
+}
+
+.weeklyBarItem:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}

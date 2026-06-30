@@ -1,0 +1,112 @@
+.windowTitleBar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-main);
+  color: var(--text-main);
+  border-bottom: 1px solid var(--panel-border);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  flex-shrink: 0;
+}
+
+.windowTitleBarDragArea {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+.windowTitleBarBrand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.windowTitleBarDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+
+.windowTitleBarTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.windowTitleBarActions {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  -webkit-app-region: no-drag;
+}
+
+.windowControlButton {
+  width: 46px;
+  height: 42px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text-main);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, opacity 0.2s ease, color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.windowControlButton svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.windowControlButton:hover {
+  background: var(--bg-hover);
+}
+
+.windowControlButton:active {
+  opacity: 0.85;
+}
+
+.windowControlButtonTools {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.windowControlButtonClose:hover {
+  background: #e81123;
+  color: white;
+}
+
+.windowControlButtonClose:active {
+  background: #c50f1f;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .windowTitleBarTitle {
+    font-size: 12px;
+  }
+
+  .windowControlButton {
+    width: 42px;
+  }
+}

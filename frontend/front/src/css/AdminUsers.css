@@ -1,0 +1,377 @@
+/* ============================================
+   ADMIN USERS - MODERNIZADO
+   ============================================ */
+
+.adminUsersPage {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  color: var(--text-main);
+}
+
+/* Header */
+.adminUsersHeader {
+  margin-bottom: 8px;
+}
+
+.adminUsersHeader h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  color: var(--text-main);
+}
+
+.adminUsersHeader p {
+  margin: 10px 0 0;
+  font-size: 15px;
+  color: color-mix(in srgb, var(--text-main) 65%, transparent);
+  line-height: 1.5;
+}
+
+/* Cards */
+.adminUsersCard {
+  background: var(--bg-main);
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: var(--panel-shadow);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+.adminUsersCard h2 {
+  margin: 0 0 20px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Forms */
+.adminUsersForm {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  align-items: end;
+}
+
+.adminUsersForm label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--text-main) 65%, transparent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.adminUsersForm input {
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--panel-border);
+  background: var(--bg-page);
+  color: var(--text-main);
+  font-size: 15px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.adminUsersForm input::placeholder {
+  color: color-mix(in srgb, var(--text-main) 40%, transparent);
+}
+
+.adminUsersForm input:focus {
+  border-color: color-mix(in srgb, var(--text-main) 38%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--text-main) 10%, transparent);
+}
+
+/* Buttons */
+.adminUsersForm button,
+.adminUsersListHeader button {
+  border: none;
+  background: linear-gradient(135deg, #16a34a 0%, #0f766e 100%);
+  color: #ffffff;
+  border-radius: 10px;
+  padding: 14px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.adminUsersForm button:hover:not(:disabled),
+.adminUsersListHeader button:hover:not(:disabled) {
+  filter: brightness(1.04);
+  transform: translateY(-1px);
+}
+
+.adminUsersForm button:disabled,
+.adminUsersListHeader button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.adminUsersListHeader button {
+  background: transparent;
+  border: 1px solid var(--panel-border);
+  color: var(--text-main);
+  padding: 10px 18px;
+  font-size: 13px;
+}
+
+.adminUsersListHeader button:hover:not(:disabled) {
+  background: var(--bg-hover);
+  transform: none;
+  filter: none;
+}
+
+/* List Header */
+.adminUsersListHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.adminUsersListHeader h2 {
+  margin: 0;
+}
+
+/* Table */
+.adminUsersTableWrap {
+  overflow-x: auto;
+  margin: 0 -8px;
+  padding: 0 8px;
+}
+
+.adminUsersTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.adminUsersTable th,
+.adminUsersTable td {
+  text-align: left;
+  padding: 14px 16px;
+}
+
+.adminUsersTable th {
+  font-size: 12px;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--text-main) 60%, transparent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.adminUsersTable tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.adminUsersTable tbody tr:hover {
+  background: var(--bg-hover);
+}
+
+.adminUsersTable td {
+  font-size: 14px;
+  color: var(--text-main);
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.adminUsersTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.adminUsersTable button {
+  border: 1px solid var(--panel-border);
+  background: transparent;
+  color: var(--text-main);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.adminUsersTable button:hover {
+  background: var(--bg-hover);
+}
+
+.adminUsersTable button.danger {
+  border-color: #dc2626;
+  color: #dc2626;
+  background: transparent;
+}
+
+.adminUsersTable button.danger:hover {
+  background: #dc2626;
+  color: white;
+}
+
+/* Feedback Messages */
+.adminFeedback {
+  margin: 16px 0 0;
+  padding: 14px 18px;
+  font-size: 14px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.adminFeedback.error {
+  background: rgba(220, 38, 38, 0.1);
+  color: #dc2626;
+  border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.adminFeedback.success {
+  background: rgba(5, 150, 105, 0.1);
+  color: #059669;
+  border: 1px solid rgba(5, 150, 105, 0.2);
+}
+
+.adminFeedback.hidden {
+  visibility: hidden;
+}
+
+/* Status */
+.adminUsersStatus {
+  margin: 20px 0;
+  padding: 40px;
+  text-align: center;
+  color: color-mix(in srgb, var(--text-main) 60%, transparent);
+  font-size: 14px;
+}
+
+/* Empty State */
+.adminEmptyState {
+  text-align: center;
+  padding: 48px 24px;
+  color: color-mix(in srgb, var(--text-main) 60%, transparent);
+}
+
+.adminEmptyState svg {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+  opacity: 0.4;
+}
+
+.adminEmptyState p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Loading Spinner */
+.adminLoading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  gap: 16px;
+  color: color-mix(in srgb, var(--text-main) 60%, transparent);
+}
+
+.adminSpinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--panel-border);
+  border-top-color: var(--link-active-bg);
+  border-radius: 50%;
+  animation: adminSpin 0.8s linear infinite;
+}
+
+@keyframes adminSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* Organization Setup Specific */
+.adminSetupIcon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 24px;
+  background: linear-gradient(135deg, var(--link-active-bg), color-mix(in srgb, var(--link-active-bg) 80%, #000));
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.adminSetupIcon svg {
+  width: 32px;
+  height: 32px;
+}
+
+.adminUsersHeader.centered {
+  text-align: center;
+}
+
+.adminUsersHeader.centered h1 {
+  font-size: 28px;
+}
+
+.adminUsersCard.compact {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.adminUsersCard.compact .adminUsersForm {
+  display: flex;
+  flex-direction: column;
+}
+
+.adminUsersCard.compact .adminUsersForm button {
+  align-self: stretch;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.adminUsersCard.compact .adminFeedback {
+  justify-content: center;
+  min-height: 56px;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .adminUsersPage {
+    padding: 20px 16px;
+    gap: 20px;
+  }
+  
+  .adminUsersHeader h1 {
+    font-size: 24px;
+  }
+  
+  .adminUsersCard {
+    padding: 20px;
+    border-radius: 12px;
+  }
+  
+  .adminUsersForm {
+    grid-template-columns: 1fr;
+  }
+  
+  .adminUsersTable th,
+  .adminUsersTable td {
+    padding: 12px;
+  }
+}

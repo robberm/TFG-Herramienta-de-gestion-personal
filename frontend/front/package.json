@@ -1,0 +1,99 @@
+{
+  "name": "gmo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GMO Productivity App",
+  "author": "Rob",
+  "homepage": "./",
+  "main": "electron/electron.js",
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "@stomp/stompjs": "^7.1.1",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@testing-library/user-event": "^13.5.0",
+    "date-fns": "^4.1.0",
+    "react": "^19.0.0",
+    "react-calendar": "^6.0.0",
+    "react-clock": "^6.0.0",
+    "react-colorful": "^5.7.0",
+    "react-datetime-picker": "^7.0.1",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.6.0",
+    "react-scripts": "5.0.1",
+    "recharts": "^3.9.0",
+    "sockjs-client": "^1.6.1",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "web": "node -e \"process.env.BROWSER='none'; require('react-scripts/scripts/start');\"",
+    "electron": "electron .",
+    "electron-dev": "concurrently \"npm run web\" \"wait-on http://localhost:3000 && electron .\"",
+    "dist": "npm run build && electron-builder --win",
+    "i18n:audit": "node scripts/i18n-audit.js"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "electron": "^35.0.0",
+    "electron-builder": "^26.8.1",
+    "wait-on": "^8.0.3"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "build": {
+    "extends": null,
+    "appId": "com.rob.gmo",
+    "productName": "GMO",
+    "directories": {
+      "output": "dist",
+      "buildResources": "resources/build"
+    },
+    "files": [
+      "build/**/*",
+      "electron/**/*",
+      "public/**/*",
+      "resources/build/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "resources/backend/tfgapp-0.0.1-SNAPSHOT.jar",
+        "to": "backend/tfgapp-0.0.1-SNAPSHOT.jar"
+      },
+      {
+        "from": "resources/docker/compose.yml",
+        "to": "docker/compose.yml"
+      }
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "GMO"
+    }
+  }
+}

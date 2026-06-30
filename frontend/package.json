@@ -1,0 +1,16 @@
+{
+  "main": "./front/electron/electron.js",
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "electron": "^35.0.1",
+    "electron-builder": "^26.8.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "electron": "electron .",
+    "dev": "concurrently \"npm start\" \"npm run electron\""
+  }
+}

@@ -1,0 +1,195 @@
+.userMenuFrame {
+  position: relative;
+  display: inline-block;
+  z-index: 1000;
+  margin-left: auto;
+}
+
+.userMenuTrigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 6px 10px 6px 6px;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.userMenuTrigger:hover {
+  background-color: var(--bg-hover);
+}
+
+.userMenuTrigger:active {
+  transform: scale(0.98);
+}
+
+.userAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--link-active-bg);
+  color: var(--link-active-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.userAvatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.userAvatarFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.1;
+  min-width: 0;
+}
+
+.userName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-main);
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.userRole {
+  font-size: 12px;
+  color: var(--text-main);
+  opacity: 0.7;
+}
+
+.userFlecha {
+  font-size: 12px;
+  color: var(--text-main);
+  opacity: 0.7;
+  transition: transform 0.2s ease;
+}
+
+.userFlecha.open {
+  transform: rotate(180deg);
+}
+
+.userMenuPop {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 220px;
+  background-color: var(--sidebar-bg);
+  border-radius: 12px;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+  padding: 8px;
+  animation: menuSlideIn 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: top right;
+  z-index: 1001;
+}
+
+@keyframes menuSlideIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(-4px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.menuItem:hover {
+  background-color: var(--bg-hover);
+}
+
+.menuItem:active {
+  transform: scale(0.98);
+}
+
+.menuItem i {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-main);
+  opacity: 0.7;
+  font-size: 14px;
+}
+
+.menuItem.logout {
+  margin-top: 6px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(128, 128, 128, 0.18);
+}
+
+.menuItem.logout:hover {
+  background-color: rgba(220, 53, 69, 0.12);
+}
+
+.menuItem.logout:hover i {
+  opacity: 1;
+}
+
+.menuItem span {
+  flex: 1;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .userMenuPop {
+    min-width: 200px;
+    right: 0;
+  }
+
+  .userInfo {
+    display: none;
+  }
+
+  .userMenuTrigger {
+    padding-right: 8px;
+  }
+}
+
+.userMenuContainer {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.userMenuContainer .userMenuFrame {
+  margin-left: auto;
+}

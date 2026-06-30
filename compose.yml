@@ -1,0 +1,18 @@
+name: tfgapp
+
+services:
+  db:
+    image: mysql:latest
+    container_name: db_app
+    environment:
+      MYSQL_ROOT_PASSWORD: admin  
+      MYSQL_DATABASE: tfgapp_db   
+      MYSQL_USER: rmgadmin           
+      MYSQL_PASSWORD: africa        
+    ports:
+      - "3310:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:

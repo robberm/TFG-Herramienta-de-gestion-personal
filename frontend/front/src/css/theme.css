@@ -1,0 +1,145 @@
+:root {
+  --bg-main: #ffffff;
+  --bg-page: #ffffff;
+  --sidebar-bg: #ffffff;
+  --bg-hover: #e9e5e0;
+  --text-main: #222;
+  --link-active-bg: #2383e2;
+  --link-active-text: white;
+  --panel-border: rgba(0, 0, 0, 0.08);
+  --panel-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --glass-blur: none;
+
+  --event-study-color: #f39c12;
+  --event-mandatory-color: #e74c3c;
+  --event-work-color: #0ea5a4;
+  --event-personal-color: #2ecc71;
+  --event-health-color: #9b59b6;
+  --event-reunion-color: #6264a7;
+  --event-perfil-color: #f48942;
+  --event-focus-color: #7c3aed;
+}
+
+body.dark {
+  --bg-main: #1c1c1c;
+  --bg-page: #1c1c1c;
+  --sidebar-bg: #2a2a2a;
+  --bg-hover: #333;
+  --text-main: #eee;
+  --link-active-bg: #4a90e2;
+  --link-active-text: white;
+  --panel-border: rgba(255, 255, 255, 0.08);
+  --panel-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  --glass-blur: none;
+}
+
+body.translucent {
+  --bg-main: rgba(255, 255, 255, 0.10);
+  --bg-page: transparent;
+  --sidebar-bg: rgba(20, 20, 20, 0.22);
+  --bg-hover: rgba(255, 255, 255, 0.16);
+  --text-main: #f5f5f5;
+  --link-active-bg: rgba(74, 144, 226, 0.90);
+  --link-active-text: white;
+  --panel-border: rgba(255, 255, 255, 0.14);
+  --panel-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  --glass-blur: blur(14px);
+}
+
+html,
+body,
+#root {
+  background: transparent;
+}
+
+body.light {
+  background: var(--bg-page);
+}
+
+body.dark {
+  background: var(--bg-page);
+}
+
+body.translucent {
+  background: transparent;
+}
+
+.homeFrame,
+.mainContent,
+.pageContent {
+  background: transparent;
+}
+
+.sideBar {
+  background-color: var(--sidebar-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+body,
+#root,
+.homeFrame,
+.sideBar,
+.mainContent,
+.pageContent,
+.settingsPage,
+.settingsCard {
+  transition:
+    background-color 0.3s ease,
+    background 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    backdrop-filter 0.3s ease,
+    -webkit-backdrop-filter 0.3s ease;
+}
+
+/* ========================================
+   Light theme modal text overrides
+   Centralized here to avoid duplication across feature CSS files.
+   ======================================== */
+body.light .modalHeader h3,
+body.light .modalForm,
+body.light .modalForm .formGroup label,
+body.light .modalForm .checkboxRow,
+body.light .modalForm input,
+body.light .modalForm select,
+body.light .modalForm textarea,
+body.light .modalForm input::placeholder,
+body.light .modalForm textarea::placeholder,
+body.light .closeButton,
+body.light .gcal-modal,
+body.light .gcal-modal-header h3,
+body.light .gcal-form,
+body.light .gcal-form .formGroup label,
+body.light .gcal-form .checkboxRow,
+body.light .gcal-form input,
+body.light .gcal-form select,
+body.light .gcal-form textarea,
+body.light .gcal-form input::placeholder,
+body.light .gcal-form textarea::placeholder,
+body.light .gcal-close-btn,
+body.light .time-selector-label,
+body.light .time-value,
+body.light .gcal-date-display,
+body.light .gcal-toggle-label,
+body.light .gcal-reminders-header span,
+body.light .gcal-reminder-chip,
+body.light .gcal-custom-reminder input {
+  color: #fff !important;
+}
+
+body.light .gcal-modal input,
+body.light .gcal-modal textarea,
+body.light .gcal-modal select,
+body.light .gcal-modal button,
+body.light .gcal-modal span,
+body.light .gcal-modal label,
+body.light .gcal-modal div {
+  color: inherit;
+}
+
+body.light .gcal-modal input::placeholder,
+body.light .gcal-modal textarea::placeholder {
+  color: rgba(255, 255, 255, 0.65) !important;
+}
