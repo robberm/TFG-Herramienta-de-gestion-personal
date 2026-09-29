@@ -9,6 +9,14 @@
   --panel-border: rgba(0, 0, 0, 0.08);
   --panel-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   --glass-blur: none;
+  --card-background: var(--sidebar-bg);
+  --border-color: var(--panel-border);
+  --text-secondary: color-mix(in srgb, var(--text-main) 62%, transparent);
+  --ui-surface: #ffffff;
+  --ui-surface-raised: #fbfaf8;
+  --ui-control: #f3f1ed;
+  --ui-popover: #ffffff;
+  --ui-muted: #706d68;
 
   --event-study-color: #f39c12;
   --event-mandatory-color: #e74c3c;
@@ -31,6 +39,46 @@ body.dark {
   --panel-border: rgba(255, 255, 255, 0.08);
   --panel-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   --glass-blur: none;
+  --ui-surface: #252525;
+  --ui-surface-raised: #2c2c2c;
+  --ui-control: #343434;
+  --ui-popover: #292929;
+  --ui-muted: #aaa7a2;
+}
+body.truedark {
+  --bg-main: #000000;
+  --bg-page: #000000;
+  --sidebar-bg: #080808;
+  --bg-hover: #171717;
+  --text-main: #f5f5f7;
+  --link-active-bg: #ffffff;
+  --link-active-text: #050505;
+  --panel-border: rgba(255, 255, 255, 0.10);
+  --panel-shadow: 0 12px 34px rgba(0, 0, 0, 0.72), inset 0 1px rgba(255, 255, 255, 0.035);
+  --glass-blur: none;
+  --ui-surface: #060606;
+  --ui-surface-raised: #0c0c0c;
+  --ui-control: #151515;
+  --ui-popover: #0b0b0b;
+  --ui-muted: #9d9d9d;
+}
+
+body.custom {
+  --bg-main: color-mix(in srgb, var(--custom-theme-color) 8%, #0d0e12);
+  --bg-page: color-mix(in srgb, var(--custom-theme-color) 6%, #0b0c10);
+  --sidebar-bg: color-mix(in srgb, var(--custom-theme-color) 14%, #17181e);
+  --bg-hover: color-mix(in srgb, var(--custom-theme-color) 24%, #25262e);
+  --text-main: #f7f7fb;
+  --link-active-bg: var(--custom-theme-color);
+  --link-active-text: #ffffff;
+  --panel-border: color-mix(in srgb, var(--custom-theme-color) 26%, rgba(255, 255, 255, 0.10));
+  --panel-shadow: 0 12px 32px color-mix(in srgb, var(--custom-theme-color) 15%, rgba(0, 0, 0, 0.48));
+  --glass-blur: none;
+  --ui-surface: color-mix(in srgb, var(--custom-theme-color) 11%, #111218);
+  --ui-surface-raised: color-mix(in srgb, var(--custom-theme-color) 15%, #181920);
+  --ui-control: color-mix(in srgb, var(--custom-theme-color) 20%, #22232b);
+  --ui-popover: color-mix(in srgb, var(--custom-theme-color) 12%, #15161c);
+  --ui-muted: color-mix(in srgb, var(--custom-theme-color) 20%, #b9b9c2);
 }
 
 body.translucent {
@@ -44,6 +92,26 @@ body.translucent {
   --panel-border: rgba(255, 255, 255, 0.14);
   --panel-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
   --glass-blur: blur(14px);
+  --ui-surface: rgba(17, 25, 40, 0.38);
+  --ui-surface-raised: rgba(17, 25, 40, 0.46);
+  --ui-control: rgba(255, 255, 255, 0.03);
+  --ui-popover: rgba(17, 25, 40, 0.90);
+  --ui-muted: rgba(255, 255, 255, 0.68);
+}
+
+body.translucent .editModal,
+body.translucent .gcal-modal {
+  --card-background: rgba(17, 25, 40, 0.38);
+  --bg-main: rgba(17, 25, 40, 0.38);
+  --bg-hover: rgba(255, 255, 255, 0.08);
+  --border-color: rgba(255, 255, 255, 0.14);
+  --panel-border: rgba(255, 255, 255, 0.14);
+  --ui-control: rgba(255, 255, 255, 0.03);
+  --ui-popover: rgba(17, 25, 40, 0.90);
+  background: rgba(17, 25, 40, 0.38);
+  color: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 html,
@@ -57,6 +125,11 @@ body.light {
 }
 
 body.dark {
+  background: var(--bg-page);
+}
+
+body.truedark,
+body.custom {
   background: var(--bg-page);
 }
 
@@ -94,6 +167,29 @@ body,
     -webkit-backdrop-filter 0.3s ease;
 }
 
+/* Los modales conservan su paleta oscura original incluso en el tema claro. */
+body.light .editModal,
+body.light .gcal-modal,
+body.light .confirmDialog {
+  --bg-main: #202126;
+  --bg-hover: #34353d;
+  --sidebar-bg: #28292f;
+  --card-background: #28292f;
+  --text-main: #f7f7f8;
+  --text-secondary: rgba(255, 255, 255, 0.66);
+  --border-color: rgba(255, 255, 255, 0.12);
+  --panel-border: rgba(255, 255, 255, 0.12);
+  --link-active-bg: #667eea;
+  --link-active-text: #ffffff;
+  --ui-surface: #28292f;
+  --ui-surface-raised: #2d2e35;
+  --ui-control: #32333b;
+  --ui-popover: #292a31;
+  --ui-muted: rgba(255, 255, 255, 0.66);
+  background: #28292f;
+  color: #f7f7f8;
+}
+
 /* ========================================
    Light theme modal text overrides
    Centralized here to avoid duplication across feature CSS files.
@@ -125,20 +221,30 @@ body.light .gcal-date-display,
 body.light .gcal-toggle-label,
 body.light .gcal-reminders-header span,
 body.light .gcal-reminder-chip,
-body.light .gcal-custom-reminder input {
+body.light .gcal-custom-reminder input,
+body.light .confirmDialog,
+body.light .confirmDialogBody h3,
+body.light .confirmDialogWarning {
   color: #fff !important;
 }
 
+body.light .editModal input,
+body.light .editModal select,
+body.light .editModal textarea,
+body.light .editModal button,
 body.light .gcal-modal input,
-body.light .gcal-modal textarea,
 body.light .gcal-modal select,
+body.light .gcal-modal textarea,
 body.light .gcal-modal button,
 body.light .gcal-modal span,
 body.light .gcal-modal label,
-body.light .gcal-modal div {
+body.light .gcal-modal div,
+body.light .confirmDialog button {
   color: inherit;
 }
 
+body.light .editModal input::placeholder,
+body.light .editModal textarea::placeholder,
 body.light .gcal-modal input::placeholder,
 body.light .gcal-modal textarea::placeholder {
   color: rgba(255, 255, 255, 0.65) !important;

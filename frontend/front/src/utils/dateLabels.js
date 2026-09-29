@@ -33,3 +33,17 @@ export const capitalizeCalendarLabel = (value) =>
   value
     .replace(SPANISH_MONTH_REGEX, (month) => capitalizeWord(month.toLowerCase()))
     .replace(/^\p{L}/u, (firstLetter) => firstLetter.toUpperCase());
+
+export const getShortWeekdayLabel = (date, language = "en", formatDateFn = null) => {
+  if (language === "es" && typeof formatDateFn === "function") {
+    const weekdayIndex = new Date(date).getDay();
+    if (weekdayIndex === 3) {
+      return "X";
+    }
+
+    const spanishShortDays = ["D", "L", "M", "X", "J", "V", "S"];
+    return spanishShortDays[weekdayIndex] || formatDateFn(date);
+  }
+
+  return typeof formatDateFn === "function" ? formatDateFn(date) : "";
+};

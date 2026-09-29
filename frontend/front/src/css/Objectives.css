@@ -613,6 +613,12 @@
   text-transform: uppercase;
 }
 
+body.dark .weeklyBarLabel,
+body.dark .weeklyBarValue {
+  color: rgba(255, 255, 255, 0.82);
+  fill: rgba(255, 255, 255, 0.82);
+}
+
 /* ========================================
    SECTIONS (Goals & Habits)
    ======================================== */
@@ -688,27 +694,39 @@
    ======================================== */
 
 .tableWrapper {
-  overflow-x: hidden;
   width: 100%;
-}
-
-.tableWrapper.hasOverflow {
-  overflow-x: auto;
+  overflow: visible;
 }
 
 .todoTable {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  display: table;
-  table-layout: fixed;
   overflow: hidden;
-  border-radius: 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--card-background) 88%, transparent);
+  box-shadow: 0 10px 30px color-mix(in srgb, #000 7%, transparent);
+}
+
+.goalTableRow,
+.habitTableRow {
+  display: grid;
+  align-items: center;
+}
+
+.goalTableRow {
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.45fr) minmax(78px, .65fr) minmax(92px, .75fr) minmax(110px, 1fr) 90px;
+}
+
+.goalTableRow.withAssignee {
+  grid-template-columns: minmax(0, 1.05fr) minmax(82px, .72fr) minmax(0, 1.25fr) minmax(76px, .62fr) minmax(88px, .7fr) minmax(104px, .9fr) 90px;
+}
+
+.habitTableRow {
+  grid-template-columns: 70px minmax(0, 1.2fr) minmax(0, 1.7fr) 88px 88px 90px;
 }
 
 .tableHeader {
-  display: table-row;
-  background: var(--bg-page);
+  background: color-mix(in srgb, var(--bg-hover) 46%, transparent);
 }
 
 .tableHeader .tableCell {
@@ -718,7 +736,8 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--text-secondary);
-  padding: 10px 12px;
+  min-width: 0;
+  padding: 11px 13px;
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -731,18 +750,16 @@
 }
 
 .tableRow {
-  display: table-row;
   transition: background 0.2s ease;
-  background: var(--bg-main);
+  background: transparent;
 }
 
-.tableRow:hover {
-  background: var(--bg-page);
+.tableRow:not(.tableHeader):hover {
+  background: color-mix(in srgb, var(--bg-hover) 48%, transparent);
 }
 
 .completedTableRow {
-  display: table-row;
-  opacity: 0.5;
+  opacity: 0.58;
 }
 
 .completedText {
@@ -751,10 +768,9 @@
 }
 
 .tableCell {
-  display: table-cell;
-  padding: 10px;
-  font-size: 0.9rem;
-  vertical-align: middle;
+  min-width: 0;
+  padding: 13px;
+  font-size: 0.86rem;
   border-bottom: 1px solid var(--border-color);
   color: var(--text-main);
   background: transparent;
@@ -766,7 +782,29 @@
 }
 
 .tableCell strong {
-  font-weight: 600;
+  display: block;
+  overflow: hidden;
+  font-weight: 680;
+  letter-spacing: -.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.descriptionCell > span {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.actionsCell {
+  justify-content: flex-end;
+}
+
+.tableRow:last-child .tableCell {
+  border-bottom: 0;
 }
 
 /* ========================================
@@ -779,12 +817,12 @@
   align-items: center;
   justify-content: center;
   padding: 6px 12px;
-  border-radius: 8px;
+  border-radius: 999px;
   color: #fff;
   font-size: 0.75rem;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.01em;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
 }
 
 .streakBadge {
@@ -794,16 +832,16 @@
   min-width: 50px;
   padding: 8px 14px;
   border-radius: 10px;
-  color: #fff;
+  color: var(--text-main);
   font-size: 0.9rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+  background: color-mix(in srgb, var(--link-active-bg) 16%, var(--bg-main));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--link-active-bg) 24%, transparent);
 }
 
 .streakBadge.secondary {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  box-shadow: 0 2px 10px rgba(240, 147, 251, 0.3);
+  background: color-mix(in srgb, #d9a441 16%, var(--bg-main));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, #d9a441 28%, transparent);
 }
 
 /* ========================================
@@ -844,24 +882,23 @@
    ======================================== */
 
 .actionsCell {
+  display: flex;
+  gap: 5px;
   white-space: nowrap;
-  width: 90px;
+  width: auto;
+  min-width: 0;
 }
 
 .actionButton {
   width: 36px;
   height: 36px;
-  margin-right: 0.5rem;
-  border-radius: 10px;
-  border: 1px solid transparent;
-  background: var(--card-background);
+  margin-right: 0;
+  border-radius: 9px;
+  border: 1px solid var(--border-color);
+  background: transparent;
   color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s ease;
-}
-
-.actionButton:last-child {
-  margin-right: 0;
 }
 
 .actionButton:hover {
@@ -882,14 +919,27 @@
 
 /* Empty State */
 .emptyState {
-  padding: 3rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  padding: 1.5rem 1rem;
   text-align: center;
   color: var(--text-secondary);
+  border: 1px dashed var(--border-color);
+  border-radius: 16px;
+  background: var(--bg-page);
+  margin-top: 1rem;
 }
 
 .emptyState p {
   margin: 0;
   font-size: 0.9rem;
+  max-width: 28rem;
+}
+
+.objectivesEmptyState {
+  margin-top: 0.75rem;
 }
 
 /* ========================================
@@ -897,7 +947,7 @@
    ======================================== */
 
 .checkboxCell {
-  width: 60px;
+  width: auto;
   text-align: center;
 }
 
@@ -1475,6 +1525,266 @@ body.dark .tableRow:hover {
   color: color-mix(in srgb, var(--text-main) 82%, transparent);
   fill: color-mix(in srgb, var(--text-main) 82%, transparent);
   font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .todoTable {
+    overflow: visible;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .todoTable .tableHeader {
+    display: none;
+  }
+
+  .goalTableRow,
+  .goalTableRow.withAssignee,
+  .habitTableRow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .todoTable .tableRow:not(.tableHeader) {
+    margin-bottom: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    border-radius: 15px;
+    background: color-mix(in srgb, var(--card-background) 90%, transparent);
+  }
+
+  .todoTable .tableRow:not(.tableHeader):hover {
+    background: color-mix(in srgb, var(--bg-hover) 40%, var(--card-background));
+  }
+
+  .tableCell {
+    display: flex;
+    min-height: 52px;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 6px;
+    border-bottom: 0;
+  }
+
+  .tableCell::before {
+    content: attr(data-label);
+    color: var(--text-secondary);
+    font-size: 9px;
+    font-weight: 750;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+  }
+
+  .primaryCell,
+  .descriptionCell {
+    grid-column: 1 / -1;
+  }
+
+  .primaryCell {
+    padding-bottom: 4px;
+  }
+
+  .descriptionCell {
+    min-height: 0;
+    padding-top: 4px;
+    padding-bottom: 12px;
+  }
+
+  .checkboxCell {
+    grid-row: 1;
+    grid-column: 1;
+  }
+
+  .habitTableRow .primaryCell {
+    grid-row: 1;
+    grid-column: 2;
+  }
+
+  .actionsCell {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .actionsCell::before {
+    margin-right: auto;
+  }
+}
+
+body.dark .selectedWeeklyBarItem .weeklyBarLabel,
+body.dark .selectedWeeklyBarItem .weeklyBarValue {
+  color: #ffffff;
+  fill: #ffffff;
+  font-weight: 700;
+}
+
+/* Goal and habit workspaces */
+.goalsWorkspace,
+.habitsWorkspace {
+  padding: clamp(18px, 2.2vw, 28px);
+  border-color: var(--panel-border);
+  border-radius: 22px;
+  background: var(--ui-surface);
+  box-shadow: var(--panel-shadow);
+}
+
+.goalsWorkspace:hover,
+.habitsWorkspace:hover {
+  box-shadow: var(--panel-shadow);
+}
+
+.modernSectionHeader {
+  align-items: flex-end;
+  margin-bottom: 22px;
+}
+
+.sectionKicker {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--ui-muted);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.modernSectionHeader h2 {
+  font-size: clamp(21px, 2vw, 27px);
+  letter-spacing: -.035em;
+}
+
+.modernSectionHeader p {
+  max-width: 520px;
+  margin-top: 5px;
+  color: var(--ui-muted);
+}
+
+.modernSectionHeader .addButton {
+  min-height: 42px;
+  padding: 0 15px;
+  border: 1px solid color-mix(in srgb, var(--link-active-bg) 70%, var(--panel-border));
+  border-radius: 11px;
+  background: var(--link-active-bg);
+  color: var(--link-active-text);
+  box-shadow: 0 7px 18px color-mix(in srgb, var(--link-active-bg) 22%, transparent);
+}
+
+.goalPanelList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.goalPanel {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(220px, 1.55fr) minmax(190px, 1fr) 82px;
+  align-items: center;
+  gap: clamp(14px, 2vw, 26px);
+  min-height: 128px;
+  padding: 18px 16px 18px 20px;
+  overflow: hidden;
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  background: var(--ui-surface-raised);
+  color: var(--text-main);
+  transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.goalPanel.withAssignee {
+  grid-template-columns: minmax(220px, 1.55fr) minmax(190px, 1fr) minmax(112px, .55fr) 82px;
+}
+
+.goalPanel::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--ui-muted);
+}
+
+.goalPanel[data-priority="Alta"]::before { background: #e86b67; }
+.goalPanel[data-priority="Media"]::before { background: #d7a545; }
+.goalPanel[data-priority="Baja"]::before { background: #63a885; }
+.goalPanel:hover { transform: translateY(-1px); border-color: color-mix(in srgb, var(--text-main) 18%, var(--panel-border)); box-shadow: 0 10px 26px rgba(0,0,0,.08); }
+.goalPanel.isCompleted { opacity: .62; }
+.goalPanelMain { min-width: 0; }
+.goalPanelEyebrow { display: flex; align-items: center; gap: 7px; margin-bottom: 8px; color: var(--ui-muted); font-size: 10px; font-weight: 720; letter-spacing: .055em; text-transform: uppercase; }
+.goalPriorityDot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.goalPanelMain h3 { overflow: hidden; margin: 0; color: var(--text-main); font-size: 16px; font-weight: 720; letter-spacing: -.018em; text-overflow: ellipsis; white-space: nowrap; }
+.goalPanelMain p { display: -webkit-box; overflow: hidden; margin: 6px 0 0; color: var(--ui-muted); font-size: 12px; line-height: 1.45; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.goalOwnerMeta { display: block; margin-top: 6px; color: var(--ui-muted); font-size: 10px; }
+.goalAssignedPill { padding: 3px 7px; border-radius: 999px; background: color-mix(in srgb, var(--link-active-bg) 12%, transparent); color: var(--link-active-bg); }
+.goalPanelProgress { min-width: 0; }
+.goalProgressHeading, .goalProgressFooter { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.goalProgressHeading { color: var(--ui-muted); font-size: 10px; font-weight: 650; text-transform: uppercase; }
+.goalProgressHeading strong { color: var(--text-main); font-size: 13px; }
+.goalProgressTrack { height: 7px; margin: 9px 0; overflow: hidden; border-radius: 999px; background: var(--ui-control); }
+.goalProgressTrack > span { display: block; height: 100%; border-radius: inherit; background: var(--link-active-bg); transition: width 300ms ease; }
+.goalProgressFooter { color: var(--ui-muted); font-size: 10px; }
+.goalStatusPill { padding: 4px 7px; border-radius: 999px; background: var(--ui-control); color: var(--text-main); font-weight: 650; }
+.goalStatusPill.status-InProgress { background: color-mix(in srgb, var(--link-active-bg) 14%, var(--ui-control)); }
+.goalStatusPill.status-Done { background: color-mix(in srgb, #58a67b 15%, var(--ui-control)); }
+.goalPanelAssignee { min-width: 0; padding-left: 14px; border-left: 1px solid var(--panel-border); }
+.goalPanelAssignee > span { display: block; margin-bottom: 7px; color: var(--ui-muted); font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.goalPanelAssignee strong { display: flex; gap: 6px; overflow: hidden; color: var(--text-main); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.goalPanelActions, .habitPanelActions { display: flex; justify-content: flex-end; gap: 6px; }
+.panelIconButton { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid var(--panel-border); border-radius: 9px; background: var(--ui-control); color: var(--ui-muted); cursor: pointer; transition: 150ms ease; }
+.panelIconButton:hover { border-color: var(--link-active-bg); color: var(--link-active-bg); transform: translateY(-1px); }
+.panelIconButton.danger:hover { border-color: #d86363; color: #d86363; }
+
+.habitPanelGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr));
+  gap: 12px;
+}
+
+.habitPanel {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding: 17px;
+  border: 1px solid var(--panel-border);
+  border-radius: 17px;
+  background: var(--ui-surface-raised);
+  transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+.habitPanel:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--text-main) 18%, var(--panel-border)); box-shadow: 0 12px 28px rgba(0,0,0,.09); }
+.habitPanel.isCompleted { border-color: color-mix(in srgb, #58a67b 42%, var(--panel-border)); }
+.habitPanelHeader { display: grid; grid-template-columns: 42px minmax(0,1fr) auto; align-items: center; gap: 11px; }
+.habitCompletionButton { display: grid; width: 40px; height: 40px; place-items: center; border: 1px solid var(--panel-border); border-radius: 12px; background: var(--ui-control); color: var(--ui-muted); cursor: pointer; }
+.habitCompletionButton[aria-pressed="true"] { border-color: #58a67b; background: #58a67b; color: #fff; box-shadow: 0 6px 16px color-mix(in srgb, #58a67b 28%, transparent); }
+.habitPanelTitle { min-width: 0; }
+.habitPanelTitle span { display: block; margin-bottom: 3px; color: var(--ui-muted); font-size: 9px; font-weight: 720; letter-spacing: .07em; text-transform: uppercase; }
+.habitPanelTitle h3 { overflow: hidden; margin: 0; color: var(--text-main); font-size: 15px; font-weight: 720; text-overflow: ellipsis; white-space: nowrap; }
+.habitPanelDescription { min-height: 36px; margin: 13px 0 14px; color: var(--ui-muted); font-size: 12px; line-height: 1.45; }
+.habitWeekStrip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; padding: 10px; border: 1px solid var(--panel-border); border-radius: 13px; background: color-mix(in srgb, var(--ui-control) 58%, transparent); }
+.habitDay { display: flex; min-width: 0; flex-direction: column; align-items: center; gap: 5px; color: var(--ui-muted); }
+.habitDay > span { font-size: 8px; font-weight: 720; text-transform: uppercase; }
+.habitDay > strong { display: grid; width: 27px; height: 27px; place-items: center; border: 1px solid transparent; border-radius: 9px; color: var(--text-main); font-size: 10px; }
+.habitDay.selected > strong { border-color: var(--link-active-bg); }
+.habitDay.done > strong { background: #58a67b; color: #fff; }
+.habitPanelStats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 13px; }
+.habitPanelStats > div { display: grid; grid-template-columns: 24px 1fr auto; align-items: center; gap: 5px; padding: 9px; border-radius: 11px; background: var(--ui-control); }
+.habitPanelStats i { color: var(--link-active-bg); text-align: center; }
+.habitPanelStats span { color: var(--ui-muted); font-size: 9px; font-weight: 650; text-transform: uppercase; }
+.habitPanelStats strong { color: var(--text-main); font-size: 14px; }
+
+@media (max-width: 1050px) {
+  .goalPanel,
+  .goalPanel.withAssignee { grid-template-columns: minmax(210px, 1.4fr) minmax(180px, 1fr) 80px; }
+  .goalPanelAssignee { display: none; }
+}
+
+@media (max-width: 720px) {
+  .goalPanel,
+  .goalPanel.withAssignee { grid-template-columns: 1fr auto; gap: 14px; }
+  .goalPanelProgress { grid-column: 1 / -1; grid-row: 2; }
+  .goalPanelActions { grid-column: 2; grid-row: 1; }
+  .habitPanelGrid { grid-template-columns: 1fr; }
+  .modernSectionHeader { align-items: stretch; }
+  .modernSectionHeader .addButton { justify-content: center; }
 }
 
 .weeklyBarItem:disabled {

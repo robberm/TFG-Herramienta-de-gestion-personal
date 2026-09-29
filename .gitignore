@@ -22,6 +22,8 @@ productivity_config.json
 # Markdown files
 # =========================
 *.md
+!docs/
+!docs/ARQUITECTURA_Y_SEGURIDAD.md
 
 # =========================
 # Java / Spring Boot

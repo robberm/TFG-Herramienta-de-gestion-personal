@@ -15,7 +15,6 @@ const isElectronEnvironment =
   typeof window !== "undefined" && typeof window.electronAPI !== "undefined";
 
 const Router = isElectronEnvironment ? HashRouter : BrowserRouter;
-
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(

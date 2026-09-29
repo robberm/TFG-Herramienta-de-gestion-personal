@@ -66,8 +66,8 @@ export default function PieChart({ goals: externalGoals = null }) {
   if (!goals || goals.length === 0) {
     return (
       <div className="chartContainer">
-        <div className="emptyState">
-          <p>No hay goals para mostrar.</p>
+        <div className="emptyState objectivesEmptyState">
+          <p>{t.goalsEmpty}</p>
         </div>
       </div>
     );

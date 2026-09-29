@@ -25,6 +25,7 @@ import HabitsSection from "../features/objectives/components/HabitsSection";
 import ObjectivesDashboard from "../features/objectives/components/ObjectivesDashboard";
 import { useLanguage } from "../context/languageContext";
 import CustomSelectDropdown from "../components/shared/CustomSelectDropdown";
+import ConfirmDialog from "../components/shared/ConfirmDialog";
 
 import {
   buildHabitCompletionMap,
@@ -56,6 +57,7 @@ const Objectives = () => {
 
   const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
   const [isHabitModalOpen, setIsHabitModalOpen] = useState(false);
+  const [deleteRequest, setDeleteRequest] = useState(null);
 
   const [selectedGoal, setSelectedGoal] = useState(null);
   const [selectedHabit, setSelectedHabit] = useState(null);
@@ -354,34 +356,39 @@ const Objectives = () => {
   /**
    * Elimina un goal tras confirmación del usuario.
    */
-  const handleGoalDelete = async (goal) => {
-    const confirmed = window.confirm(
-      `${t.objectivesDeleteGoalConfirmPrefix} "${goal.titulo}"?`,
-    );
-    if (!confirmed) return;
-
-    try {
-      await deleteGoal(goal.id);
-      await loadObjectivesData(false);
-    } catch (error) {
-      setErrorMessage(error.message || t.objectivesGoalDeleteError);
-    }
+  const handleGoalDelete = (goal) => {
+    setDeleteRequest({ type: "goal", item: goal });
   };
 
   /**
    * Elimina un hábito tras confirmación del usuario.
    */
-  const handleHabitDelete = async (habit) => {
-    const confirmed = window.confirm(
-      `${t.objectivesDeleteHabitConfirmPrefix} "${habit.titulo}"?`,
-    );
-    if (!confirmed) return;
+  const handleHabitDelete = (habit) => {
+    setDeleteRequest({ type: "habit", item: habit });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteRequest?.item?.id) {
+      setDeleteRequest(null);
+      return;
+    }
+
+    const { type, item } = deleteRequest;
 
     try {
-      await deleteHabit(habit.id);
+      if (type === "goal") {
+        await deleteGoal(item.id);
+      } else {
+        await deleteHabit(item.id);
+      }
       await loadObjectivesData(false);
     } catch (error) {
-      setErrorMessage(error.message || t.objectivesHabitDeleteError);
+      setErrorMessage(
+        error.message ||
+          (type === "goal" ? t.objectivesGoalDeleteError : t.objectivesHabitDeleteError),
+      );
+    } finally {
+      setDeleteRequest(null);
     }
   };
 
@@ -570,6 +577,21 @@ const Objectives = () => {
           isSubmitting={isSubmittingHabit}
         />
       )}
+
+      <ConfirmDialog
+        isOpen={Boolean(deleteRequest)}
+        title={t.confirmDeleteTitle}
+        message={
+          deleteRequest?.item?.titulo
+            ? `${t.confirmDeleteMessagePrefix} "${deleteRequest.item.titulo}"?`
+            : t.confirmDeleteMessagePrefix
+        }
+        warning={t.confirmDeleteWarning}
+        confirmLabel={t.commonDelete}
+        cancelLabel={t.commonCancel}
+        onCancel={() => setDeleteRequest(null)}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 };

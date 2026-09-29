@@ -20,6 +20,7 @@ import {
 import { getApiErrorMessage } from "../api/apiClient";
 import { useError } from "../components/ErrorContext";
 import { useLanguage } from "../context/languageContext";
+import CustomSelectDropdown from "../components/shared/CustomSelectDropdown";
 
 const SearchIcon = () => (
   <svg
@@ -697,21 +698,22 @@ function Block() {
           </div>
           <div className="focus-action-field">
             <label>{t.blockOnFinish}</label>
-            <select
+            <CustomSelectDropdown
               value={focusAction}
-              onChange={(e) => {
-                setFocusAction(e.target.value);
+              options={[
+                { value: "NOTIFICATION", label: t.blockNotification },
+                { value: "SCREEN_BLOCK", label: t.blockScreen },
+              ]}
+              onChange={(value) => {
+                setFocusAction(value);
                 saveFocusSettings({
                   focusModeEnabled,
                   workDurationSeconds,
                   breakDurationSeconds,
-                  focusAction: e.target.value,
+                  focusAction: value,
                 });
               }}
-            >
-              <option value="NOTIFICATION">{t.blockNotification}</option>
-              <option value="SCREEN_BLOCK">{t.blockScreen}</option>
-            </select>
+            />
           </div>
         </div>
 

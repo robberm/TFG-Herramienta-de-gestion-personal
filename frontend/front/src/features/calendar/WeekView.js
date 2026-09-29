@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { format, startOfWeek, addDays, isSameDay, parseISO } from "date-fns";
 import { enUS, es } from "date-fns/locale";
 import { useLanguage } from "../../context/languageContext";
+import { getShortWeekdayLabel } from "../../utils/dateLabels";
 
 const HOUR_HEIGHT_PX = 80;
 const MINUTES_PER_HOUR = 60;
@@ -189,7 +190,13 @@ const WeekView = ({ currentDate, events, onTimeSlotClick, onEventClick, isAdmin 
     weekDays.push(addDays(weekStart, i));
   }
 
-  const shortDayNames = weekDays.map((day) => format(day, "EEEEE", { locale: calendarLocale }));
+  const shortDayNames = weekDays.map((day) =>
+    getShortWeekdayLabel(
+      day,
+      language,
+      (date) => format(date, "EEEEE", { locale: calendarLocale }),
+    ),
+  );
 
   const getEventsForDay = (day) => {
     return events.filter((event) =>

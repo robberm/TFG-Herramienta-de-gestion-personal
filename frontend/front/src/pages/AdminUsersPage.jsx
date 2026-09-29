@@ -6,6 +6,7 @@ import {
   getManagedUsers,
 } from "../api/adminApi";
 import { useLanguage } from "../context/languageContext";
+import ConfirmDialog from "../components/shared/ConfirmDialog";
 
 const UsersIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -29,6 +30,7 @@ function AdminUsersPage() {
   const [successMessage, setSuccessMessage] = useState("");
   const [form, setForm] = useState(initialForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deleteRequest, setDeleteRequest] = useState(null);
 
   const sortedUsers = useMemo(
     () => [...users].sort((a, b) => a.username.localeCompare(b.username)),
@@ -84,14 +86,15 @@ function AdminUsersPage() {
   const handleDeleteUser = async (userId, username) => {
     setErrorMessage("");
     setSuccessMessage("");
+    setDeleteRequest({ userId, username });
+  };
 
-    const confirmed = window.confirm(
-      `${t.adminConfirmDeletePrefix} ${username}?`,
-    );
-
-    if (!confirmed) {
+  const handleConfirmDelete = async () => {
+    if (!deleteRequest) {
       return;
     }
+
+    const { userId, username } = deleteRequest;
 
     try {
       await deleteManagedUser(userId);
@@ -99,6 +102,8 @@ function AdminUsersPage() {
       setSuccessMessage(`${t.adminUser} ${username} ${t.adminDeleted}`);
     } catch (error) {
       setErrorMessage(error.message || t.adminDeleteError);
+    } finally {
+      setDeleteRequest(null);
     }
   };
 
@@ -200,6 +205,21 @@ function AdminUsersPage() {
           </div>
         )}
       </section>
+
+      <ConfirmDialog
+        isOpen={Boolean(deleteRequest)}
+        title={t.confirmDeleteTitle}
+        message={
+          deleteRequest?.username
+            ? `${t.confirmDeleteMessagePrefix} ${deleteRequest.username}?`
+            : t.confirmDeleteMessagePrefix
+        }
+        warning={t.confirmDeleteWarning}
+        confirmLabel={t.commonDelete}
+        cancelLabel={t.commonCancel}
+        onCancel={() => setDeleteRequest(null)}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 }

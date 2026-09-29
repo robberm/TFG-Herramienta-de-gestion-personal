@@ -10,6 +10,7 @@ import Calendar from "./features/calendar/Calendar";
 import Block from "./pages/Block";
 import AdminUsersPage from "./pages/AdminUsersPage";
 import AdminOrganizationSetupPage from "./pages/AdminOrganizationSetupPage";
+import Notes from "./pages/Notes";
 
 const AppRouter = () => {
   return (
@@ -32,6 +33,15 @@ const AppRouter = () => {
         element={
           <ProtectedRoute>
             <Objectives />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/notes"
+        element={
+          <ProtectedRoute>
+            <Notes />
           </ProtectedRoute>
         }
       />

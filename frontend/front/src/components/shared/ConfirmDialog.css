@@ -1,0 +1,110 @@
+.confirmDialogOverlay,
+.confirmDialogOverlay * {
+  box-sizing: border-box;
+}
+
+.confirmDialogOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: confirm-dialog-fade-in 0.18s ease-out;
+}
+
+.confirmDialog {
+  width: min(92vw, 420px);
+  max-width: 420px;
+  border-radius: 18px;
+  border: 1px solid var(--border-color);
+  background: var(--card-background);
+  color: var(--text-main);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+  overflow: hidden;
+}
+
+.confirmDialogBody {
+  padding: 1.5rem 1.5rem 1.25rem;
+}
+
+.confirmDialogBody h3 {
+  margin: 0 0 0.65rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.confirmDialogBody p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.confirmDialogWarning {
+  margin-top: 0.85rem !important;
+  color: var(--text-main) !important;
+  font-size: 0.84rem !important;
+}
+
+.confirmDialogActions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  padding: 0 1.5rem 1.5rem;
+}
+
+.confirmDialogButton {
+  min-width: 96px;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.confirmDialogButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.confirmDialogButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.confirmDialogButton.secondary {
+  border-color: var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.confirmDialogButton.secondary:hover:not(:disabled) {
+  color: var(--text-main);
+  border-color: var(--text-secondary);
+}
+
+.confirmDialogButton.danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: #fff;
+}
+
+.confirmDialogButton.danger:hover:not(:disabled) {
+  filter: brightness(1.04);
+}
+
+@keyframes confirm-dialog-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

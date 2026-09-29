@@ -5,6 +5,7 @@ import lombok.Setter;
 import net.tfg.tfgapp.domains.Event;
 
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -23,4 +24,7 @@ public class EventRequest {
     private Long targetUserId;
     private List<Long> targetUserIds;
     private Boolean assignToAllUsers;
+    private String recurrenceType;
+    private LocalDate recurrenceEndDate;
+    private List<Integer> recurrenceWeekdays;
 }

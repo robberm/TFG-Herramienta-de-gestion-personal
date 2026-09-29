@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { HexColorPicker } from "react-colorful";
 import { useDarkMode } from "../DarkModeContext";
 import "../css/Settings.css";
 import { resolveProfileImageUrl } from "../utils/profileImage";
@@ -15,8 +16,7 @@ import { useLanguage } from "../context/languageContext";
 import CustomSelectDropdown from "../components/shared/CustomSelectDropdown";
 
 const Settings = () => {
-  const { darkMode, translucentMode, toggleDarkMode, toggleTranslucentMode } =
-    useDarkMode();
+  const { theme, setTheme, customThemeColor, setCustomThemeColor } = useDarkMode();
   const { language, setLanguage, t } = useLanguage();
 
   const [username, setUsername] = useState(
@@ -38,10 +38,45 @@ const Settings = () => {
   const [deleteError, setDeleteError] = useState(false);
   const [autoStartSupported, setAutoStartSupported] = useState(false);
   const [autoStartEnabled, setAutoStartEnabled] = useState(false);
+  const [customThemeOpen, setCustomThemeOpen] = useState(false);
+  const [customColorDraft, setCustomColorDraft] = useState(() =>
+    customThemeColor.replace("#", "").toUpperCase(),
+  );
+
+  const themeOptions = [
+    {
+      id: "truedark",
+      label: t.trueDarkTheme,
+      hint: t.trueDarkThemeHint,
+      colors: ["#000000", "#090909", "#191919"],
+    },
+    {
+      id: "dark",
+      label: t.darkTheme,
+      hint: t.darkThemeHint,
+      colors: ["#1c1c1c", "#2a2a2a", "#4a90e2"],
+    },
+    {
+      id: "light",
+      label: t.lightTheme,
+      hint: t.lightThemeHint,
+      colors: ["#ffffff", "#e9e5e0", "#2383e2"],
+    },
+    {
+      id: "translucent",
+      label: t.translucentTheme,
+      hint: t.translucentThemeHint,
+      colors: ["rgba(26, 28, 34, .42)", "rgba(255, 255, 255, .16)", "#4a90e2"],
+    },
+  ];
 
   useEffect(() => {
     loadCurrentUserProfile();
   }, []);
+
+  useEffect(() => {
+    setCustomColorDraft(customThemeColor.replace("#", "").toUpperCase());
+  }, [customThemeColor]);
 
   useEffect(() => {
     const loadAutoStart = async () => {
@@ -248,45 +283,107 @@ const Settings = () => {
             </div>
           </div>
         </section>
-<section className="settingsCard">
+        <section className="settingsCard appearanceCard">
           <div className="settingsCardHeader">
             <h2>{t.appearance}</h2>
             <p>{t.appearanceDesc}</p>
           </div>
 
-          <div className="settingsRow">
-            <div>
-              <span className="settingsLabel">{t.darkTheme}</span>
-              <p className="settingsHint">{t.darkThemeHint}</p>
-            </div>
-
-            <button
-              type="button"
-              className={`settingsSwitch ${darkMode ? "active" : ""}`}
-              onClick={toggleDarkMode}
-            >
-              <span className="settingsSwitchThumb"></span>
-            </button>
+          <div className="themeSectionHeading">
+            <span>{t.defaultThemes}</span>
+            <small>{t.defaultThemesHint}</small>
           </div>
 
-          <div className="settingsRow">
-            <div>
-              <span className="settingsLabel">{t.translucentTheme}</span>
-              <p className="settingsHint">
-                {t.translucentThemeHint}
-              </p>
-            </div>
-
-            <button
-              type="button"
-              className={`settingsSwitch ${translucentMode ? "active" : ""}`}
-              onClick={toggleTranslucentMode}
-            >
-              <span className="settingsSwitchThumb"></span>
-            </button>
+          <div className="themePaletteGrid" role="radiogroup" aria-label={t.defaultThemes}>
+            {themeOptions.map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                role="radio"
+                aria-checked={theme === option.id}
+                className={`themePalette ${theme === option.id ? "active" : ""}`}
+                onClick={() => {
+                  setCustomThemeOpen(false);
+                  setTheme(option.id);
+                }}
+              >
+                <span className="themePalettePreview" aria-hidden="true">
+                  <span style={{ background: option.colors[0] }} />
+                  <span style={{ background: option.colors[1] }} />
+                  <span style={{ background: option.colors[2] }} />
+                </span>
+                <span className="themePaletteCopy">
+                  <strong>{option.label}</strong>
+                  <small>{option.hint}</small>
+                </span>
+                {theme === option.id && (
+                  <span className="themeSelectedMark" aria-hidden="true">
+                    <i className="fa fa-check" />
+                  </span>
+                )}
+              </button>
+            ))}
           </div>
 
-          <div className="settingsRow">
+          <div className="customThemePanel">
+            <button
+              type="button"
+              role="radio"
+              aria-checked={theme === "custom"}
+              className={`customThemeTrigger ${theme === "custom" ? "active" : ""}`}
+              onClick={() => {
+                setTheme("custom");
+                setCustomThemeOpen((current) => !current);
+              }}
+            >
+              <span
+                className="customThemeSwatch"
+                style={{ "--theme-swatch": customThemeColor }}
+                aria-hidden="true"
+              />
+              <span className="themePaletteCopy">
+                <strong>{t.customTheme}</strong>
+                <small>{t.customThemeHint}</small>
+              </span>
+              <span className="customThemeHex">{customThemeColor.toUpperCase()}</span>
+              <i className={`fa fa-chevron-down ${customThemeOpen ? "open" : ""}`} />
+            </button>
+
+            {customThemeOpen && (
+              <div className="customThemeEditor">
+                <HexColorPicker color={customThemeColor} onChange={setCustomThemeColor} />
+                <div className="customThemeEditorCopy">
+                  <span className="settingsLabel">{t.customThemeColor}</span>
+                  <p className="settingsHint">{t.customThemeColorHint}</p>
+                  <label className="customThemeHexInput">
+                    <span>#</span>
+                    <input
+                      type="text"
+                      value={customColorDraft}
+                      maxLength={6}
+                      onChange={(event) => {
+                        const nextValue = event.target.value
+                          .replace(/[^0-9a-f]/gi, "")
+                          .toUpperCase();
+                        setCustomColorDraft(nextValue);
+                        if (nextValue.length === 6) {
+                          setCustomThemeColor(`#${nextValue}`);
+                        }
+                      }}
+                      onBlur={() =>
+                        setCustomColorDraft(
+                          customThemeColor.replace("#", "").toUpperCase(),
+                        )
+                      }
+                      aria-label={t.customThemeColor}
+                    />
+                  </label>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="settingsRow appearanceUtilityRow">
             <div>
               <span className="settingsLabel">{t.autoStartWindows}</span>
               <p className="settingsHint">{t.autoStartWindowsHint}</p>

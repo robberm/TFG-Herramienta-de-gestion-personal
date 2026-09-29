@@ -35,6 +35,10 @@ public class Event {
     private EventCategory category;
     @Column(unique = false)
     private Boolean isAllDay;
+    @Column(length = 36)
+    private String recurrenceSeriesId;
+    @Column(length = 16)
+    private String recurrenceType;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "EventsReminders", joinColumns = @JoinColumn(name = "event_id"))

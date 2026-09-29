@@ -1,137 +1,76 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useMemo } from "react";
 import { formatIsoDate } from "../utils/objectiveHelpers";
 import { useLanguage } from "../../../context/languageContext";
 
-const HabitsSection = ({
-  habits,
-  habitCompletionMap,
-  selectedHabitDate,
-  onCreate,
-  onEdit,
-  onDelete,
-  onToggleDate,
-  isHabitUpdating,
-}) => {
+const HabitsSection = ({ habits, habitCompletionMap, selectedHabitDate, onCreate, onEdit, onDelete, onToggleDate, isHabitUpdating }) => {
   const { t } = useLanguage();
   const todayIso = formatIsoDate(new Date());
   const selectedDate = selectedHabitDate || todayIso;
   const selectedDateLabel = selectedDate === todayIso ? t.commonToday : selectedDate;
-  const wrapperRef = useRef(null);
-  const tableRef = useRef(null);
-  const [hasOverflow, setHasOverflow] = useState(false);
-
-  useEffect(() => {
-    const update = () => {
-      if (!wrapperRef.current || !tableRef.current) return;
-      setHasOverflow(tableRef.current.scrollWidth > wrapperRef.current.clientWidth + 1);
+  const recentDays = useMemo(() => Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(`${selectedDate}T12:00:00`);
+    date.setDate(date.getDate() - (6 - index));
+    return {
+      iso: formatIsoDate(date),
+      day: new Intl.DateTimeFormat(undefined, { weekday: "short" }).format(date).slice(0, 2),
+      number: date.getDate(),
     };
-
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, [habits]);
+  }), [selectedDate]);
 
   return (
-    <section className="objectivesSection">
-      <div className="sectionHeader">
+    <section className="objectivesSection habitsWorkspace">
+      <div className="sectionHeader modernSectionHeader">
         <div>
+          <span className="sectionKicker">{selectedDateLabel}</span>
           <h2>{t.habitsTitle}</h2>
           <p>{t.habitsSubtitle}</p>
         </div>
-
-        <button className="addButton" onClick={onCreate}>
-          <i className="fa fa-plus"></i> {t.habitsNew}
-        </button>
+        <button className="addButton" onClick={onCreate}><i className="fa fa-plus" /> {t.habitsNew}</button>
       </div>
 
-      <div
-        ref={wrapperRef}
-        className={`tableWrapper ${hasOverflow ? "hasOverflow" : "noOverflow"}`}
-      >
-        <div ref={tableRef} className="todoTable">
-          <div className="tableRow tableHeader">
-            <div className="tableCell">{selectedDateLabel}</div>
-            <div className="tableCell">{t.commonTitle}</div>
-            <div className="tableCell">{t.commonDescription}</div>
-            <div className="tableCell">{t.habitsStreak}</div>
-            <div className="tableCell">{t.habitsBest}</div>
-            <div className="tableCell">{t.commonActions}</div>
-          </div>
-
-          {habits.length === 0 ? (
-            <div className="emptyState">
-              <p>{t.habitsEmpty}</p>
-            </div>
-          ) : (
-            habits.map((habit) => {
-              const isCompletedSelectedDate =
-                habitCompletionMap[habit.id] &&
-                habitCompletionMap[habit.id][selectedDate] === true;
-
-              return (
-                <div
-                  key={habit.id}
-                  className={`tableRow ${isCompletedSelectedDate ? "completedTableRow" : ""}`}
-                >
-                  <div className="tableCell checkboxCell">
-                    <label className="habitCheckbox">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(isCompletedSelectedDate)}
-                        disabled={isHabitUpdating}
-                        onChange={() => onToggleDate(habit, !isCompletedSelectedDate)}
-                      />
-                      <span className="habitCheckboxVisual"></span>
-                    </label>
+      {habits.length > 0 ? (
+        <div className="habitPanelGrid">
+          {habits.map((habit) => {
+            const completed = habitCompletionMap[habit.id]?.[selectedDate] === true;
+            return (
+              <article key={habit.id} className={`habitPanel ${completed ? "isCompleted" : ""}`}>
+                <header className="habitPanelHeader">
+                  <button type="button" className="habitCompletionButton" disabled={isHabitUpdating} aria-pressed={completed} onClick={() => onToggleDate(habit, !completed)}>
+                    <i className={`fa ${completed ? "fa-check" : "fa-plus"}`} />
+                  </button>
+                  <div className="habitPanelTitle">
+                    <span>{completed ? t.goalStatusDone : selectedDateLabel}</span>
+                    <h3>{habit.titulo}</h3>
                   </div>
-
-                  <div className="tableCell">
-                    <strong className={isCompletedSelectedDate ? "completedText" : ""}>
-                      {habit.titulo}
-                    </strong>
+                  <div className="habitPanelActions">
+                    <button type="button" className="panelIconButton" onClick={() => onEdit(habit)} title={t.commonEdit}><i className="fa fa-pen" /></button>
+                    <button type="button" className="panelIconButton danger" onClick={() => onDelete(habit)} title={t.commonDelete}><i className="fa fa-trash" /></button>
                   </div>
+                </header>
 
-                  <div className="tableCell">
-                    <span className={isCompletedSelectedDate ? "completedText" : ""}>
-                      {habit.description || "—"}
-                    </span>
-                  </div>
+                <p className="habitPanelDescription">{habit.description || "—"}</p>
 
-                  <div className="tableCell">
-                    <span className="streakBadge">
-                      {habit.currentStreak || 0}
-                    </span>
-                  </div>
-
-                  <div className="tableCell">
-                    <span className="streakBadge secondary">
-                      {habit.bestStreak || 0}
-                    </span>
-                  </div>
-
-                  <div className="tableCell actionsCell">
-                    <button
-                      className="actionButton editButton"
-                      onClick={() => onEdit(habit)}
-                      title={t.commonEdit}
-                    >
-                      <i className="fa fa-edit"></i>
-                    </button>
-
-                    <button
-                      className="actionButton deleteButton"
-                      onClick={() => onDelete(habit)}
-                      title={t.commonDelete}
-                    >
-                      <i className="fa fa-trash"></i>
-                    </button>
-                  </div>
+                <div className="habitWeekStrip" aria-label="Last seven days">
+                  {recentDays.map((day) => {
+                    const done = habitCompletionMap[habit.id]?.[day.iso] === true;
+                    return (
+                      <div key={day.iso} className={`habitDay ${done ? "done" : ""} ${day.iso === selectedDate ? "selected" : ""}`}>
+                        <span>{day.day}</span>
+                        <strong>{done ? <i className="fa fa-check" /> : day.number}</strong>
+                      </div>
+                    );
+                  })}
                 </div>
-              );
-            })
-          )}
+
+                <footer className="habitPanelStats">
+                  <div><i className="fa fa-fire" /><span>{t.habitsStreak}</span><strong>{habit.currentStreak || 0}</strong></div>
+                  <div><i className="fa fa-trophy" /><span>{t.habitsBest}</span><strong>{habit.bestStreak || 0}</strong></div>
+                </footer>
+              </article>
+            );
+          })}
         </div>
-      </div>
+      ) : <div className="emptyState objectivesEmptyState"><p>{t.habitsEmpty}</p></div>}
     </section>
   );
 };

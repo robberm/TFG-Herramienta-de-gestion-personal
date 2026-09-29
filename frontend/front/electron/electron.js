@@ -399,6 +399,8 @@ function loadRenderer(win, route = "/") {
 }
 
 function attachWindowEvents(win) {
+  win.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
+
   win.webContents.on("before-input-event", (event, input) => {
     const wc = win.webContents;
 
@@ -462,7 +464,6 @@ function createMainWindow({
       preload: path.join(__dirname, "preload.js"),
       nodeIntegration: false,
       contextIsolation: true,
-      enableRemoteModule: true,
       backgroundThrottling: false,
     },
   });

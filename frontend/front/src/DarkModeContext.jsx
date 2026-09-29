@@ -9,9 +9,18 @@ import React, {
 
 const DarkModeContext = createContext();
 
-const THEME_CLASSES = ["light", "dark", "translucent"];
+const THEME_CLASSES = ["light", "dark", "truedark", "translucent", "custom"];
+const THEME_STORAGE_KEY = "appTheme";
+const CUSTOM_COLOR_STORAGE_KEY = "customThemeColor";
+const DEFAULT_CUSTOM_COLOR = "#6c63ff";
+
+const isValidTheme = (theme) => THEME_CLASSES.includes(theme);
+const isValidHexColor = (color) => /^#[0-9a-f]{6}$/i.test(color || "");
 
 const getStoredTheme = () => {
+  const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+  if (isValidTheme(storedTheme)) return storedTheme;
+
   const translucentMode = localStorage.getItem("translucentMode") === "true";
   const darkMode = localStorage.getItem("darkMode") === "true";
 
@@ -20,9 +29,15 @@ const getStoredTheme = () => {
   return "light";
 };
 
-const applyThemeToBody = (theme) => {
+const getStoredCustomColor = () => {
+  const storedColor = localStorage.getItem(CUSTOM_COLOR_STORAGE_KEY);
+  return isValidHexColor(storedColor) ? storedColor : DEFAULT_CUSTOM_COLOR;
+};
+
+const applyThemeToBody = (theme, customColor) => {
   document.body.classList.remove(...THEME_CLASSES);
   document.body.classList.add(theme);
+  document.body.style.setProperty("--custom-theme-color", customColor);
 };
 
 const isElectronEnvironment =
@@ -38,11 +53,17 @@ const getCurrentRoute = () => {
 
 export const DarkModeProvider = ({ children }) => {
   const [theme, setTheme] = useState(getStoredTheme);
+  const [customThemeColor, setCustomThemeColorState] = useState(getStoredCustomColor);
 
   useEffect(() => {
-    applyThemeToBody(theme);
-    localStorage.setItem("darkMode", String(theme === "dark"));
+    applyThemeToBody(theme, customThemeColor);
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+    localStorage.setItem(CUSTOM_COLOR_STORAGE_KEY, customThemeColor);
+    localStorage.setItem("darkMode", String(theme === "dark" || theme === "truedark"));
     localStorage.setItem("translucentMode", String(theme === "translucent"));
+  }, [customThemeColor, theme]);
+
+  useEffect(() => {
     if (window.electronAPI?.setWindowTransparencyMode) {
       window.electronAPI.setWindowTransparencyMode({
         transparent: theme === "translucent",
@@ -52,9 +73,12 @@ export const DarkModeProvider = ({ children }) => {
   }, [theme]);
 
   const switchTheme = useCallback((nextTheme) => {
+    if (!isValidTheme(nextTheme)) return;
+
     const wasTransparent = theme === "translucent";
     const willBeTransparent = nextTheme === "translucent";
 
+    localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
     setTheme(nextTheme);
 
     if (
@@ -67,6 +91,11 @@ export const DarkModeProvider = ({ children }) => {
       });
     }
   }, [theme]);
+
+  const setCustomThemeColor = useCallback((nextColor) => {
+    if (!isValidHexColor(nextColor)) return;
+    setCustomThemeColorState(nextColor);
+  }, []);
 
   const toggleDarkMode = useCallback(() => {
     if (theme === "dark") {
@@ -90,12 +119,21 @@ export const DarkModeProvider = ({ children }) => {
     () => ({
       darkMode: theme === "dark",
       translucentMode: theme === "translucent",
+      customThemeColor,
+      setCustomThemeColor,
       toggleDarkMode,
       toggleTranslucentMode,
       setTheme: switchTheme,
       theme,
     }),
-    [switchTheme, theme, toggleDarkMode, toggleTranslucentMode],
+    [
+      customThemeColor,
+      setCustomThemeColor,
+      switchTheme,
+      theme,
+      toggleDarkMode,
+      toggleTranslucentMode,
+    ],
   );
 
   return (

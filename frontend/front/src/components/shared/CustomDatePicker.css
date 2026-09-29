@@ -1,0 +1,21 @@
+.custom-date-picker { position: relative; width: 100%; }
+.custom-date-trigger { display: flex; align-items: center; gap: 11px; width: 100%; min-height: 44px; padding: 10px 13px; border: 1px solid var(--panel-border); border-radius: 12px; background: var(--ui-control); color: var(--text-main); font: inherit; text-align: left; cursor: pointer; transition: 160ms ease; }
+.custom-date-trigger > span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: capitalize; }
+.custom-date-trigger:hover, .custom-date-trigger.active { border-color: var(--link-active-bg); background: color-mix(in srgb, var(--link-active-bg) 8%, var(--bg-main)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--link-active-bg) 13%, transparent); }
+.custom-date-trigger:disabled { cursor: not-allowed; opacity: .55; }
+.custom-date-chevron { font-size: 10px; opacity: .55; transition: transform 160ms ease; }
+.custom-date-trigger.active .custom-date-chevron { transform: rotate(180deg); }
+.custom-date-popover { position: absolute; top: calc(100% + 8px); left: 0; z-index: 11000; width: min(330px, calc(100vw - 48px)); padding: 12px; border: 1px solid var(--panel-border); border-radius: 16px; background: var(--ui-popover); box-shadow: var(--panel-shadow), 0 22px 60px rgba(0,0,0,.24); color: var(--text-main); animation: datePickerIn 140ms ease-out; }
+.custom-date-popover .react-calendar { width: 100%; border: 0; background: transparent; color: inherit; font: inherit; }
+.custom-date-popover .react-calendar__navigation { display: grid; grid-template-columns: 38px 1fr 38px; align-items: center; gap: 5px; height: 40px; margin-bottom: 8px; }
+.custom-date-popover .react-calendar__navigation button { min-width: 0; height: 36px; border: 0; border-radius: 9px; background: transparent; color: inherit; font: inherit; font-weight: 700; cursor: pointer; }
+.custom-date-popover .react-calendar__navigation button:hover { background: var(--bg-hover); }
+.custom-date-popover .react-calendar__month-view__weekdays { margin-bottom: 4px; color: var(--text-main); font-size: 10px; font-weight: 750; opacity: .48; text-align: center; text-transform: uppercase; }
+.custom-date-popover .react-calendar__month-view__weekdays abbr { text-decoration: none; }
+.custom-date-popover .react-calendar__tile { aspect-ratio: 1; max-width: 100%; padding: 0; border: 0; border-radius: 10px; background: transparent; color: inherit; font: inherit; font-size: 12px; cursor: pointer; }
+.custom-date-popover .react-calendar__tile:hover { background: var(--bg-hover); }
+.custom-date-popover .react-calendar__month-view__days__day--neighboringMonth { opacity: .28; }
+.custom-date-popover .react-calendar__tile--now { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--link-active-bg) 58%, transparent); }
+.custom-date-popover .react-calendar__tile--active { background: var(--link-active-bg); color: var(--link-active-text); font-weight: 800; box-shadow: 0 5px 14px color-mix(in srgb, var(--link-active-bg) 30%, transparent); }
+.custom-date-popover .react-calendar__tile:disabled { cursor: not-allowed; opacity: .2; }
+@keyframes datePickerIn { from { opacity: 0; transform: translateY(-5px) scale(.985); } to { opacity: 1; transform: none; } }

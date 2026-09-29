@@ -1,23 +1,17 @@
-import React, { useState, useRef } from "react";
+import React, { useRef, useState } from "react";
 import "../css/App.css";
 import { useNavigate } from "react-router-dom";
-import {
-  getApiErrorMessage,
-} from "../api/apiClient";
+import { getApiErrorMessage } from "../api/apiClient";
 import { loginUser, registerActiveSessionUser } from "../api/authApi";
 import { getCurrentUserProfile } from "../api/userApi";
 import { resolveProfileImageUrl } from "../utils/profileImage";
 import { useLanguage } from "../context/languageContext";
 
-
 const Login = () => {
   const { t } = useLanguage();
-  // Definir estado para username y password
-  const [loginUsername, setLoginUsername] = useState("");  // Estado para el nombre de usuario
-  const [loginPw, setLoginPw] = useState("");  // Estado para la contraseña
+  const [loginUsername, setLoginUsername] = useState("");
+  const [loginPw, setLoginPw] = useState("");
   const [error, setError] = useState("");
-
-  // Usamos useRef para el campo de contraseña
   const passwordInputRef = useRef(null);
   const navigate = useNavigate();
 
@@ -27,60 +21,55 @@ const Login = () => {
     try {
       setError("");
       const data = await loginUser(loginUsername, loginPw);
-      //pasamos token de sesión
-        const token = data.token.trim(); 
-        localStorage.setItem("token", token); 
-        localStorage.setItem("username", data.username);
-        localStorage.setItem("role", data.role || "PERSONAL");
-        localStorage.setItem("organizationId", data.organizationId ?? "");
 
-        const profile = await getCurrentUserProfile({ forceRefresh: true });
-        if (profile?.profileImagePath) {
-          localStorage.setItem(
-            "profileImage",
-            resolveProfileImageUrl(profile.profileImagePath),
-          );
-        } else {
-          localStorage.removeItem("profileImage");
-        }
-        const isAdmin = (data.role || profile?.role) === "ADMIN";
-        const hasOrganization = Boolean((data.organizationId ?? profile?.organizationId));
-        const nextPath = isAdmin
-          ? hasOrganization
-            ? "/admin"
-            : "/admin/setup-organization"
-          : "/home";
+      const token = data.token.trim();
+      localStorage.setItem("token", token);
+      localStorage.setItem("username", data.username);
+      localStorage.setItem("role", data.role || "PERSONAL");
+      localStorage.setItem("organizationId", data.organizationId ?? "");
 
-        //Registramos usuario en la sesión 
-        await registerActiveSessionUser();
-        // Redirige según rol
-        console.log("Login perfecto");
-        navigate(nextPath);
+      const profile = await getCurrentUserProfile({ forceRefresh: true });
+      if (profile?.profileImagePath) {
+        localStorage.setItem(
+          "profileImage",
+          resolveProfileImageUrl(profile.profileImagePath),
+        );
+      } else {
+        localStorage.removeItem("profileImage");
+      }
+
+      const isAdmin = (data.role || profile?.role) === "ADMIN";
+      const hasOrganization = Boolean(data.organizationId ?? profile?.organizationId);
+      const nextPath = isAdmin
+        ? hasOrganization
+          ? "/admin"
+          : "/admin/setup-organization"
+        : "/home";
+
+      await registerActiveSessionUser();
+      navigate(nextPath);
     } catch (err) {
-      setError(getApiErrorMessage(err, t.loginConnectionError));
-      
+      const loginMessage =
+        err?.status === 401
+          ? t.loginInvalidCredentials
+          : getApiErrorMessage(err, t.loginConnectionError);
+      setError(loginMessage);
     }
   };
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       if (e.target.name === "username") {
-        passwordInputRef.current.focus(); // Foco en la contraseña
+        passwordInputRef.current?.focus();
       } else {
-        handleLogin(e);  // Si es la contraseña, realiza el login
+        handleLogin(e);
       }
     }
   };
 
-  const colorLogInTexto = {
-    color: "#FFFFFF" 
-  };
-
-  
-
   return (
     <div className="login-form">
-      <h2 style={colorLogInTexto}>{t.loginTitle}</h2>
+      <h2 style={{ color: "#FFFFFF" }}>{t.loginTitle}</h2>
       <form onSubmit={handleLogin}>
         <input
           className="app-input"
@@ -88,8 +77,8 @@ const Login = () => {
           type="text"
           placeholder={t.username}
           value={loginUsername}
-          onChange={(e) => setLoginUsername(e.target.value)} // Actualiza el estado
-          onKeyDown={handleKeyDown} // Manejo de la tecla Enter
+          onChange={(e) => setLoginUsername(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
         <input
           className="app-input"
@@ -110,6 +99,6 @@ const Login = () => {
       {error && <div className="error">{error}</div>}
     </div>
   );
-}
+};
 
 export default Login;

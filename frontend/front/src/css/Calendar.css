@@ -6,7 +6,10 @@
   --border-color-soft: #f3f2f1;
 }
 
-body.dark {
+body.dark,
+body.truedark,
+body.custom,
+body.translucent {
   --border-color: #3f3f3f;
   --border-color-soft: #555;
 }

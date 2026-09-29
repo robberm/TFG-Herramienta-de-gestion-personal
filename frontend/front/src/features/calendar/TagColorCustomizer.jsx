@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { HexColorPicker } from "react-colorful";
 import { useLanguage } from "../../context/languageContext";
+import { getCalendarTagLabel } from "./utils/calendarLabels";
 
 const STORAGE_KEY = "calendar.tag-colors.v1";
 const COLLAPSED_KEY = "calendar.tag-colors.collapsed";
@@ -174,6 +175,7 @@ const TagColorCustomizer = () => {
   };
 
   const activeTag = TAG_COLOR_CONFIG.find((item) => item.cssVar === activeCss) || null;
+  const activeTagLabel = activeTag ? getCalendarTagLabel(activeTag.key, t) : "";
   const specialText =
     activeTag?.key === "FOCUS"
       ? t.calendarTagFocusDescription
@@ -182,7 +184,10 @@ const TagColorCustomizer = () => {
         : "";
 
   return (
-    <section className="calendar-tag-color-module" aria-label="Tag color settings">
+    <section
+      className="calendar-tag-color-module"
+      aria-label={t.calendarTagColorSettings}
+    >
       <div className="calendar-tag-color-module-header">
         <h4>{t.calendarTagColors}</h4>
         <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
@@ -206,9 +211,9 @@ const TagColorCustomizer = () => {
                   item.key === "FOCUS" || item.key === "MANDATORY" ? "special" : ""
                 } ${activeCss === item.cssVar ? "active" : ""}`}
                 onClick={() => setActiveCss(activeCss === item.cssVar ? null : item.cssVar)}
-                title={`Editar color ${item.key}`}
+                title={`${t.calendarEditColor} ${getCalendarTagLabel(item.key, t)}`}
               >
-                <span>{item.key}</span>
+                <span>{getCalendarTagLabel(item.key, t)}</span>
                 <div
                   className="calendar-tag-swatch"
                   style={{ background: colors[item.cssVar] || item.defaultColor }}
@@ -236,7 +241,7 @@ const TagColorCustomizer = () => {
 
                 {specialText && (
                   <aside className="calendar-tag-color-note" aria-live="polite">
-                    <strong>{activeTag.key}</strong>
+                    <strong>{activeTagLabel}</strong>
                     <p>{specialText}</p>
                   </aside>
                 )}

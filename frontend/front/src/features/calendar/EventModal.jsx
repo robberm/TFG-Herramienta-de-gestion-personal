@@ -5,7 +5,11 @@ import "../../css/EventModal.css";
 import { fetchEventCategories } from "../../api/eventApi";
 import { useLanguage } from "../../context/languageContext";
 import AdminAssignmentSelector from "../../components/AdminAssignmentSelector";
+import ConfirmDialog from "../../components/shared/ConfirmDialog";
 import { capitalizeCalendarLabel } from "../../utils/dateLabels";
+import { getCalendarTagLabel } from "./utils/calendarLabels";
+import CustomSelectDropdown from "../../components/shared/CustomSelectDropdown";
+import CustomDatePicker from "../../components/shared/CustomDatePicker";
 
 // Genera opciones de tiempo en incrementos de 15 minutos
 const generateTimeOptions = () => {
@@ -194,11 +198,15 @@ const EventModal = ({
     targetUserId: "",
     targetUserIds: [],
     assignmentMode: "single",
+    recurrenceType: "NONE",
+    recurrenceEndDate: "",
+    recurrenceWeekdays: [],
   });
   const [reminderMinutesBeforeList, setReminderMinutesBeforeList] = useState([]);
   const [customReminderHours, setCustomReminderHours] = useState("");
   const [categories, setCategories] = useState([]);
   const [showMoreOptions, setShowMoreOptions] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const titleInputRef = useRef(null);
 
   useEffect(() => {
@@ -240,6 +248,9 @@ const EventModal = ({
         targetUserId: defaultSingleUserId,
         targetUserIds: assignedUserIds,
         assignmentMode: inferredAssignmentMode,
+        recurrenceType: "NONE",
+        recurrenceEndDate: "",
+        recurrenceWeekdays: [],
       });
       setReminderMinutesBeforeList(
         Array.isArray(event.reminderMinutesBeforeList)
@@ -268,6 +279,9 @@ const EventModal = ({
         targetUserId: defaultManagedUserId ?? "",
         targetUserIds: defaultManagedUserId != null ? [String(defaultManagedUserId)] : [],
         assignmentMode: "single",
+        recurrenceType: "NONE",
+        recurrenceEndDate: format(addMinutes(startDateTime, 60 * 24 * 90), "yyyy-MM-dd"),
+        recurrenceWeekdays: [startDateTime.getDay() === 0 ? 7 : startDateTime.getDay()],
       });
       setReminderMinutesBeforeList([]);
       setCustomReminderHours("");
@@ -383,15 +397,27 @@ const EventModal = ({
                             .map((value) => Number(value))
           : null,
       assignToAllUsers: isAdmin && formData.assignmentMode === "all",
+      recurrenceType: formData.id ? "NONE" : formData.recurrenceType,
+      recurrenceEndDate:
+        !formData.id && formData.recurrenceType !== "NONE"
+          ? formData.recurrenceEndDate
+          : null,
+      recurrenceWeekdays:
+        !formData.id && formData.recurrenceType === "CUSTOM"
+          ? formData.recurrenceWeekdays
+          : null,
     };
 
     onSave(eventData);
   };
 
   const handleDelete = () => {
-    if (window.confirm(t.calendarDeleteConfirm)) {
-      onDelete(formData.id);
-    }
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = () => {
+    setShowDeleteConfirm(false);
+    onDelete(formData.id);
   };
 
   const getCategoryColor = (cat) => {
@@ -429,6 +455,22 @@ const EventModal = ({
     const date = new Date(`${formData.date}T00:00:00`);
     return capitalizeCalendarLabel(format(date, "EEEE, d 'de' MMMM", { locale: calendarLocale }));
   };
+
+  const formatDateValue = (value) => {
+    if (!value) return "";
+    const date = new Date(`${value}T00:00:00`);
+    return capitalizeCalendarLabel(
+      format(date, "d MMM yyyy", { locale: calendarLocale }),
+    );
+  };
+
+  const recurrenceOptions = [
+    { value: "NONE", label: t.calendarRepeatNone },
+    { value: "DAILY", label: t.calendarRepeatDaily },
+    { value: "WEEKLY", label: t.calendarRepeatWeekly },
+    { value: "WEEKDAYS", label: t.calendarRepeatWeekdays },
+    { value: "CUSTOM", label: t.calendarRepeatCustom },
+  ];
 
   return (
     <div className="gcal-modal-overlay" onClick={onClose}>
@@ -492,16 +534,16 @@ const EventModal = ({
 
             <div className="gcal-datetime-content">
               <div className="gcal-date-row">
-                <input
-                  type="date"
-                  name="date"
-                  className="gcal-date-input"
+                <CustomDatePicker
                   value={formData.date}
+                  displayValue={formatDisplayDate()}
                   disabled={isAssignedEventReadOnly}
-                  onChange={handleChange}
-                  required
+                  locale={language === "es" ? "es-ES" : "en-US"}
+                  ariaLabel={t.calendarDate || t.calendarStart}
+                  onChange={(value) =>
+                    setFormData((previous) => ({ ...previous, date: value }))
+                  }
                 />
-                <span className="gcal-date-display">{formatDisplayDate()}</span>
               </div>
 
               {!formData.isAllDay && (
@@ -607,6 +649,52 @@ const EventModal = ({
                 />
               </div>
 
+              {!event && (
+                <div className="formGroup gcal-recurrence">
+                  <label htmlFor="recurrenceType">{t.calendarRepeat}</label>
+                  <CustomSelectDropdown
+                    id="recurrenceType"
+                    value={formData.recurrenceType}
+                    options={recurrenceOptions}
+                    onChange={(value) => setFormData((prev) => ({ ...prev, recurrenceType: value }))}
+                  />
+                  {formData.recurrenceType !== "NONE" && (
+                    <label className="gcal-recurrence-until">
+                      <span>{t.calendarRepeatUntil}</span>
+                      <CustomDatePicker
+                        min={formData.date}
+                        value={formData.recurrenceEndDate}
+                        displayValue={formatDateValue(formData.recurrenceEndDate)}
+                        locale={language === "es" ? "es-ES" : "en-US"}
+                        ariaLabel={t.calendarRepeatUntil}
+                        onChange={(value) => setFormData((prev) => ({ ...prev, recurrenceEndDate: value }))}
+                      />
+                    </label>
+                  )}
+                  {formData.recurrenceType === "CUSTOM" && (
+                    <div className="gcal-weekday-picker">
+                      {(language === "es" ? ["L", "M", "X", "J", "V", "S", "D"] : ["M", "T", "W", "T", "F", "S", "S"]).map((label, index) => {
+                        const day = index + 1;
+                        const active = formData.recurrenceWeekdays.includes(day);
+                        return (
+                          <button
+                            type="button"
+                            key={day}
+                            className={active ? "active" : ""}
+                            onClick={() => setFormData((prev) => ({
+                              ...prev,
+                              recurrenceWeekdays: active
+                                ? prev.recurrenceWeekdays.filter((value) => value !== day)
+                                : [...prev.recurrenceWeekdays, day],
+                            }))}
+                          >{label}</button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="formGroup">
                 <label>{t.calendarReminders}</label>
                 <div className="gcal-reminder-presets">
@@ -678,23 +766,28 @@ const EventModal = ({
                   </svg>
                 </div>
                 <div className="gcal-category-chips">
-                  {categories.map((cat) => (
-                    <button
-                      key={cat}
-                      type="button"
-                      className={`gcal-category-chip ${formData.category === cat ? "active" : ""}`}
-                      disabled={isAssignedEventReadOnly}
-                      style={{
-                        "--chip-color": getCategoryColor(cat),
-                      }}
-                      onClick={() =>
-                        setFormData((prev) => ({ ...prev, category: cat }))
-                      }
-                    >
-                      <span className="gcal-chip-dot"></span>
-                      {cat}
-                    </button>
-                  ))}
+                  {categories.map((cat) => {
+                    const label = getCalendarTagLabel(cat, t);
+
+                    return (
+                      <button
+                        key={cat}
+                        type="button"
+                        className={`gcal-category-chip ${formData.category === cat ? "active" : ""}`}
+                        disabled={isAssignedEventReadOnly}
+                        style={{
+                          "--chip-color": getCategoryColor(cat),
+                        }}
+                        onClick={() =>
+                          setFormData((prev) => ({ ...prev, category: cat }))
+                        }
+                        title={label}
+                      >
+                        <span className="gcal-chip-dot"></span>
+                        {label}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </>
@@ -736,6 +829,16 @@ const EventModal = ({
           </div>
         </form>
       </div>
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        title={t.confirmDeleteTitle}
+        message={`${t.confirmDeleteMessagePrefix} "${formData.title || ""}"?`}
+        warning={t.confirmDeleteWarning}
+        confirmLabel={t.commonDelete}
+        cancelLabel={t.commonCancel}
+        onCancel={() => setShowDeleteConfirm(false)}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 };

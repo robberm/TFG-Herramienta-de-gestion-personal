@@ -81,15 +81,10 @@ public class CalendarController {
         User currentUser = getCurrentUser(token);
 
         eventRequestValidator.requireValidDates(request);
-        Event event = new Event();
-        eventService.applyEventDetails(event, request);
         List<PersonalUser> targets = resolveTargetUsers(currentUser, request);
         AdminUser audAdmin = currentUser.isAdmin() ? (AdminUser) currentUser : null;
-        for (PersonalUser target : targets) {
-            event.addAssignment(target, audAdmin);
-        }
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(List.of(eventService.save(event)));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(eventService.createEvents(request, targets, audAdmin));
     }
 
     @PutMapping("/{id}")

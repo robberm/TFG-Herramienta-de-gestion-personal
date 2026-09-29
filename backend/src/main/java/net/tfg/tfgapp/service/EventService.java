@@ -4,18 +4,25 @@ import jakarta.persistence.EntityNotFoundException;
 import net.tfg.tfgapp.DTOs.events.EventRequest;
 import net.tfg.tfgapp.components.SessionStore;
 import net.tfg.tfgapp.domains.Event;
+import net.tfg.tfgapp.domains.AdminUser;
+import net.tfg.tfgapp.domains.PersonalUser;
 import net.tfg.tfgapp.repos.EventRepo;
 import net.tfg.tfgapp.schedulers.ReminderScheduler;
 import net.tfg.tfgapp.utils.WindowsUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.LinkedHashSet;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Set;
+import java.util.UUID;
 
 @Service
 public class EventService {
@@ -33,6 +40,68 @@ public class EventService {
         S savedEvent = eventRepo.save(entity);
         reminderScheduler.scheduleReminder(savedEvent);
         return savedEvent;
+    }
+
+    @Transactional
+    public List<Event> createEvents(EventRequest request, List<PersonalUser> targets, AdminUser audAdmin) {
+        List<LocalDate> dates = resolveOccurrenceDates(request);
+        String recurrenceType = normalizedRecurrenceType(request);
+        String seriesId = dates.size() > 1 ? UUID.randomUUID().toString() : null;
+        LocalDate originalDate = request.getStartTime().toLocalDate();
+        List<Event> created = new ArrayList<>();
+
+        for (LocalDate date : dates) {
+            long shiftDays = ChronoUnit.DAYS.between(originalDate, date);
+            Event event = new Event();
+            applyEventDetails(event, request);
+            event.setStartTime(request.getStartTime().plusDays(shiftDays));
+            event.setEndTime(request.getEndTime().plusDays(shiftDays));
+            event.setRecurrenceSeriesId(seriesId);
+            event.setRecurrenceType(seriesId == null ? null : recurrenceType);
+            for (PersonalUser target : targets) {
+                event.addAssignment(target, audAdmin);
+            }
+            created.add(save(event));
+        }
+        return created;
+    }
+
+    private List<LocalDate> resolveOccurrenceDates(EventRequest request) {
+        LocalDate start = request.getStartTime().toLocalDate();
+        String type = normalizedRecurrenceType(request);
+        if ("NONE".equals(type)) {
+            return List.of(start);
+        }
+
+        LocalDate end = request.getRecurrenceEndDate();
+        Set<Integer> customDays = request.getRecurrenceWeekdays() == null
+                ? Set.of()
+                : new LinkedHashSet<>(request.getRecurrenceWeekdays());
+        List<LocalDate> dates = new ArrayList<>();
+        LocalDate cursor = start;
+        while (!cursor.isAfter(end) && dates.size() < 731) {
+            boolean include = switch (type) {
+                case "DAILY" -> true;
+                case "WEEKLY" -> cursor.getDayOfWeek() == start.getDayOfWeek();
+                case "WEEKDAYS" -> cursor.getDayOfWeek().getValue() <= 5;
+                case "CUSTOM" -> customDays.contains(cursor.getDayOfWeek().getValue());
+                default -> cursor.equals(start);
+            };
+            if (include) {
+                dates.add(cursor);
+            }
+            cursor = cursor.plusDays(1);
+        }
+        if (dates.isEmpty()) {
+            dates.add(start);
+        }
+        return dates;
+    }
+
+    private String normalizedRecurrenceType(EventRequest request) {
+        return request.getRecurrenceType() == null
+                ? "NONE"
+                : request.getRecurrenceType().toUpperCase();
     }
 
     public List<Event> findEventsByUserAndDateRange(String username, LocalDateTime start, LocalDateTime end) {

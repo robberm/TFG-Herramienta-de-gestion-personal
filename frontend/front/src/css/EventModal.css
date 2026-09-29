@@ -186,6 +186,11 @@
   min-width: 0;
 }
 
+.gcal-date-row .custom-date-trigger {
+  min-height: 48px;
+  padding-inline: 16px;
+}
+
 .gcal-date-input {
   position: absolute;
   opacity: 0;
@@ -759,6 +764,23 @@ body.translucent .gcal-modal-footer {
     transform: translateY(0) scale(1);
   }
 }
+
+.gcal-recurrence {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(150px, .7fr);
+  gap: 10px 14px;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .04);
+}
+
+.gcal-recurrence > label:first-child { grid-column: 1 / -1; }
+.gcal-recurrence-until { display: flex; min-width: 0; flex-direction: column; align-items: stretch; gap: 6px; }
+.gcal-recurrence-until span { font-size: 12px; opacity: .72; }
+.gcal-weekday-picker { grid-column: 1 / -1; display: flex; gap: 7px; }
+.gcal-weekday-picker button { width: 34px; height: 34px; border: 1px solid rgba(255,255,255,.15); border-radius: 50%; background: rgba(255,255,255,.07); color: inherit; cursor: pointer; }
+.gcal-weekday-picker button.active { background: #f0c75e; border-color: #f0c75e; color: #28251f; font-weight: 800; }
 
 @media (max-width: 768px) {
   .gcal-modal {

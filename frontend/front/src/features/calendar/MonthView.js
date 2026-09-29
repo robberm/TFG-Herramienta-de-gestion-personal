@@ -12,6 +12,7 @@ import {
 } from "date-fns";
 import { enUS, es } from "date-fns/locale";
 import { useLanguage } from "../../context/languageContext";
+import { getShortWeekdayLabel } from "../../utils/dateLabels";
 
 /**
  * Convierte una fecha del backend a objeto Date de forma estable.
@@ -76,10 +77,15 @@ const MonthView = ({
 
   for (let i = 0; i < 7; i++) {
     const dayOfWeek = addDays(startOfTheWeek, i);
+    const shortLabel = getShortWeekdayLabel(
+      dayOfWeek,
+      language,
+      (date) => format(date, "EEEEE", { locale: calendarLocale }),
+    );
 
     daysOfWeek.push(
       <div className="day-header" key={`header-${i}`}>
-        {format(dayOfWeek, "EEEEE", { locale: calendarLocale })}
+        {shortLabel}
       </div>,
     );
   }

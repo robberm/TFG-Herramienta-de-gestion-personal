@@ -54,6 +54,13 @@ const CalendarIcon = () => (
   </svg>
 );
 
+const NotesIcon = () => (
+  <svg className="menuIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M5 3.75h10.5L19 7.25v13H5v-16.5Z" stroke="currentColor" strokeWidth="1.9" strokeLinejoin="round" />
+    <path d="M15.5 3.75v3.5H19M8.5 11h7M8.5 15h7" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+  </svg>
+);
+
 const ObjectivesIcon = () => (
   <svg className="menuIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <circle cx="12" cy="12" r="7.25" stroke="currentColor" strokeWidth="1.9" />
@@ -162,6 +169,11 @@ const MainLayout = ({ children }) => {
               <NavLink to="/calendar">
                 <CalendarIcon />
                 <span className="menuLabel">{t.menuCalendar}</span>
+              </NavLink>
+
+              <NavLink to="/notes">
+                <NotesIcon />
+                <span className="menuLabel">{t.menuNotes}</span>
               </NavLink>
 
               <NavLink to="/objectives">

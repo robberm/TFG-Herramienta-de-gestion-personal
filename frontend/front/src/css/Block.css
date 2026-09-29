@@ -323,33 +323,8 @@ input.picker-input {
   letter-spacing: 0.05em;
 }
 
-.focus-action-field select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  max-width: 220px;
-  padding: 0.65rem 2.25rem 0.65rem 0.9rem;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  background-color: var(--bg-tertiary);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  color: var(--text-primary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.focus-action-field select:hover {
-  border-color: color-mix(in srgb, var(--text-primary) 30%, transparent);
-}
-
-.focus-action-field select:focus {
-  outline: none;
-  border-color: var(--link-active-bg);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--link-active-bg) 20%, transparent);
+.focus-action-field .custom-select-container {
+  width: min(100%, 280px);
 }
 
 /* Tabs */
