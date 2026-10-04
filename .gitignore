@@ -24,6 +24,7 @@ productivity_config.json
 *.md
 !docs/
 !docs/ARQUITECTURA_Y_SEGURIDAD.md
+!docs/CAPA_BLOQUEO_EXTRA.md
 
 # =========================
 # Java / Spring Boot
@@ -76,3 +77,4 @@ desktop.ini
 *.pid
 *.seed
 *.pid.lock
+.claude/worktrees/

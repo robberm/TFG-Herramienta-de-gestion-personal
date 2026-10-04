@@ -27,6 +27,21 @@ export const resetBlockedApps = () =>
     includeJson: false,
   });
 
+export const getBlockedWebsites = () =>
+  apiRequest("/api/blocked-websites", { method: "GET", includeJson: false });
+
+export const addBlockedWebsite = (domain) =>
+  apiRequest("/api/blocked-websites", {
+    method: "POST",
+    body: JSON.stringify({ domain }),
+  });
+
+export const removeBlockedWebsite = (domain) =>
+  apiRequest(`/api/blocked-websites/${encodeURIComponent(domain)}`, {
+    method: "DELETE",
+    includeJson: false,
+  });
+
 export const getFocusState = () =>
   apiRequest("/api/block/focus-state", { method: "GET", includeJson: false });
 

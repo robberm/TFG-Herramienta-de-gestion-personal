@@ -105,6 +105,56 @@ public class AppRestrictionService {
         return Collections.unmodifiableSet(storageService.loadConfig().getBlockedApps());
     }
 
+    public Set<String> getBlockedWebsites() {
+        return Collections.unmodifiableSet(storageService.loadConfig().getBlockedWebsites());
+    }
+
+    public void addBlockedWebsite(String website) {
+        String domain = normalizeDomain(website);
+        IStorageService.Config config = storageService.loadConfig();
+        Set<String> websites = new HashSet<>(config.getBlockedWebsites());
+
+        if (!websites.add(domain)) {
+            throw new IllegalStateException("El sitio web ya est\u00e1 en la lista bloqueada");
+        }
+
+        config.setBlockedWebsites(websites);
+        storageService.saveConfig(config);
+    }
+
+    public void removeBlockedWebsite(String website) {
+        String domain = normalizeDomain(website);
+        IStorageService.Config config = storageService.loadConfig();
+        Set<String> websites = new HashSet<>(config.getBlockedWebsites());
+
+        if (!websites.remove(domain)) {
+            throw new IllegalArgumentException("El sitio web no estaba en la lista");
+        }
+
+        config.setBlockedWebsites(websites);
+        storageService.saveConfig(config);
+    }
+
+    private String normalizeDomain(String website) {
+        if (website == null || website.isBlank()) {
+            throw new IllegalArgumentException("El dominio no puede estar vac\u00edo");
+        }
+
+        String domain = website.trim().toLowerCase()
+                .replaceFirst("^https?://", "")
+                .replaceFirst("^www\\.", "");
+        int pathStart = domain.indexOf('/');
+        if (pathStart >= 0) {
+            domain = domain.substring(0, pathStart);
+        }
+
+        if (!domain.matches("^(?=.{1,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$")) {
+            throw new IllegalArgumentException("Formato de dominio inv\u00e1lido: " + website);
+        }
+
+        return domain;
+    }
+
     /**
      * Se mantiene por compatibilidad retroactiva con endpoints existentes.
      */

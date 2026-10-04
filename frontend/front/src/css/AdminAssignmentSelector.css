@@ -10,7 +10,7 @@
 
 .admin-assignment-input {
   width:100%;
-  background: rgba(255,255,255,.03);
+  background: var(--ui-control);
   border:1px solid var(--border-color);
   border-radius:12px;
   color:var(--text-main);
@@ -38,7 +38,7 @@ select.admin-assignment-input { cursor: pointer; appearance: none; padding-right
 }
 .admin-assignment-tags { display:flex; flex-wrap:wrap; gap:.4rem; }
 .admin-assignment-tag { border:1px solid rgba(102,126,234,.4); background:rgba(102,126,234,.12); color:var(--text-main); border-radius:999px; padding:.25rem .6rem; cursor:pointer; }
-.admin-assignment-results { max-height:180px; overflow:auto; border:1px solid var(--border-color); border-radius:12px; padding:.35rem; display:flex; flex-direction:column; gap:.25rem; background: var(--card-background); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); }
+.admin-assignment-results { max-height:180px; overflow:auto; border:1px solid var(--border-color); border-radius:12px; padding:.35rem; display:flex; flex-direction:column; gap:.25rem; background: var(--ui-popover); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); }
 .admin-assignment-result { width:100%; display:flex; justify-content:space-between; background:transparent; border:none; color:var(--text-main); padding:.45rem .55rem; border-radius:8px; cursor:pointer; }
 .admin-assignment-result:hover { background:rgba(102,126,234,.1); }
 .admin-assignment-result.selected { background:rgba(102,126,234,.18); }
@@ -51,40 +51,4 @@ select.admin-assignment-input { cursor: pointer; appearance: none; padding-right
 .admin-assignment-all-confirm {
   animation: gcal-slide-up 0.15s ease-out;
   transform-origin: top;
-}
-
-
-body.light .gcal-modal .admin-assignment-input,
-body.light .gcal-modal .admin-assignment-results,
-body.light .editModal .admin-assignment-input,
-body.light .editModal .admin-assignment-results,
-body.light .modalForm .admin-assignment-input,
-body.light .modalForm .admin-assignment-results {
-  background: rgba(255, 255, 255, 0.03);
-  border-color: var(--border-color);
-  color: #fff !important;
-}
-
-body.light .gcal-modal .admin-assignment-input::placeholder,
-body.light .editModal .admin-assignment-input::placeholder,
-body.light .modalForm .admin-assignment-input::placeholder {
-  color: rgba(255, 255, 255, 0.62) !important;
-}
-
-body.light .gcal-modal .admin-assignment-result,
-body.light .editModal .admin-assignment-result,
-body.light .modalForm .admin-assignment-result {
-  color: #fff !important;
-}
-
-body.light .gcal-modal .admin-assignment-result:hover,
-body.light .editModal .admin-assignment-result:hover,
-body.light .modalForm .admin-assignment-result:hover {
-  background: rgba(102, 126, 234, 0.16);
-}
-
-body.light .gcal-modal .admin-assignment-result.selected,
-body.light .editModal .admin-assignment-result.selected,
-body.light .modalForm .admin-assignment-result.selected {
-  background: rgba(102, 126, 234, 0.24);
 }

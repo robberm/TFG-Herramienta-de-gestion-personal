@@ -70,4 +70,30 @@ public class AppController {
         restrictionService.resetBlockedApps();
         return ResponseEntity.ok(languageResolver.text(language, "apps.blocked.reset"));
     }
+
+    @GetMapping("/blocked-websites")
+    public Set<String> getBlockedWebsites() {
+        return restrictionService.getBlockedWebsites();
+    }
+
+    @PostMapping("/blocked-websites")
+    public ResponseEntity<Void> addBlockedWebsite(@RequestBody java.util.Map<String, String> request) {
+        restrictionService.addBlockedWebsite(request.get("domain"));
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/blocked-websites/{domain}")
+    public ResponseEntity<Void> removeBlockedWebsite(@PathVariable String domain) {
+        restrictionService.removeBlockedWebsite(domain);
+        return ResponseEntity.noContent().build();
+    }
+
+    /** Endpoint de solo lectura consumido por la extensiÃ³n del navegador local. */
+    @GetMapping("/browser-blocking-policy")
+    public java.util.Map<String, Object> getBrowserBlockingPolicy() {
+        return java.util.Map.of(
+                "focusModeEnabled", blockingService.isEffectiveFocusModeEnabled(),
+                "blockedDomains", restrictionService.getBlockedWebsites()
+        );
+    }
 }

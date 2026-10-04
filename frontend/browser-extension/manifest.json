@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "__MSG_extensionName__",
+  "description": "__MSG_extensionDescription__",
+  "default_locale": "en",
+  "version": "0.1.2",
+  "permissions": ["declarativeNetRequest", "storage", "alarms", "webNavigation"],
+  "host_permissions": ["http://localhost:8080/*", "http://127.0.0.1:8080/*", "ws://localhost:8080/*", "*://*/*"],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "__MSG_extensionName__"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["blocked.html"],
+      "matches": ["*://*/*"]
+    }
+  ]
+}

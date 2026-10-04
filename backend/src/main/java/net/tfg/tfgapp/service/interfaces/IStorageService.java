@@ -41,6 +41,7 @@ public interface IStorageService {
 
     class Config {
         private Set<String> blockedApps;
+        private Set<String> blockedWebsites;
         private Set<String> games;
         private boolean focusModeEnabled = false;
         private int workDurationSeconds = 20 * 60;
@@ -53,6 +54,14 @@ public interface IStorageService {
 
         public void setBlockedApps(Set<String> blockedApps) {
             this.blockedApps = blockedApps;
+        }
+
+        public Set<String> getBlockedWebsites() {
+            return blockedWebsites;
+        }
+
+        public void setBlockedWebsites(Set<String> blockedWebsites) {
+            this.blockedWebsites = blockedWebsites;
         }
 
         public Set<String> getGames() {

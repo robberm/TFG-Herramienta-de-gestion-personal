@@ -34,6 +34,7 @@ public class StorageServiceImpl implements IStorageService {
                         "riotclientservices.exe",
                         "steam.exe"
                 )));
+                defaultConfig.setBlockedWebsites(new HashSet<>());
                 defaultConfig.setGames(Set.of(
                         "valorant.exe",
                         "leagueoflegends.exe",
@@ -47,6 +48,10 @@ public class StorageServiceImpl implements IStorageService {
 
             if (config.getBlockedApps() == null) {
                 config.setBlockedApps(Collections.emptySet());
+            }
+
+            if (config.getBlockedWebsites() == null) {
+                config.setBlockedWebsites(Collections.emptySet());
             }
 
             if (config.getGames() == null) {
@@ -86,6 +91,7 @@ public class StorageServiceImpl implements IStorageService {
         try {
             Config cleanConfig = new Config();
             cleanConfig.setBlockedApps(new HashSet<>());
+            cleanConfig.setBlockedWebsites(new HashSet<>());
             cleanConfig.setGames(Set.of(
                     "valorant.exe",
                     "leagueoflegends.exe",

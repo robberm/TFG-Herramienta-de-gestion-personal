@@ -10,10 +10,13 @@ import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import {
   addBlockedApp as addBlockedAppApi,
+  addBlockedWebsite as addBlockedWebsiteApi,
   getBlockedApps as getBlockedAppsApi,
+  getBlockedWebsites as getBlockedWebsitesApi,
   getFocusState,
   getInstalledApps,
   removeBlockedApp as removeBlockedAppApi,
+  removeBlockedWebsite as removeBlockedWebsiteApi,
   resetBlockedApps,
   updateFocusSettings,
 } from "../api/blockApi";
@@ -275,6 +278,8 @@ function Block() {
   const { t } = useLanguage();
   const { setErrorMessage } = useError();
   const [blockedApps, setBlockedApps] = useState([]);
+  const [blockedWebsites, setBlockedWebsites] = useState([]);
+  const [websiteDomain, setWebsiteDomain] = useState("");
   const [installedApps, setInstalledApps] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -408,6 +413,17 @@ function Block() {
     }
   }, [setErrorMessage]);
 
+  const fetchBlockedWebsites = useCallback(async () => {
+    try {
+      const websites = await getBlockedWebsitesApi();
+      setBlockedWebsites(Array.isArray(websites) ? websites : []);
+    } catch (error) {
+      setErrorMessage(
+        getApiErrorMessage(error, t.blockWebsitesLoadError),
+      );
+    }
+  }, [setErrorMessage, t.blockWebsitesLoadError]);
+
   const fetchFocusState = useCallback(
     async (showError = true) => {
       try {
@@ -426,12 +442,13 @@ function Block() {
 
   useEffect(() => {
     fetchBlockedApps();
+    fetchBlockedWebsites();
     fetchInstalledApps();
     fetchFocusState(true);
 
     const refreshInterval = setInterval(() => fetchFocusState(false), 20000);
     return () => clearInterval(refreshInterval);
-  }, [fetchBlockedApps, fetchFocusState, fetchInstalledApps]);
+  }, [fetchBlockedApps, fetchBlockedWebsites, fetchFocusState, fetchInstalledApps]);
 
   useEffect(() => {
     const socket = new SockJS("http://localhost:8080/ws");
@@ -551,6 +568,26 @@ function Block() {
       setErrorMessage(
         getApiErrorMessage(error, "No se pudo eliminar la aplicación"),
       );
+    }
+  };
+
+  const addBlockedWebsite = async () => {
+    if (!websiteDomain.trim()) return;
+    try {
+      await addBlockedWebsiteApi(websiteDomain);
+      setWebsiteDomain("");
+      await fetchBlockedWebsites();
+    } catch (error) {
+      setErrorMessage(getApiErrorMessage(error, t.blockWebsiteAddError));
+    }
+  };
+
+  const removeBlockedWebsite = async (domain) => {
+    try {
+      await removeBlockedWebsiteApi(domain);
+      await fetchBlockedWebsites();
+    } catch (error) {
+      setErrorMessage(getApiErrorMessage(error, t.blockWebsiteRemoveError));
     }
   };
 
@@ -731,6 +768,13 @@ function Block() {
           >
             <TrashIcon />
             {t.blockManage} ({blockedApps.length})
+          </button>
+          <button
+            className={`tab-btn ${activeTab === "websites" ? "active" : ""}`}
+            onClick={() => setActiveTab("websites")}
+          >
+            <SearchIcon />
+            {t.blockWebsites} ({blockedWebsites.length})
           </button>
         </div>
 
@@ -913,6 +957,51 @@ function Block() {
                   </div>
                   <p>{t.blockNoBlockedApps}</p>
                   <span>{t.blockAddFromTab}</span>
+                </div>
+              )}
+            </div>
+          )}
+          {activeTab === "websites" && (
+            <div className="websites-section">
+              <p className="websites-description">{t.blockWebsitesDescription}</p>
+              <div className="website-add-row">
+                <input
+                  type="text"
+                  value={websiteDomain}
+                  onChange={(event) => setWebsiteDomain(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") addBlockedWebsite();
+                  }}
+                  placeholder={t.blockWebsitePlaceholder}
+                  className="search-input website-input"
+                />
+                <button type="button" className="website-add-btn" onClick={addBlockedWebsite}>
+                  <PlusIcon /> {t.blockAddWebsite}
+                </button>
+              </div>
+              {blockedWebsites.length ? (
+                <ul className="blocked-apps-list website-list">
+                  {blockedWebsites.map((domain) => (
+                    <li key={domain} className="blocked-app-item">
+                      <div className="blocked-app-info">
+                        <span className="blocked-app-name">{domain}</span>
+                        <span className="blocked-app-exe">{t.blockWebsiteIncludesSubdomains}</span>
+                      </div>
+                      <button
+                        type="button"
+                        className="remove-app-btn"
+                        onClick={() => removeBlockedWebsite(domain)}
+                        title={t.blockRemoveWebsite}
+                      >
+                        <TrashIcon />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="empty-state">
+                  <p>{t.blockNoBlockedWebsites}</p>
+                  <span>{t.blockAddWebsiteHint}</span>
                 </div>
               )}
             </div>

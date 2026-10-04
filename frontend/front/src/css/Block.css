@@ -365,6 +365,14 @@ input.picker-input {
   color: var(--link-active-text);
 }
 
+/* Un color personalizado muy claro no debe convertir la pestaña activa en un
+   bloque blanco. Conservamos su matiz, pero lo anclamos a una superficie oscura
+   para mantener contraste con el texto y el resto de la interfaz. */
+body.custom .tab-btn.active {
+  background: color-mix(in srgb, var(--custom-theme-color) 42%, #0b0c10);
+  color: #fff;
+}
+
 .tab-btn svg {
   width: 16px;
   height: 16px;
@@ -912,4 +920,43 @@ input.picker-input {
 
 .search-dropdown::-webkit-scrollbar-thumb:hover {
   background: color-mix(in srgb, var(--text-primary) 60%, transparent);
+}
+
+.websites-section {
+  display: grid;
+  gap: 1rem;
+}
+
+.websites-description {
+  margin: 0;
+  color: color-mix(in srgb, var(--text-primary) 70%, transparent);
+}
+
+.website-add-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.website-input {
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-tertiary);
+  padding: 0.75rem;
+}
+
+.website-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 0;
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  color: var(--button-primary-text);
+  background: var(--button-primary-bg);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.website-add-btn:hover {
+  filter: brightness(1.08);
 }

@@ -1,0 +1,8 @@
+{
+  "extensionName": { "message": "GMO Focus Web Blocker" },
+  "extensionDescription": { "message": "Blocks the websites configured in GMO while Focus is active." },
+  "blockedTitle": { "message": "Focus is active" },
+  "activeTitleOne": { "message": "GMO Focus: $COUNT$ blocked domain", "placeholders": { "count": { "content": "$1" } } },
+  "activeTitleMany": { "message": "GMO Focus: $COUNT$ blocked domains", "placeholders": { "count": { "content": "$1" } } },
+  "blockedMessage": { "message": "This website is on your blocked list. Return to GMO to review or end your Focus session." }
+}

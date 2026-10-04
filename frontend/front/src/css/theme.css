@@ -11,12 +11,13 @@
   --glass-blur: none;
   --card-background: var(--sidebar-bg);
   --border-color: var(--panel-border);
-  --text-secondary: color-mix(in srgb, var(--text-main) 62%, transparent);
   --ui-surface: #ffffff;
   --ui-surface-raised: #fbfaf8;
   --ui-control: #f3f1ed;
   --ui-popover: #ffffff;
   --ui-muted: #706d68;
+  /* Los textos auxiliares comparten el mismo token en todas las vistas. */
+  --text-secondary: var(--ui-muted);
 
   --event-study-color: #f39c12;
   --event-mandatory-color: #e74c3c;
@@ -44,6 +45,7 @@ body.dark {
   --ui-control: #343434;
   --ui-popover: #292929;
   --ui-muted: #aaa7a2;
+  --text-secondary: var(--ui-muted);
 }
 body.truedark {
   --bg-main: #000000;
@@ -61,6 +63,7 @@ body.truedark {
   --ui-control: #151515;
   --ui-popover: #0b0b0b;
   --ui-muted: #9d9d9d;
+  --text-secondary: var(--ui-muted);
 }
 
 body.custom {
@@ -79,6 +82,7 @@ body.custom {
   --ui-control: color-mix(in srgb, var(--custom-theme-color) 20%, #22232b);
   --ui-popover: color-mix(in srgb, var(--custom-theme-color) 12%, #15161c);
   --ui-muted: color-mix(in srgb, var(--custom-theme-color) 20%, #b9b9c2);
+  --text-secondary: var(--ui-muted);
 }
 
 body.translucent {
@@ -97,21 +101,18 @@ body.translucent {
   --ui-control: rgba(255, 255, 255, 0.03);
   --ui-popover: rgba(17, 25, 40, 0.90);
   --ui-muted: rgba(255, 255, 255, 0.68);
+  --text-secondary: var(--ui-muted);
 }
 
 body.translucent .editModal,
-body.translucent .gcal-modal {
-  --card-background: rgba(17, 25, 40, 0.38);
-  --bg-main: rgba(17, 25, 40, 0.38);
-  --bg-hover: rgba(255, 255, 255, 0.08);
-  --border-color: rgba(255, 255, 255, 0.14);
-  --panel-border: rgba(255, 255, 255, 0.14);
-  --ui-control: rgba(255, 255, 255, 0.03);
-  --ui-popover: rgba(17, 25, 40, 0.90);
-  background: rgba(17, 25, 40, 0.38);
-  color: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+body.translucent .gcal-modal,
+body.translucent .confirmDialog {
+  --modal-surface: rgba(17, 25, 40, 0.72);
+  --modal-control: rgba(255, 255, 255, 0.06);
+  --modal-hover: rgba(255, 255, 255, 0.1);
+  --modal-border: rgba(255, 255, 255, 0.16);
+  --modal-text: rgba(255, 255, 255, 0.96);
+  --modal-muted: rgba(255, 255, 255, 0.68);
 }
 
 html,
@@ -167,85 +168,59 @@ body,
     -webkit-backdrop-filter 0.3s ease;
 }
 
-/* Los modales conservan su paleta oscura original incluso en el tema claro. */
-body.light .editModal,
-body.light .gcal-modal,
-body.light .confirmDialog {
-  --bg-main: #202126;
-  --bg-hover: #34353d;
-  --sidebar-bg: #28292f;
-  --card-background: #28292f;
-  --text-main: #f7f7f8;
-  --text-secondary: rgba(255, 255, 255, 0.66);
-  --border-color: rgba(255, 255, 255, 0.12);
-  --panel-border: rgba(255, 255, 255, 0.12);
-  --link-active-bg: #667eea;
-  --link-active-text: #ffffff;
-  --ui-surface: #28292f;
-  --ui-surface-raised: #2d2e35;
-  --ui-control: #32333b;
-  --ui-popover: #292a31;
-  --ui-muted: rgba(255, 255, 255, 0.66);
-  background: #28292f;
-  color: #f7f7f8;
+/* La paleta de modal se mantiene consistente sin anular los estilos internos. */
+.editModal,
+.gcal-modal,
+.confirmDialog {
+  --modal-surface: #28292f;
+  --modal-control: #32333b;
+  --modal-hover: #3a3b43;
+  --modal-border: rgba(255, 255, 255, 0.12);
+  --modal-text: #f7f7f8;
+  --modal-muted: rgba(255, 255, 255, 0.66);
+  --card-background: var(--modal-surface);
+  --bg-main: var(--modal-control);
+  --bg-hover: var(--modal-hover);
+  --border-color: var(--modal-border);
+  --panel-border: var(--modal-border);
+  --text-main: var(--modal-text);
+  --text-secondary: var(--modal-muted);
+  --ui-surface: var(--modal-surface);
+  --ui-surface-raised: var(--modal-surface);
+  --ui-control: var(--modal-control);
+  --ui-popover: var(--modal-surface);
+  --ui-muted: var(--modal-muted);
+  background: var(--modal-surface);
+  color: var(--modal-text);
 }
 
-/* ========================================
-   Light theme modal text overrides
-   Centralized here to avoid duplication across feature CSS files.
-   ======================================== */
-body.light .modalHeader h3,
-body.light .modalForm,
-body.light .modalForm .formGroup label,
-body.light .modalForm .checkboxRow,
-body.light .modalForm input,
-body.light .modalForm select,
-body.light .modalForm textarea,
-body.light .modalForm input::placeholder,
-body.light .modalForm textarea::placeholder,
-body.light .closeButton,
-body.light .gcal-modal,
-body.light .gcal-modal-header h3,
-body.light .gcal-form,
-body.light .gcal-form .formGroup label,
-body.light .gcal-form .checkboxRow,
-body.light .gcal-form input,
-body.light .gcal-form select,
-body.light .gcal-form textarea,
-body.light .gcal-form input::placeholder,
-body.light .gcal-form textarea::placeholder,
-body.light .gcal-close-btn,
-body.light .time-selector-label,
-body.light .time-value,
-body.light .gcal-date-display,
-body.light .gcal-toggle-label,
-body.light .gcal-reminders-header span,
-body.light .gcal-reminder-chip,
-body.light .gcal-custom-reminder input,
-body.light .confirmDialog,
-body.light .confirmDialogBody h3,
-body.light .confirmDialogWarning {
-  color: #fff !important;
+body.dark .editModal,
+body.dark .gcal-modal,
+body.dark .confirmDialog {
+  --modal-surface: #2a2a2a;
+  --modal-control: #343434;
+  --modal-hover: #3d3d3d;
 }
 
-body.light .editModal input,
-body.light .editModal select,
-body.light .editModal textarea,
-body.light .editModal button,
-body.light .gcal-modal input,
-body.light .gcal-modal select,
-body.light .gcal-modal textarea,
-body.light .gcal-modal button,
-body.light .gcal-modal span,
-body.light .gcal-modal label,
-body.light .gcal-modal div,
-body.light .confirmDialog button {
-  color: inherit;
+body.truedark .editModal,
+body.truedark .gcal-modal,
+body.truedark .confirmDialog {
+  --modal-surface: #0c0c0c;
+  --modal-control: #181818;
+  --modal-hover: #242424;
 }
 
-body.light .editModal input::placeholder,
-body.light .editModal textarea::placeholder,
-body.light .gcal-modal input::placeholder,
-body.light .gcal-modal textarea::placeholder {
-  color: rgba(255, 255, 255, 0.65) !important;
+body.custom .editModal,
+body.custom .gcal-modal,
+body.custom .confirmDialog {
+  --modal-surface: color-mix(in srgb, var(--custom-theme-color) 16%, #181920);
+  --modal-control: color-mix(in srgb, var(--custom-theme-color) 22%, #22232b);
+  --modal-hover: color-mix(in srgb, var(--custom-theme-color) 28%, #282a34);
+}
+
+body.translucent .editModal,
+body.translucent .gcal-modal,
+body.translucent .confirmDialog {
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
