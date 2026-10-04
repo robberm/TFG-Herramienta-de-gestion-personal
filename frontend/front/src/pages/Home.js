@@ -4,6 +4,7 @@ import PieChart from "../features/objectives/components/PieChart.jsx";
 import HomeHeader from "../features/home/HomeHeader.jsx";
 import DailyWidget from "../features/home/DailyWidget.jsx";
 import RemindersPanel from "../features/home/RemindersPanel.js";
+import TodoList from "../features/home/TodoList.jsx";
 import useTodayEvents from "../hooks/useTodayEvents.jsx";
 import { getCurrentUserProfile } from "../api/userApi";
 import { getManagedUsers, getManagedUserGoals } from "../api/adminApi";
@@ -299,6 +300,8 @@ if (isAdmin) {
             onEventsChanged={refreshTodayEvents}
           />
         </div>
+
+        <TodoList />
       </div>
     </>
   );
