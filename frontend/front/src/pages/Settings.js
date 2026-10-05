@@ -68,6 +68,18 @@ const Settings = () => {
       hint: t.translucentThemeHint,
       colors: ["rgba(26, 28, 34, .42)", "rgba(255, 255, 255, .16)", "#4a90e2"],
     },
+    {
+      id: "acrylic",
+      label: t.acrylicTheme,
+      hint: t.acrylicThemeHint,
+      colors: ["rgba(44, 44, 48, .55)", "rgba(255, 255, 255, .10)", "#60a5fa"],
+    },
+    {
+      id: "mica",
+      label: t.micaTheme,
+      hint: t.micaThemeHint,
+      colors: ["rgba(36, 38, 46, .85)", "rgba(255, 255, 255, .08)", "#60a5fa"],
+    },
   ];
 
   useEffect(() => {

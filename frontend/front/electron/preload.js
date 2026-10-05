@@ -10,8 +10,12 @@ contextBridge.exposeInMainWorld("electronAPI", {
   toggleMaximizeWindow: () => ipcRenderer.send("window:toggle-maximize"),
   closeWindow: () => ipcRenderer.send("window:close"),
 
-  setWindowTransparencyMode: ({ transparent, route }) =>
-    ipcRenderer.send("window:set-transparency-mode", { transparent, route }),
+  setWindowTransparencyMode: ({ transparent, mode, route }) =>
+    ipcRenderer.send("window:set-transparency-mode", {
+      transparent,
+      mode,
+      route,
+    }),
 
   isWindowMaximized: () => ipcRenderer.invoke("window:is-maximized"),
 

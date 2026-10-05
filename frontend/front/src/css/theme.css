@@ -115,6 +115,47 @@ body.translucent .confirmDialog {
   --modal-muted: rgba(255, 255, 255, 0.68);
 }
 
+/*
+ * Acrylic y Mica: el material lo pinta Windows (DWM) detrás de la ventana, así que aquí no
+ * hace falta backdrop-filter. Se apoyan en los estilos de componentes de body.translucent
+ * (el body lleva ambas clases) y solo ajustan la paleta a un tinte más fino y legible.
+ */
+body.translucent.acrylic,
+body.translucent.mica {
+  --bg-main: rgba(255, 255, 255, 0.06);
+  --bg-page: transparent;
+  --sidebar-bg: rgba(0, 0, 0, 0.16);
+  --bg-hover: rgba(255, 255, 255, 0.09);
+  --text-main: #f3f3f3;
+  --link-active-bg: rgba(96, 165, 250, 0.85);
+  --link-active-text: #ffffff;
+  --panel-border: rgba(255, 255, 255, 0.09);
+  --panel-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  --glass-blur: none;
+  --ui-surface: rgba(255, 255, 255, 0.045);
+  --ui-surface-raised: rgba(255, 255, 255, 0.07);
+  --ui-control: rgba(255, 255, 255, 0.06);
+  --ui-popover: rgba(36, 36, 40, 0.94);
+  --ui-muted: rgba(255, 255, 255, 0.66);
+  --text-secondary: var(--ui-muted);
+}
+
+/* Mica es casi opaco y apenas aclara: un pelo más de contraste en superficies. */
+body.translucent.mica {
+  --sidebar-bg: rgba(0, 0, 0, 0.10);
+  --ui-surface: rgba(255, 255, 255, 0.055);
+  --ui-surface-raised: rgba(255, 255, 255, 0.085);
+}
+
+body.translucent.acrylic .editModal,
+body.translucent.acrylic .gcal-modal,
+body.translucent.acrylic .confirmDialog,
+body.translucent.mica .editModal,
+body.translucent.mica .gcal-modal,
+body.translucent.mica .confirmDialog {
+  --modal-surface: rgba(32, 32, 36, 0.86);
+}
+
 html,
 body,
 #root {

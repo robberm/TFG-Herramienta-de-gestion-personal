@@ -5,8 +5,10 @@ const {
   globalShortcut,
   screen,
   dialog,
+  nativeTheme,
 } = require("electron");
 const path = require("path");
+const os = require("os");
 const fs = require("fs");
 const { exec, spawn } = require("child_process");
 const net = require("net");
@@ -16,8 +18,41 @@ let mainWindow = null;
 let blockWindow = null;
 let backendProcess = null;
 
-let currentWindowTransparent = false;
+let currentWindowMode = "opaque";
 let isRecreatingWindow = false;
+
+/**
+ * Modos de ventana principal:
+ * - opaque: ventana normal.
+ * - transparent: ventana con alfa real (tema translúcido); el escritorio se ve sin difuminar.
+ * - acrylic / mica: material nativo de Windows 11 (DWM). Acrylic difumina en tiempo real lo
+ *   que hay detrás; Mica tiñe con el fondo de escritorio.
+ */
+const WINDOW_MODES = ["opaque", "transparent", "acrylic", "mica"];
+const MATERIAL_WINDOW_MODES = ["acrylic", "mica"];
+
+// DWMWA_SYSTEMBACKDROP_TYPE existe desde Windows 11 22H2 (compilación 22621).
+const MIN_BACKDROP_MATERIAL_BUILD = 22621;
+
+function supportsBackgroundMaterial() {
+  if (process.platform !== "win32") return false;
+  const build = Number(os.release().split(".")[2] || 0);
+  return build >= MIN_BACKDROP_MATERIAL_BUILD;
+}
+
+/** Si el sistema no soporta materiales, se cae al modo transparente clásico. */
+function resolveWindowMode(requestedMode) {
+  const mode = WINDOW_MODES.includes(requestedMode) ? requestedMode : "opaque";
+  if (MATERIAL_WINDOW_MODES.includes(mode) && !supportsBackgroundMaterial()) {
+    return "transparent";
+  }
+  return mode;
+}
+
+/** El tinte de Acrylic/Mica sigue el modo oscuro de la ventana, que Electron toma de nativeTheme. */
+function syncNativeThemeWithWindowMode(mode) {
+  nativeTheme.themeSource = MATERIAL_WINDOW_MODES.includes(mode) ? "dark" : "system";
+}
 /** Mensajes centralizados para no dejar textos de error sueltos por el archivo. */
 const ERROR_MESSAGES = {
   COMPOSE_NOT_FOUND: "No se ha encontrado compose.yml en:",
@@ -437,7 +472,7 @@ function attachWindowEvents(win) {
 }
 
 function createMainWindow({
-  transparentMode = false,
+  windowMode = "opaque",
   route = "/",
   bounds = null,
   maximized = false,
@@ -452,8 +487,11 @@ function createMainWindow({
     minHeight: 600,
     autoHideMenuBar: true,
     frame: false,
-    transparent: transparentMode,
-    backgroundColor: transparentMode ? "#00000000" : "#111111",
+    transparent: windowMode === "transparent",
+    backgroundColor: windowMode === "opaque" ? "#111111" : "#00000000",
+    ...(MATERIAL_WINDOW_MODES.includes(windowMode)
+      ? { backgroundMaterial: windowMode }
+      : {}),
     hasShadow: true,
     thickFrame: true,
     roundedCorners: true,
@@ -484,17 +522,19 @@ function createMainWindow({
 
 function openInitialWindow() {
   mainWindow = createMainWindow({
-    transparentMode: false,
+    windowMode: "opaque",
     route: "/",
     hidden: false,
   });
 }
 
-function recreateMainWindow({ transparentMode, route = "/" }) {
+function recreateMainWindow({ windowMode, route = "/" }) {
+  syncNativeThemeWithWindowMode(windowMode);
+
   if (!mainWindow || mainWindow.isDestroyed()) {
-    currentWindowTransparent = transparentMode;
+    currentWindowMode = windowMode;
     mainWindow = createMainWindow({
-      transparentMode,
+      windowMode,
       route,
       hidden: false,
     });
@@ -502,7 +542,17 @@ function recreateMainWindow({ transparentMode, route = "/" }) {
   }
 
   if (isRecreatingWindow) return;
-  if (currentWindowTransparent === transparentMode) return;
+  if (currentWindowMode === windowMode) return;
+
+  // Entre materiales no hace falta recrear: DWM permite cambiar el backdrop en caliente.
+  if (
+    MATERIAL_WINDOW_MODES.includes(currentWindowMode) &&
+    MATERIAL_WINDOW_MODES.includes(windowMode)
+  ) {
+    mainWindow.setBackgroundMaterial(windowMode);
+    currentWindowMode = windowMode;
+    return;
+  }
 
   isRecreatingWindow = true;
 
@@ -513,7 +563,7 @@ function recreateMainWindow({ transparentMode, route = "/" }) {
     : oldWindow.getBounds();
 
   const newWindow = createMainWindow({
-    transparentMode,
+    windowMode,
     route,
     bounds,
     maximized: wasMaximized,
@@ -528,7 +578,7 @@ function recreateMainWindow({ transparentMode, route = "/" }) {
 
     newWindow.show();
     mainWindow = newWindow;
-    currentWindowTransparent = transparentMode;
+    currentWindowMode = windowMode;
 
     if (wasMaximized && !newWindow.isDestroyed()) {
       newWindow.maximize();
@@ -855,9 +905,10 @@ ipcMain.on("window:close", () => {
 });
 
 ipcMain.on("window:set-transparency-mode", (_, payload) => {
-  const transparentMode = !!payload?.transparent;
+  const requestedMode =
+    payload?.mode || (payload?.transparent ? "transparent" : "opaque");
   const route = getRouteToLoad(payload?.route);
-  recreateMainWindow({ transparentMode, route });
+  recreateMainWindow({ windowMode: resolveWindowMode(requestedMode), route });
 });
 
 ipcMain.on("show-reminder-window", (_event, reminder) => {

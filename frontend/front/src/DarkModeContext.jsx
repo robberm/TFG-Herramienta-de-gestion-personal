@@ -9,12 +9,25 @@ import React, {
 
 const DarkModeContext = createContext();
 
-const THEME_CLASSES = ["light", "dark", "truedark", "translucent", "custom"];
+const THEMES = ["light", "dark", "truedark", "translucent", "acrylic", "mica", "custom"];
+// Acrylic y Mica reutilizan los estilos de componentes del tema translúcido y solo cambian tokens.
+const THEME_BASE_CLASSES = {
+  acrylic: ["translucent"],
+  mica: ["translucent"],
+};
+// Modo de ventana que pide cada tema al proceso principal de Electron.
+const THEME_WINDOW_MODES = {
+  translucent: "transparent",
+  acrylic: "acrylic",
+  mica: "mica",
+};
+
+const getWindowModeForTheme = (theme) => THEME_WINDOW_MODES[theme] || "opaque";
 const THEME_STORAGE_KEY = "appTheme";
 const CUSTOM_COLOR_STORAGE_KEY = "customThemeColor";
 const DEFAULT_CUSTOM_COLOR = "#6c63ff";
 
-const isValidTheme = (theme) => THEME_CLASSES.includes(theme);
+const isValidTheme = (theme) => THEMES.includes(theme);
 const isValidHexColor = (color) => /^#[0-9a-f]{6}$/i.test(color || "");
 
 const getStoredTheme = () => {
@@ -35,8 +48,8 @@ const getStoredCustomColor = () => {
 };
 
 const applyThemeToBody = (theme, customColor) => {
-  document.body.classList.remove(...THEME_CLASSES);
-  document.body.classList.add(theme);
+  document.body.classList.remove(...THEMES);
+  document.body.classList.add(...(THEME_BASE_CLASSES[theme] || []), theme);
   document.body.style.setProperty("--custom-theme-color", customColor);
 };
 
@@ -65,8 +78,10 @@ export const DarkModeProvider = ({ children }) => {
 
   useEffect(() => {
     if (window.electronAPI?.setWindowTransparencyMode) {
+      const mode = getWindowModeForTheme(theme);
       window.electronAPI.setWindowTransparencyMode({
-        transparent: theme === "translucent",
+        transparent: mode !== "opaque",
+        mode,
         route: getCurrentRoute(),
       });
     }
@@ -75,18 +90,16 @@ export const DarkModeProvider = ({ children }) => {
   const switchTheme = useCallback((nextTheme) => {
     if (!isValidTheme(nextTheme)) return;
 
-    const wasTransparent = theme === "translucent";
-    const willBeTransparent = nextTheme === "translucent";
+    const currentMode = getWindowModeForTheme(theme);
+    const nextMode = getWindowModeForTheme(nextTheme);
 
     localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
     setTheme(nextTheme);
 
-    if (
-      window.electronAPI?.setWindowTransparencyMode &&
-      wasTransparent !== willBeTransparent
-    ) {
+    if (window.electronAPI?.setWindowTransparencyMode && currentMode !== nextMode) {
       window.electronAPI.setWindowTransparencyMode({
-        transparent: willBeTransparent,
+        transparent: nextMode !== "opaque",
+        mode: nextMode,
         route: getCurrentRoute(),
       });
     }
