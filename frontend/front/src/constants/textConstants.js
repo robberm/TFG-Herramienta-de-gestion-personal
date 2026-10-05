@@ -20,8 +20,9 @@ export const TEXT_CONSTANTS = {
     translucentThemeHint: "Glass over your desktop",
     acrylicTheme: "Acrylic theme",
     acrylicThemeHint: "Live Windows blur of what is behind",
-    micaTheme: "Mica theme",
-    micaThemeHint: "Tinted by your wallpaper",
+    reactiveContrast: "Reactive contrast",
+    reactiveContrastHint:
+      "Text adapts to what is behind the window. Turn it off if you record the screen: the window briefly hides from captures while sampling.",
     customTheme: "Custom theme",
     customThemeHint: "Create a palette around your favorite color.",
     customThemeColor: "Palette color",
@@ -349,8 +350,9 @@ export const TEXT_CONSTANTS = {
     translucentThemeHint: "Cristal sobre tu escritorio",
     acrylicTheme: "Tema acrílico",
     acrylicThemeHint: "Desenfoque en vivo de Windows",
-    micaTheme: "Tema Mica",
-    micaThemeHint: "Teñido con tu fondo de escritorio",
+    reactiveContrast: "Contraste reactivo",
+    reactiveContrastHint:
+      "El texto se adapta a lo que hay detrás de la ventana. Desactívalo si grabas pantalla: la ventana se oculta un instante de las capturas al muestrear.",
     customTheme: "Tema personalizado",
     customThemeHint: "Crea una paleta alrededor de tu color favorito.",
     customThemeColor: "Color de la paleta",

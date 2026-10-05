@@ -16,7 +16,15 @@ import { useLanguage } from "../context/languageContext";
 import CustomSelectDropdown from "../components/shared/CustomSelectDropdown";
 
 const Settings = () => {
-  const { theme, setTheme, customThemeColor, setCustomThemeColor } = useDarkMode();
+  const {
+    theme,
+    setTheme,
+    customThemeColor,
+    setCustomThemeColor,
+    reactiveContrast,
+    setReactiveContrast,
+  } = useDarkMode();
+  const canUseReactiveContrast = typeof window !== "undefined" && !!window.electronAPI?.onBackdropSample;
   const { language, setLanguage, t } = useLanguage();
 
   const [username, setUsername] = useState(
@@ -73,12 +81,6 @@ const Settings = () => {
       label: t.acrylicTheme,
       hint: t.acrylicThemeHint,
       colors: ["rgba(44, 44, 48, .55)", "rgba(255, 255, 255, .10)", "#60a5fa"],
-    },
-    {
-      id: "mica",
-      label: t.micaTheme,
-      hint: t.micaThemeHint,
-      colors: ["rgba(36, 38, 46, .85)", "rgba(255, 255, 255, .08)", "#60a5fa"],
     },
   ];
 
@@ -394,6 +396,26 @@ const Settings = () => {
               </div>
             )}
           </div>
+
+          {canUseReactiveContrast && theme === "translucent" && (
+            <div className="settingsRow appearanceUtilityRow">
+              <div>
+                <span className="settingsLabel">{t.reactiveContrast}</span>
+                <p className="settingsHint">{t.reactiveContrastHint}</p>
+              </div>
+
+              <button
+                type="button"
+                role="switch"
+                aria-checked={reactiveContrast}
+                aria-label={t.reactiveContrast}
+                className={`settingsSwitch ${reactiveContrast ? "active" : ""}`}
+                onClick={() => setReactiveContrast(!reactiveContrast)}
+              >
+                <span className="settingsSwitchThumb"></span>
+              </button>
+            </div>
+          )}
 
           <div className="settingsRow appearanceUtilityRow">
             <div>

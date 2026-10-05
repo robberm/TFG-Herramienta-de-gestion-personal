@@ -17,6 +17,16 @@ contextBridge.exposeInMainWorld("electronAPI", {
       route,
     }),
 
+  setBackdropSampling: (enabled) =>
+    ipcRenderer.send("backdrop:set-enabled", !!enabled),
+
+  /** Devuelve una función para dejar de escuchar las muestras del fondo. */
+  onBackdropSample: (callback) => {
+    const listener = (_event, sample) => callback(sample);
+    ipcRenderer.on("backdrop:sample", listener);
+    return () => ipcRenderer.removeListener("backdrop:sample", listener);
+  },
+
   isWindowMaximized: () => ipcRenderer.invoke("window:is-maximized"),
 
   showReminderWindow: (reminder) =>

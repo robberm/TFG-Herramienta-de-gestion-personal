@@ -13,6 +13,7 @@ const fs = require("fs");
 const { exec, spawn } = require("child_process");
 const net = require("net");
 const { promisify } = require("util");
+const { createBackdropSampler } = require("./backdropSampler");
 
 let mainWindow = null;
 let blockWindow = null;
@@ -20,16 +21,18 @@ let backendProcess = null;
 
 let currentWindowMode = "opaque";
 let isRecreatingWindow = false;
+// Contraste reactivo del tema translúcido: lo activa/desactiva el renderer desde Ajustes.
+let backdropSamplingEnabled = true;
+const backdropSamplers = new WeakMap();
 
 /**
  * Modos de ventana principal:
  * - opaque: ventana normal.
  * - transparent: ventana con alfa real (tema translúcido); el escritorio se ve sin difuminar.
- * - acrylic / mica: material nativo de Windows 11 (DWM). Acrylic difumina en tiempo real lo
- *   que hay detrás; Mica tiñe con el fondo de escritorio.
+ * - acrylic: material nativo de Windows 11 (DWM) que difumina en tiempo real lo que hay detrás.
  */
-const WINDOW_MODES = ["opaque", "transparent", "acrylic", "mica"];
-const MATERIAL_WINDOW_MODES = ["acrylic", "mica"];
+const WINDOW_MODES = ["opaque", "transparent", "acrylic"];
+const MATERIAL_WINDOW_MODES = ["acrylic"];
 
 // DWMWA_SYSTEMBACKDROP_TYPE existe desde Windows 11 22H2 (compilación 22621).
 const MIN_BACKDROP_MATERIAL_BUILD = 22621;
@@ -49,7 +52,7 @@ function resolveWindowMode(requestedMode) {
   return mode;
 }
 
-/** El tinte de Acrylic/Mica sigue el modo oscuro de la ventana, que Electron toma de nativeTheme. */
+/** El tinte de Acrylic sigue el modo oscuro de la ventana, que Electron toma de nativeTheme. */
 function syncNativeThemeWithWindowMode(mode) {
   nativeTheme.themeSource = MATERIAL_WINDOW_MODES.includes(mode) ? "dark" : "system";
 }
@@ -507,6 +510,14 @@ function createMainWindow({
   });
 
   attachWindowEvents(win);
+
+  if (windowMode === "transparent") {
+    const sampler = createBackdropSampler(win);
+    sampler.setEnabled(backdropSamplingEnabled);
+    sampler.start();
+    backdropSamplers.set(win, sampler);
+  }
+
   loadRenderer(win, route);
 
   if (maximized) {
@@ -543,16 +554,6 @@ function recreateMainWindow({ windowMode, route = "/" }) {
 
   if (isRecreatingWindow) return;
   if (currentWindowMode === windowMode) return;
-
-  // Entre materiales no hace falta recrear: DWM permite cambiar el backdrop en caliente.
-  if (
-    MATERIAL_WINDOW_MODES.includes(currentWindowMode) &&
-    MATERIAL_WINDOW_MODES.includes(windowMode)
-  ) {
-    mainWindow.setBackgroundMaterial(windowMode);
-    currentWindowMode = windowMode;
-    return;
-  }
 
   isRecreatingWindow = true;
 
@@ -909,6 +910,13 @@ ipcMain.on("window:set-transparency-mode", (_, payload) => {
     payload?.mode || (payload?.transparent ? "transparent" : "opaque");
   const route = getRouteToLoad(payload?.route);
   recreateMainWindow({ windowMode: resolveWindowMode(requestedMode), route });
+});
+
+ipcMain.on("backdrop:set-enabled", (_event, enabled) => {
+  backdropSamplingEnabled = !!enabled;
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    backdropSamplers.get(mainWindow)?.setEnabled(backdropSamplingEnabled);
+  }
 });
 
 ipcMain.on("show-reminder-window", (_event, reminder) => {
