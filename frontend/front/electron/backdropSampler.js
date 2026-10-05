@@ -4,13 +4,14 @@ const { desktopCapturer, screen } = require("electron");
  * Muestreo de lo que hay detrás de la ventana transparente para el contraste reactivo.
  *
  * Una página web no puede leer el escritorio que tiene debajo, así que el proceso principal
- * captura la pantalla a baja resolución y calcula la luminancia de una rejilla de celdas
- * sobre la zona que ocupa la ventana. Para que la captura muestre lo que hay *detrás* y no
+ * captura la pantalla a baja resolución y calcula la luminancia y el color medio de una
+ * rejilla de celdas sobre la zona que ocupa la ventana. Para que la captura muestre lo que hay *detrás* y no
  * la propia app, la ventana se excluye un instante de la captura (setContentProtection usa
  * WDA_EXCLUDEFROMCAPTURE en Windows 10 2004+).
  */
-const GRID_COLS = 16;
-const GRID_ROWS = 10;
+// Rejilla fina: además del contraste alimenta el velo de color con el gradiente del fondo.
+const GRID_COLS = 32;
+const GRID_ROWS = 20;
 const SAMPLE_INTERVAL_MS = 1500;
 // Sin foco (p. ej. con un juego delante) se muestrea mucho menos: cada captura cuesta ~300 ms.
 const UNFOCUSED_SAMPLE_INTERVAL_MS = 5000;
@@ -28,13 +29,21 @@ const SRGB_TO_LINEAR = Array.from({ length: 256 }, (_, value) => {
   return channel <= 0.03928 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
 });
 
+const linearToSrgb = (channel) => {
+  const value = channel <= 0.0031308 ? channel * 12.92 : 1.055 * channel ** (1 / 2.4) - 0.055;
+  return Math.round(Math.min(1, Math.max(0, value)) * 255);
+};
+
 /**
- * Calcula la luminancia media de cada celda de la rejilla dentro de `region`.
- * El bitmap de NativeImage en Windows viene en orden BGRA.
+ * Calcula, para cada celda de la rejilla dentro de `region`, la luminancia media (`cells`)
+ * y el color medio en sRGB (`colors`, plano: r, g, b por celda). Se promedia en espacio
+ * lineal para que los colores mezclados no se oscurezcan. El bitmap de NativeImage en
+ * Windows viene en orden BGRA.
  */
-function computeLuminanceGrid(bitmap, imageWidth, region, cols = GRID_COLS, rows = GRID_ROWS) {
-  const cells = new Array(cols * rows).fill(0);
-  const counts = new Array(cols * rows).fill(0);
+function computeBackdropGrid(bitmap, imageWidth, region, cols = GRID_COLS, rows = GRID_ROWS) {
+  const size = cols * rows;
+  const sums = new Float64Array(size * 3);
+  const counts = new Uint32Array(size);
 
   for (let y = region.y; y < region.y + region.height; y += PIXEL_STEP) {
     const row = Math.min(rows - 1, Math.floor(((y - region.y) / region.height) * rows));
@@ -42,19 +51,31 @@ function computeLuminanceGrid(bitmap, imageWidth, region, cols = GRID_COLS, rows
     for (let x = region.x; x < region.x + region.width; x += PIXEL_STEP) {
       const col = Math.min(cols - 1, Math.floor(((x - region.x) / region.width) * cols));
       const offset = (y * imageWidth + x) * 4;
-      const luminance =
-        0.0722 * SRGB_TO_LINEAR[bitmap[offset]] +
-        0.7152 * SRGB_TO_LINEAR[bitmap[offset + 1]] +
-        0.2126 * SRGB_TO_LINEAR[bitmap[offset + 2]];
+      const cell = row * cols + col;
 
-      cells[row * cols + col] += luminance;
-      counts[row * cols + col] += 1;
+      sums[cell * 3] += SRGB_TO_LINEAR[bitmap[offset + 2]];
+      sums[cell * 3 + 1] += SRGB_TO_LINEAR[bitmap[offset + 1]];
+      sums[cell * 3 + 2] += SRGB_TO_LINEAR[bitmap[offset]];
+      counts[cell] += 1;
     }
   }
 
-  return cells.map((total, index) =>
-    counts[index] ? Math.round((total / counts[index]) * 1000) / 1000 : 0,
-  );
+  const cells = new Array(size).fill(0);
+  const colors = new Array(size * 3).fill(0);
+
+  for (let cell = 0; cell < size; cell += 1) {
+    if (!counts[cell]) continue;
+    const red = sums[cell * 3] / counts[cell];
+    const green = sums[cell * 3 + 1] / counts[cell];
+    const blue = sums[cell * 3 + 2] / counts[cell];
+
+    cells[cell] = Math.round((0.2126 * red + 0.7152 * green + 0.0722 * blue) * 1000) / 1000;
+    colors[cell * 3] = linearToSrgb(red);
+    colors[cell * 3 + 1] = linearToSrgb(green);
+    colors[cell * 3 + 2] = linearToSrgb(blue);
+  }
+
+  return { cells, colors };
 }
 
 function getThumbnailSize(display) {
@@ -126,12 +147,21 @@ function createBackdropSampler(win) {
       const region = getRegionInThumbnail(bounds, display, imageSize);
       if (!region) return;
 
-      const cells = computeLuminanceGrid(source.thumbnail.toBitmap(), imageSize.width, region);
-      const payloadKey = cells.join(",");
+      const { cells, colors } = computeBackdropGrid(
+        source.thumbnail.toBitmap(),
+        imageSize.width,
+        region,
+      );
+      const payloadKey = colors.join(",");
       if (payloadKey === lastPayloadKey) return;
 
       lastPayloadKey = payloadKey;
-      win.webContents.send("backdrop:sample", { cols: GRID_COLS, rows: GRID_ROWS, cells });
+      win.webContents.send("backdrop:sample", {
+        cols: GRID_COLS,
+        rows: GRID_ROWS,
+        cells,
+        colors,
+      });
     } catch (_error) {
       // Si la captura falla (permisos, pantalla bloqueada...) se mantiene el último contraste.
     } finally {
@@ -183,4 +213,4 @@ function createBackdropSampler(win) {
   return { start, stop, setEnabled, sampleNow: scheduleSoon };
 }
 
-module.exports = { createBackdropSampler, computeLuminanceGrid, getRegionInThumbnail };
+module.exports = { createBackdropSampler, computeBackdropGrid, getRegionInThumbnail };
