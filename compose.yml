@@ -1,16 +1,20 @@
 name: tfgapp
 
+# MySQL local para desarrollo. Las credenciales se leen del fichero .env de esta carpeta
+# (copia .env.example a .env). Si ya tenías la BD creada, usa las mismas credenciales:
+# MySQL solo las aplica la primera vez que inicializa el volumen.
 services:
   db:
     image: mysql:latest
     container_name: db_app
     environment:
-      MYSQL_ROOT_PASSWORD: admin  
-      MYSQL_DATABASE: tfgapp_db   
-      MYSQL_USER: rmgadmin           
-      MYSQL_PASSWORD: africa        
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Define MYSQL_ROOT_PASSWORD en .env}
+      MYSQL_DATABASE: tfgapp_db
+      MYSQL_USER: ${DB_USERNAME:?Define DB_USERNAME en .env}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en .env}
     ports:
-      - "3310:3306"
+      # Solo accesible desde este equipo, no desde la red local.
+      - "127.0.0.1:3310:3306"
     volumes:
       - mysql_data:/var/lib/mysql
 

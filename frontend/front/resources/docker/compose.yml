@@ -1,16 +1,19 @@
 name: tfgapp
 
+# MySQL local que levanta Electron cuando gmo.env no apunta a una BD remota.
+# Electron le pasa las credenciales desde gmo.env (MYSQL_ROOT_PASSWORD, DB_USERNAME, DB_PASSWORD).
 services:
   db:
     image: mysql:latest
     container_name: db_app
     environment:
-      MYSQL_ROOT_PASSWORD: admin  
-      MYSQL_DATABASE: tfgapp_db   
-      MYSQL_USER: rmgadmin           
-      MYSQL_PASSWORD: africa        
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Define MYSQL_ROOT_PASSWORD en gmo.env}
+      MYSQL_DATABASE: tfgapp_db
+      MYSQL_USER: ${DB_USERNAME:?Define DB_USERNAME en gmo.env}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en gmo.env}
     ports:
-      - "3310:3306"
+      # Solo accesible desde este equipo, no desde la red local.
+      - "127.0.0.1:3310:3306"
     volumes:
       - mysql_data:/var/lib/mysql
 
