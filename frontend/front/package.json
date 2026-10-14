@@ -73,6 +73,13 @@
       {
         "from": "resources/docker/compose.yml",
         "to": "docker/compose.yml"
+      },
+      {
+        "from": "resources/config",
+        "to": "config",
+        "filter": [
+          "gmo.env"
+        ]
       }
     ],
     "win": {
