@@ -47,13 +47,13 @@ Edita el parámetro `require_secure_transport` = `1`. Así RDS rechaza conexione
 | Engine | MySQL 8.4 |
 | Template | **Free tier** si aparece; si no, *Dev/Test* |
 | Availability | **Single-AZ** (Multi-AZ duplica el precio) |
-| DB instance identifier | `gmo-db` |
+| DB instance identifier | `gmodb` |
 | Master username | `admin` — guarda la contraseña en un gestor de contraseñas |
 | Instance class | `db.t4g.micro` |
 | Storage | gp3, 20 GB, **desactiva storage autoscaling** |
 | Public access | **Yes** (cada PC se conecta directamente; ver §6) |
 | VPC security group | nuevo: `gmo-db-sg` |
-| Initial database name (Additional configuration) | `tfgapp_db` |
+| Initial database name (Additional configuration) | `gmoapp_db` |
 | DB parameter group | `gmo-mysql84` |
 | Backup retention | 7 días |
 | Performance Insights / Enhanced monitoring | **Desactivados** (tienen coste) |
@@ -71,7 +71,7 @@ de la consola) y crea el usuario que irá en los instaladores, **sin permisos de
 
 ```sql
 CREATE USER 'gmo_app'@'%' IDENTIFIED BY '<contraseña-larga-y-aleatoria>' REQUIRE SSL;
-GRANT SELECT, INSERT, UPDATE, DELETE ON tfgapp_db.* TO 'gmo_app'@'%';
+GRANT SELECT, INSERT, UPDATE, DELETE ON gmoapp_db.* TO 'gmo_app'@'%';
 ```
 
 - `admin` → solo tú, para aplicar migraciones.
@@ -85,7 +85,7 @@ se aplican **solo desde tu máquina con el usuario `admin`**:
 
 1. En el `.env` de la raíz del repo (copia de `.env.example`):
    ```
-   DB_URL=jdbc:mysql://<endpoint-rds>:3306/tfgapp_db?sslMode=REQUIRED
+   DB_URL=jdbc:mysql://<endpoint-rds>:3306/gmoapp_db?sslMode=REQUIRED
    DB_USERNAME=admin
    DB_PASSWORD=<contraseña admin>
    DB_MIGRATE=true
@@ -95,10 +95,10 @@ se aplican **solo desde tu máquina con el usuario `admin`**:
    `Successfully applied 2 migrations ... now at version v2`. Ya puedes pararlo.
 
 ### ¿Quieres llevarte los datos de tu MySQL local?
-Antes del paso 2, vuelca la BD de Docker y cárgala en RDS:
+Antes del paso 2, vuelca la BD de Docker (en local se llama `tfgapp_db`) y cárgala en `gmoapp_db` de RDS:
 ```powershell
 docker exec db_app mysqldump -u<usuario> -p<contraseña> --single-transaction --no-tablespaces tfgapp_db > gmo-local.sql
-mysql -h <endpoint-rds> -u admin -p --ssl-mode=REQUIRED tfgapp_db < gmo-local.sql
+mysql -h <endpoint-rds> -u admin -p --ssl-mode=REQUIRED gmoapp_db < gmo-local.sql
 ```
 Al arrancar el backend con `admin`, Flyway detecta que el esquema ya existe, lo adopta como
 versión 1 y aplica solo la V2 (que arregla la columna de las notas).
@@ -113,7 +113,7 @@ no arranca y dice qué columna o tabla no cuadra.
 Copia `frontend/front/resources/config/gmo.env.example` como `gmo.env`:
 
 ```
-DB_URL=jdbc:mysql://<endpoint-rds>:3306/tfgapp_db?sslMode=REQUIRED
+DB_URL=jdbc:mysql://<endpoint-rds>:3306/gmoapp_db?sslMode=REQUIRED
 DB_USERNAME=gmo_app
 DB_PASSWORD=<contraseña de gmo_app>
 DB_MIGRATE=false
@@ -191,7 +191,7 @@ verificarlo, descarga el bundle de certificados de RDS
 truststore PKCS12 siguiendo la guía de AWS *"Using SSL/TLS to encrypt a connection to a DB
 instance"* (sección Java), empaquétalo con la app y usa:
 ```
-DB_URL=jdbc:mysql://<endpoint>:3306/tfgapp_db?sslMode=VERIFY_CA&trustCertificateKeyStoreUrl=file:///<ruta>/rds-truststore.p12&trustCertificateKeyStoreType=PKCS12&trustCertificateKeyStorePassword=<pass>
+DB_URL=jdbc:mysql://<endpoint>:3306/gmoapp_db?sslMode=VERIFY_CA&trustCertificateKeyStoreUrl=file:///<ruta>/rds-truststore.p12&trustCertificateKeyStoreType=PKCS12&trustCertificateKeyStorePassword=<pass>
 ```
 
 ## 6. Limitaciones de seguridad conocidas

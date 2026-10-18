@@ -8,6 +8,8 @@ services:
     container_name: db_app
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Define MYSQL_ROOT_PASSWORD en gmo.env}
+      # BD local histórica: se mantiene tfgapp_db para no perder los datos del volumen existente.
+      # En RDS la BD se llama gmoapp_db (ver docs/AWS_SETUP.md).
       MYSQL_DATABASE: tfgapp_db
       MYSQL_USER: ${DB_USERNAME:?Define DB_USERNAME en gmo.env}
       MYSQL_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en gmo.env}

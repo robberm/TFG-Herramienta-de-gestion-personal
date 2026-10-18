@@ -13,8 +13,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Hibernate acepta con ddl-auto=validate y que las notas largas se pueden guardar.
  *
  * Opcional (no se ejecuta en un build normal). Ejemplo con un MySQL desechable:
- *   docker run -d --name gmo-it -e MYSQL_ROOT_PASSWORD=it -e MYSQL_DATABASE=tfgapp_db -p 127.0.0.1:3399:3306 mysql:8.4
- *   ./mvnw test -Dtest=FlywaySchemaIT -Dit.db.url=jdbc:mysql://localhost:3399/tfgapp_db -Dit.db.user=root -Dit.db.password=it
+ *   docker run -d --name gmo-it -e MYSQL_ROOT_PASSWORD=it -e MYSQL_DATABASE=gmoapp_db -p 127.0.0.1:3399:3306 mysql:8.4
+ *   ./mvnw test -Dtest=FlywaySchemaIT -Dit.db.url=jdbc:mysql://localhost:3399/gmoapp_db -Dit.db.user=root -Dit.db.password=it
  */
 @EnabledIfSystemProperty(named = "it.db.url", matches = ".+")
 @SpringBootTest(
