@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { getCurrentUserProfile } from "../api/userApi";
+import { clearCurrentUserProfileCache, getCurrentUserProfile } from "../api/userApi";
 
 
 const isElectronEnvironment =
@@ -26,16 +26,14 @@ const ProtectedRoute = ({
       }
 
       try {
-        let role = localStorage.getItem("role");
-        let organizationId = localStorage.getItem("organizationId");
-
-        if (!role) {
-          const profile = await getCurrentUserProfile();
-          role = profile?.role || "PERSONAL";
-          organizationId = profile?.organizationId ?? "";
-          localStorage.setItem("role", role);
-          localStorage.setItem("organizationId", organizationId);
-        }
+        // Siempre se valida el token contra el backend (el perfil queda cacheado en memoria
+        // por token, así que solo cuesta una petición por sesión). Antes, con el rol en
+        // localStorage se saltaba la validación y un token inválido dejaba la app llena de 401.
+        const profile = await getCurrentUserProfile();
+        const role = profile?.role || "PERSONAL";
+        const organizationId = profile?.organizationId ?? "";
+        localStorage.setItem("role", role);
+        localStorage.setItem("organizationId", organizationId);
 
         const isAdmin = role === "ADMIN";
         const hasOrganization = Boolean(organizationId);
@@ -62,13 +60,18 @@ const ProtectedRoute = ({
 
         if (isMounted) setStatus("ok");
       } catch (error) {
+        // 401 = el backend ha rechazado el token (firmado con otro secreto, usuario borrado,
+        // token revocado...). Mantener la sesión solo provocaría 401 en todas las pantallas.
+        const isRejectedToken = error?.status === 401;
         const hasToken = Boolean(localStorage.getItem("token"));
-        if (isElectronEnvironment && hasToken) {
+        if (isElectronEnvironment && hasToken && !isRejectedToken) {
+          // El backend local aún no responde (arrancando): se mantiene la sesión.
           console.warn("[ProtectedRoute] Validación remota fallida en Electron. Se mantiene sesión local.", error);
           if (isMounted) setStatus("ok");
           return;
         }
 
+        clearCurrentUserProfileCache();
         localStorage.removeItem("token");
         localStorage.removeItem("username");
         localStorage.removeItem("role");
