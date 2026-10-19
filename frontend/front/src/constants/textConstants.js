@@ -30,6 +30,38 @@ export const TEXT_CONSTANTS = {
     autoStartWindows: "Run app on Windows startup",
     autoStartWindowsHint:
       "Automatically open the desktop app when you sign in to Windows.",
+    graphicsSection: "Performance & graphics",
+    graphicsSectionDesc: "Balance visual effects against memory and GPU usage.",
+    hardwareAcceleration: "Hardware acceleration",
+    hardwareAccelerationHint:
+      "Uses the GPU to draw the app. Turn it off if your graphics card causes glitches or to save a little memory (around 20-30 MB); the translucent and acrylic themes will be disabled.",
+    hardwareAccelerationRestartPending: "The change will apply after restarting GMO.",
+    restartNow: "Restart now",
+    continuousBackdrop: "Continuous background sampling",
+    continuousBackdropHint:
+      "Reactive contrast follows what is behind the window in real time instead of every 1.5 s, without the brief freeze. Uses more GPU and memory (around 50 MB).",
+    continuousBackdropUnavailable:
+      "Available with the translucent theme, reactive contrast and hardware acceleration.",
+    gpuThemeUnavailable: "Requires hardware acceleration",
+    gpuThemeWarningTitle: "This theme uses graphics acceleration",
+    gpuThemeWarningMessage:
+      "Translucent and acrylic themes draw the window with real transparency and blur effects, and the translucent one samples what is behind the window. They rely on the GPU and can use more resources than the opaque themes.",
+    gpuThemeWarningConfirm: "Use theme",
+    dontShowAgain: "Don't show this again",
+    hardwareAccelerationOffTitle: "Turn off hardware acceleration?",
+    hardwareAccelerationOffMessage:
+      "GMO will use less memory, but the translucent and acrylic themes will be disabled and the dark theme will be used instead.",
+    hardwareAccelerationOnTitle: "Turn on hardware acceleration?",
+    hardwareAccelerationOnMessage:
+      "The translucent and acrylic themes will be available again. GMO will use more memory.",
+    hardwareAccelerationRestartWarning: "GMO needs to restart to apply this change.",
+    saveAndRestart: "Save and restart",
+    continuousBackdropWarningTitle: "Enable continuous sampling?",
+    continuousBackdropWarningMessage:
+      "The window will follow its background in real time without freezing. It uses more GPU and memory (around 50 MB).",
+    continuousBackdropWarningCapture:
+      "While enabled, GMO will not appear in screenshots or when sharing your screen (Discord, Teams...): it will show as a black area.",
+    enable: "Enable",
     profile: "Profile",
     profileDesc: "Update your profile photo.",
     uploadPhoto: "Upload photo",
@@ -374,6 +406,38 @@ export const TEXT_CONSTANTS = {
     autoStartWindows: "Ejecutar app al iniciar Windows",
     autoStartWindowsHint:
       "Abre automáticamente la aplicación de escritorio al iniciar sesión en Windows.",
+    graphicsSection: "Rendimiento y gráficos",
+    graphicsSectionDesc: "Equilibra los efectos visuales con el uso de memoria y GPU.",
+    hardwareAcceleration: "Aceleración por hardware",
+    hardwareAccelerationHint:
+      "Usa la GPU para dibujar la app. Desactívala si tu tarjeta gráfica da fallos visuales o para ahorrar algo de memoria (unos 20-30 MB); los temas translúcido y acrílico se desactivarán.",
+    hardwareAccelerationRestartPending: "El cambio se aplicará al reiniciar GMO.",
+    restartNow: "Reiniciar ahora",
+    continuousBackdrop: "Muestreo continuo del fondo",
+    continuousBackdropHint:
+      "El contraste reactivo sigue lo que hay detrás de la ventana en tiempo real en lugar de cada 1,5 s, sin el pequeño parón. Usa más GPU y memoria (unos 50 MB).",
+    continuousBackdropUnavailable:
+      "Disponible con el tema translúcido, el contraste reactivo y la aceleración por hardware.",
+    gpuThemeUnavailable: "Requiere aceleración por hardware",
+    gpuThemeWarningTitle: "Este tema usa aceleración gráfica",
+    gpuThemeWarningMessage:
+      "Los temas translúcido y acrílico dibujan la ventana con transparencia real y efectos de desenfoque, y el translúcido muestrea lo que hay detrás de la ventana. Dependen de la GPU y pueden consumir más recursos que los temas opacos.",
+    gpuThemeWarningConfirm: "Usar tema",
+    dontShowAgain: "No volver a mostrar",
+    hardwareAccelerationOffTitle: "¿Desactivar la aceleración por hardware?",
+    hardwareAccelerationOffMessage:
+      "GMO usará menos memoria, pero los temas translúcido y acrílico se desactivarán y se usará el tema oscuro.",
+    hardwareAccelerationOnTitle: "¿Activar la aceleración por hardware?",
+    hardwareAccelerationOnMessage:
+      "Los temas translúcido y acrílico volverán a estar disponibles. GMO usará más memoria.",
+    hardwareAccelerationRestartWarning: "GMO tiene que reiniciarse para aplicar este cambio.",
+    saveAndRestart: "Guardar y reiniciar",
+    continuousBackdropWarningTitle: "¿Activar el muestreo continuo?",
+    continuousBackdropWarningMessage:
+      "La ventana seguirá su fondo en tiempo real y sin parones. Usa más GPU y memoria (unos 50 MB).",
+    continuousBackdropWarningCapture:
+      "Mientras esté activado, GMO no aparecerá en capturas de pantalla ni al compartir pantalla (Discord, Teams...): se verá como una zona negra.",
+    enable: "Activar",
     profile: "Perfil",
     profileDesc: "Actualiza tu foto de perfil.",
     uploadPhoto: "Subir foto",

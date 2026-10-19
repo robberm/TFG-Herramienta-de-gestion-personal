@@ -27,6 +27,30 @@ contextBridge.exposeInMainWorld("electronAPI", {
     return () => ipcRenderer.removeListener("backdrop:sample", listener);
   },
 
+  /** Muestreo continuo del fondo: datos de la pantalla a capturar (null si no está activo). */
+  getBackdropCaptureInfo: () => ipcRenderer.invoke("backdrop:get-capture-info"),
+  reportContinuousBackdropFailure: () => ipcRenderer.send("backdrop:continuous-failed"),
+  onBackdropWindowChange: (callback) => {
+    const listener = (_event, info) => callback(info);
+    ipcRenderer.on("backdrop:window-changed", listener);
+    return () => ipcRenderer.removeListener("backdrop:window-changed", listener);
+  },
+  onBackdropFocusChange: (callback) => {
+    const listener = (_event, focused) => callback(!!focused);
+    ipcRenderer.on("backdrop:focus-changed", listener);
+    return () => ipcRenderer.removeListener("backdrop:focus-changed", listener);
+  },
+
+  /** Ajustes gráficos guardados en %APPDATA%/GMO/graphics.json. */
+  graphics: {
+    get: () => ipcRenderer.invoke("graphics:get"),
+    setHardwareAcceleration: (enabled) =>
+      ipcRenderer.invoke("graphics:set-hardware-acceleration", !!enabled),
+    setContinuousBackdrop: (enabled) =>
+      ipcRenderer.invoke("graphics:set-continuous-backdrop", !!enabled),
+    relaunch: () => ipcRenderer.send("graphics:relaunch"),
+  },
+
   isWindowMaximized: () => ipcRenderer.invoke("window:is-maximized"),
 
   showReminderWindow: (reminder) =>

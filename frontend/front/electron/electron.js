@@ -6,6 +6,7 @@ const {
   screen,
   dialog,
   nativeTheme,
+  desktopCapturer,
 } = require("electron");
 const path = require("path");
 const os = require("os");
@@ -22,6 +23,16 @@ const {
   getMissingRequiredKeys,
   buildChildEnv,
 } = require("./runtimeConfig");
+const { loadGraphicsSettings, saveGraphicsSettings } = require("./graphicsSettings");
+
+// La aceleración por hardware solo se puede desactivar antes de app.ready, así que se lee
+// aquí. `hardwareAccelerationActive` es la de ESTA ejecución; si el usuario la cambia, se
+// guarda y se aplica al reiniciar.
+const graphicsSettings = loadGraphicsSettings(app);
+const hardwareAccelerationActive = graphicsSettings.hardwareAcceleration;
+if (!hardwareAccelerationActive) {
+  app.disableHardwareAcceleration();
+}
 
 let mainWindow = null;
 let blockWindow = null;
@@ -33,6 +44,11 @@ let isRecreatingWindow = false;
 // Contraste reactivo del tema translúcido: lo activa/desactiva el renderer desde Ajustes.
 let backdropSamplingEnabled = true;
 const backdropSamplers = new WeakMap();
+// Ventanas en modo transparente y las que han tenido que volver al muestreo por capturas
+// porque el flujo continuo falló en su renderer.
+const transparentWindows = new WeakSet();
+const continuousCaptureFailed = new WeakSet();
+const BACKDROP_WINDOW_CHANGE_DEBOUNCE_MS = 150;
 
 /**
  * Modos de ventana principal:
@@ -52,9 +68,15 @@ function supportsBackgroundMaterial() {
   return build >= MIN_BACKDROP_MATERIAL_BUILD;
 }
 
-/** Si el sistema no soporta materiales, se cae al modo transparente clásico. */
+/**
+ * Si el sistema no soporta materiales, se cae al modo transparente clásico. Sin aceleración
+ * por hardware, las ventanas con transparencia se componen por CPU: se usa la opaca.
+ */
 function resolveWindowMode(requestedMode) {
   const mode = WINDOW_MODES.includes(requestedMode) ? requestedMode : "opaque";
+  if (!hardwareAccelerationActive && mode !== "opaque") {
+    return "opaque";
+  }
   if (MATERIAL_WINDOW_MODES.includes(mode) && !supportsBackgroundMaterial()) {
     return "transparent";
   }
@@ -554,10 +576,9 @@ function createMainWindow({
   attachWindowEvents(win);
 
   if (windowMode === "transparent") {
-    const sampler = createBackdropSampler(win);
-    sampler.setEnabled(backdropSamplingEnabled);
-    sampler.start();
-    backdropSamplers.set(win, sampler);
+    transparentWindows.add(win);
+    applyBackdropMode(win);
+    attachBackdropWindowEvents(win);
   }
 
   loadRenderer(win, route);
@@ -571,6 +592,93 @@ function createMainWindow({
   }
 
   return win;
+}
+
+/** ¿Esta ventana debe muestrear el fondo con el flujo continuo (en su renderer)? */
+function usesContinuousBackdrop(win) {
+  return (
+    hardwareAccelerationActive &&
+    graphicsSettings.continuousBackdrop &&
+    backdropSamplingEnabled &&
+    !continuousCaptureFailed.has(win)
+  );
+}
+
+/**
+ * Aplica el modo de muestreo a una ventana transparente:
+ * - Continuo: la ventana queda excluida de las capturas de forma permanente y es su propio
+ *   renderer quien lee un flujo de vídeo de la pantalla (sin parones en el proceso principal).
+ *   Efecto secundario: GMO no aparece en capturas ni al compartir pantalla.
+ * - Por capturas (por defecto): el backdropSampler del proceso principal hace una captura
+ *   cada 1,5 s ocultando la ventana un instante.
+ */
+function applyBackdropMode(win) {
+  if (!win || win.isDestroyed() || !transparentWindows.has(win)) return;
+
+  if (usesContinuousBackdrop(win)) {
+    backdropSamplers.get(win)?.stop();
+    backdropSamplers.delete(win);
+    win.setContentProtection(true);
+    return;
+  }
+
+  win.setContentProtection(false);
+  let sampler = backdropSamplers.get(win);
+  if (!sampler) {
+    sampler = createBackdropSampler(win);
+    backdropSamplers.set(win, sampler);
+    sampler.start();
+  }
+  sampler.setEnabled(backdropSamplingEnabled);
+}
+
+/** Datos que necesita el renderer para capturar la pantalla en la que está su ventana. */
+async function getBackdropCaptureInfo(win) {
+  const windowBounds = win.getBounds();
+  const display = screen.getDisplayMatching(windowBounds);
+  const sources = await desktopCapturer.getSources({
+    types: ["screen"],
+    thumbnailSize: { width: 0, height: 0 },
+  });
+  const source =
+    sources.find((item) => item.display_id === String(display.id)) ||
+    (sources.length === 1 ? sources[0] : null);
+
+  return {
+    sourceId: source?.id || null,
+    displayId: display.id,
+    displayBounds: display.bounds,
+    windowBounds,
+    focused: win.isFocused(),
+  };
+}
+
+/** Avisa al renderer de movimientos, cambios de tamaño y de foco (para el flujo continuo). */
+function attachBackdropWindowEvents(win) {
+  let debounceTimer = null;
+
+  const notifyChange = () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(async () => {
+      if (win.isDestroyed() || !usesContinuousBackdrop(win)) return;
+      try {
+        win.webContents.send("backdrop:window-changed", await getBackdropCaptureInfo(win));
+      } catch (_) {
+        // Si no se puede consultar la pantalla, el renderer sigue con la última región.
+      }
+    }, BACKDROP_WINDOW_CHANGE_DEBOUNCE_MS);
+  };
+  const notifyFocus = () => {
+    if (!win.isDestroyed()) win.webContents.send("backdrop:focus-changed", win.isFocused());
+  };
+
+  win.on("moved", notifyChange);
+  win.on("resized", notifyChange);
+  win.on("maximize", notifyChange);
+  win.on("unmaximize", notifyChange);
+  win.on("focus", notifyFocus);
+  win.on("blur", notifyFocus);
+  win.once("closed", () => clearTimeout(debounceTimer));
 }
 
 function openInitialWindow() {
@@ -979,8 +1087,57 @@ ipcMain.on("window:set-transparency-mode", (_, payload) => {
 ipcMain.on("backdrop:set-enabled", (_event, enabled) => {
   backdropSamplingEnabled = !!enabled;
   if (mainWindow && !mainWindow.isDestroyed()) {
-    backdropSamplers.get(mainWindow)?.setEnabled(backdropSamplingEnabled);
+    applyBackdropMode(mainWindow);
   }
+});
+
+/** Ventana que hace la petición (durante el cambio de tema conviven la vieja y la nueva). */
+const windowFromEvent = (event) => BrowserWindow.fromWebContents(event.sender);
+
+ipcMain.handle("backdrop:get-capture-info", async (event) => {
+  const win = windowFromEvent(event);
+  if (!win || win.isDestroyed() || !usesContinuousBackdrop(win)) return null;
+  return getBackdropCaptureInfo(win);
+});
+
+// El renderer no pudo abrir el flujo continuo (permisos, driver...): esa ventana vuelve
+// al muestreo por capturas para no quedarse sin contraste reactivo.
+ipcMain.on("backdrop:continuous-failed", (event) => {
+  const win = windowFromEvent(event);
+  if (!win || win.isDestroyed()) return;
+  continuousCaptureFailed.add(win);
+  applyBackdropMode(win);
+});
+
+const getGraphicsState = () => ({
+  hardwareAcceleration: graphicsSettings.hardwareAcceleration,
+  hardwareAccelerationActive,
+  continuousBackdrop: graphicsSettings.continuousBackdrop,
+  restartRequired: graphicsSettings.hardwareAcceleration !== hardwareAccelerationActive,
+});
+
+ipcMain.handle("graphics:get", () => getGraphicsState());
+
+ipcMain.handle("graphics:set-hardware-acceleration", (_event, enabled) => {
+  graphicsSettings.hardwareAcceleration = !!enabled;
+  saveGraphicsSettings(app, graphicsSettings);
+  return getGraphicsState();
+});
+
+ipcMain.handle("graphics:set-continuous-backdrop", (_event, enabled) => {
+  graphicsSettings.continuousBackdrop = !!enabled;
+  saveGraphicsSettings(app, graphicsSettings);
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    continuousCaptureFailed.delete(mainWindow);
+    applyBackdropMode(mainWindow);
+  }
+  return getGraphicsState();
+});
+
+// Reinicio para aplicar la aceleración por hardware (before-quit cierra el backend).
+ipcMain.on("graphics:relaunch", () => {
+  app.relaunch();
+  app.quit();
 });
 
 ipcMain.on("show-reminder-window", (_event, reminder) => {

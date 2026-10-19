@@ -346,6 +346,36 @@
   transform: translateX(26px);
 }
 
+.settingsSwitch:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Temas que necesitan aceleración por hardware cuando está desactivada. */
+.themePalette.unavailable {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.6);
+}
+
+.graphicsRestartHint {
+  margin-top: 6px;
+  opacity: 1;
+  font-weight: 500;
+}
+
+.graphicsInlineButton {
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--link-active-bg);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .profileSection {
   display: flex;
   align-items: center;
