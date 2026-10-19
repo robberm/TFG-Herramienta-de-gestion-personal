@@ -76,6 +76,29 @@ const BACKEND_PORT = 8080;
 const BACKEND_TIMEOUT_MS = 60_000;
 
 /**
+ * Parámetros de la JVM del backend local. Es un servidor con un solo cliente (esta app),
+ * así que se prima la memoria sobre el rendimiento máximo:
+ * - SerialGC: recolector de un solo hilo, sin las estructuras ni los hilos extra de G1.
+ * - TieredStopAtLevel=1: solo el compilador rápido (C1); menos code cache y menos hilos.
+ * - Min/MaxHeapFreeRatio: el heap devuelve al sistema la memoria que deja de usar.
+ * - MaxMetaspaceSize / ReservedCodeCacheSize: topes con margen sobre lo medido
+ *   (~93 MB de metaspace y ~28 MB de code cache con la app en uso).
+ * - Xss512k: pila más pequeña por hilo (el backend no usa recursión profunda).
+ */
+const BACKEND_JVM_ARGS = [
+  "-Xms32m",
+  "-Xmx256m",
+  "-XX:+UseSerialGC",
+  "-XX:MinHeapFreeRatio=10",
+  "-XX:MaxHeapFreeRatio=30",
+  "-XX:TieredStopAtLevel=1",
+  "-XX:ReservedCodeCacheSize=64m",
+  "-XX:MaxMetaspaceSize=192m",
+  "-Xss512k",
+  "-XX:+UseStringDeduplication",
+];
+
+/**
  * Guarda trazas de arranque en disco. Esto ayuda en instalaciones empaquetadas,
  * donde no hay terminal, pero evita dejar mensajes sueltos por consola.
  */
@@ -351,7 +374,7 @@ function startBackend() {
 
   const javaPath = isDevMode() ? "java" : getEmbeddedJavaPath();
 
-  backendProcess = spawn(javaPath, ["-Xms64m", "-Xmx256m", "-jar", jarPath], {
+  backendProcess = spawn(javaPath, [...BACKEND_JVM_ARGS, "-jar", jarPath], {
     cwd: path.dirname(jarPath),
     windowsHide: true,
     detached: false,
