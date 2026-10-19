@@ -99,6 +99,33 @@
   filter: brightness(1.04);
 }
 
+.confirmDialogButton.primary {
+  background: var(--link-active-bg);
+  color: var(--link-active-text);
+}
+
+.confirmDialogButton.primary:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+
+.confirmDialogCheckbox {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 1rem;
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.confirmDialogCheckbox input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--link-active-bg);
+  cursor: pointer;
+}
+
 @keyframes confirm-dialog-fade-in {
   from {
     opacity: 0;

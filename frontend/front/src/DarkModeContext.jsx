@@ -7,6 +7,7 @@ import React, {
   useState,
 } from "react";
 import { startBackdropContrast } from "./theme/backdropContrast";
+import { createContinuousBackdropSource } from "./theme/continuousBackdropSource";
 
 const DarkModeContext = createContext();
 
@@ -22,6 +23,18 @@ const THEME_WINDOW_MODES = {
 };
 
 const getWindowModeForTheme = (theme) => THEME_WINDOW_MODES[theme] || "opaque";
+// Temas que necesitan aceleración por hardware (ventana con transparencia real).
+export const GPU_THEMES = Object.keys(THEME_WINDOW_MODES);
+// Tema al que se vuelve si la aceleración está desactivada.
+const NO_GPU_FALLBACK_THEME = "dark";
+
+const DEFAULT_GRAPHICS_STATE = {
+  loaded: false,
+  hardwareAcceleration: true,
+  hardwareAccelerationActive: true,
+  continuousBackdrop: false,
+  restartRequired: false,
+};
 const THEME_STORAGE_KEY = "appTheme";
 const CUSTOM_COLOR_STORAGE_KEY = "customThemeColor";
 const DEFAULT_CUSTOM_COLOR = "#6c63ff";
@@ -71,6 +84,21 @@ export const DarkModeProvider = ({ children }) => {
   const [theme, setTheme] = useState(getStoredTheme);
   const [customThemeColor, setCustomThemeColorState] = useState(getStoredCustomColor);
   const [reactiveContrast, setReactiveContrast] = useState(getStoredReactiveContrast);
+  const [graphics, setGraphics] = useState(DEFAULT_GRAPHICS_STATE);
+
+  // Ajustes gráficos del proceso principal (%APPDATA%/GMO/graphics.json).
+  useEffect(() => {
+    let cancelled = false;
+    window.electronAPI?.graphics
+      ?.get()
+      .then((state) => {
+        if (!cancelled && state) setGraphics({ ...state, loaded: true });
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     applyThemeToBody(theme, customThemeColor);
@@ -97,12 +125,26 @@ export const DarkModeProvider = ({ children }) => {
   }, [reactiveContrast]);
 
   // Solo el translúcido deja ver el escritorio sin filtrar; Acrylic ya garantiza un fondo oscuro.
+  // La fuente de muestras es el flujo continuo (si está activado) o las capturas periódicas
+  // del proceso principal; ambas tienen la misma interfaz.
+  const useContinuousBackdrop =
+    graphics.hardwareAccelerationActive && graphics.continuousBackdrop;
+
   useEffect(() => {
     if (theme !== "translucent" || !reactiveContrast) return undefined;
-    if (!window.electronAPI?.onBackdropSample) return undefined;
+    const electronAPI = window.electronAPI;
+    if (!electronAPI?.onBackdropSample) return undefined;
 
-    return startBackdropContrast(window.electronAPI);
-  }, [reactiveContrast, theme]);
+    const source = useContinuousBackdrop && electronAPI.getBackdropCaptureInfo
+      ? createContinuousBackdropSource(electronAPI)
+      : electronAPI;
+    const stopContrast = startBackdropContrast(source);
+
+    return () => {
+      stopContrast();
+      source.destroy?.();
+    };
+  }, [reactiveContrast, theme, useContinuousBackdrop]);
 
   const switchTheme = useCallback((nextTheme) => {
     if (!isValidTheme(nextTheme)) return;
@@ -121,6 +163,30 @@ export const DarkModeProvider = ({ children }) => {
       });
     }
   }, [theme]);
+
+  // Sin aceleración por hardware el proceso principal no abre ventanas con transparencia:
+  // un tema translúcido/acrílico guardado se sustituye por el oscuro.
+  useEffect(() => {
+    if (graphics.loaded && !graphics.hardwareAccelerationActive && GPU_THEMES.includes(theme)) {
+      switchTheme(NO_GPU_FALLBACK_THEME);
+    }
+  }, [graphics.hardwareAccelerationActive, graphics.loaded, switchTheme, theme]);
+
+  const setHardwareAcceleration = useCallback(async (enabled) => {
+    const state = await window.electronAPI?.graphics?.setHardwareAcceleration(enabled);
+    if (state) setGraphics({ ...state, loaded: true });
+    return state;
+  }, []);
+
+  const setContinuousBackdrop = useCallback(async (enabled) => {
+    const state = await window.electronAPI?.graphics?.setContinuousBackdrop(enabled);
+    if (state) setGraphics({ ...state, loaded: true });
+    return state;
+  }, []);
+
+  const relaunchApp = useCallback(() => {
+    window.electronAPI?.graphics?.relaunch();
+  }, []);
 
   const setCustomThemeColor = useCallback((nextColor) => {
     if (!isValidHexColor(nextColor)) return;
@@ -157,11 +223,19 @@ export const DarkModeProvider = ({ children }) => {
       toggleTranslucentMode,
       setTheme: switchTheme,
       theme,
+      graphics,
+      setHardwareAcceleration,
+      setContinuousBackdrop,
+      relaunchApp,
     }),
     [
       customThemeColor,
+      graphics,
       reactiveContrast,
+      relaunchApp,
+      setContinuousBackdrop,
       setCustomThemeColor,
+      setHardwareAcceleration,
       switchTheme,
       theme,
       toggleDarkMode,

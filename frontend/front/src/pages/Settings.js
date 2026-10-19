@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { HexColorPicker } from "react-colorful";
-import { useDarkMode } from "../DarkModeContext";
+import { GPU_THEMES, useDarkMode } from "../DarkModeContext";
+import ConfirmDialog from "../components/shared/ConfirmDialog";
 import "../css/Settings.css";
 import { resolveProfileImageUrl } from "../utils/profileImage";
 import {
@@ -23,8 +24,20 @@ const Settings = () => {
     setCustomThemeColor,
     reactiveContrast,
     setReactiveContrast,
+    graphics,
+    setHardwareAcceleration,
+    setContinuousBackdrop,
+    relaunchApp,
   } = useDarkMode();
   const canUseReactiveContrast = typeof window !== "undefined" && !!window.electronAPI?.onBackdropSample;
+  const canUseGraphicsSettings = typeof window !== "undefined" && !!window.electronAPI?.graphics;
+  // Sin aceleración activa en esta ejecución, los temas con transparencia no se pueden usar.
+  const gpuThemesAvailable = !canUseGraphicsSettings || graphics.hardwareAccelerationActive;
+  const continuousBackdropAvailable =
+    canUseReactiveContrast &&
+    graphics.hardwareAccelerationActive &&
+    theme === "translucent" &&
+    reactiveContrast;
   const { language, setLanguage, t } = useLanguage();
 
   const [username, setUsername] = useState(
@@ -47,6 +60,9 @@ const Settings = () => {
   const [autoStartSupported, setAutoStartSupported] = useState(false);
   const [autoStartEnabled, setAutoStartEnabled] = useState(false);
   const [customThemeOpen, setCustomThemeOpen] = useState(false);
+  // Diálogo de confirmación abierto: { type: "gpuTheme", themeId } | { type: "hardware", enabled } | { type: "continuous" }
+  const [graphicsDialog, setGraphicsDialog] = useState(null);
+  const [dontShowGpuWarning, setDontShowGpuWarning] = useState(false);
   const [customColorDraft, setCustomColorDraft] = useState(() =>
     customThemeColor.replace("#", "").toUpperCase(),
   );
@@ -83,6 +99,79 @@ const Settings = () => {
       colors: ["rgba(44, 44, 48, .55)", "rgba(255, 255, 255, .10)", "#60a5fa"],
     },
   ];
+
+  const GPU_THEME_WARNING_KEY = "gpuThemeWarningDismissed";
+
+  /** Elegir un tema translúcido/acrílico avisa (una vez, si se marca) de que usa la GPU. */
+  const selectTheme = (themeId) => {
+    setCustomThemeOpen(false);
+    const isGpuTheme = GPU_THEMES.includes(themeId);
+    if (isGpuTheme && !gpuThemesAvailable) return;
+
+    const warningDismissed = localStorage.getItem(GPU_THEME_WARNING_KEY) === "true";
+    if (isGpuTheme && canUseGraphicsSettings && theme !== themeId && !warningDismissed) {
+      setDontShowGpuWarning(false);
+      setGraphicsDialog({ type: "gpuTheme", themeId });
+      return;
+    }
+    setTheme(themeId);
+  };
+
+  const closeGraphicsDialog = () => setGraphicsDialog(null);
+
+  const confirmGraphicsDialog = async () => {
+    const dialog = graphicsDialog;
+    setGraphicsDialog(null);
+    if (!dialog) return;
+
+    if (dialog.type === "gpuTheme") {
+      if (dontShowGpuWarning) localStorage.setItem(GPU_THEME_WARNING_KEY, "true");
+      setTheme(dialog.themeId);
+      return;
+    }
+
+    if (dialog.type === "hardware") {
+      const state = await setHardwareAcceleration(dialog.enabled);
+      if (state?.restartRequired) relaunchApp();
+      return;
+    }
+
+    if (dialog.type === "continuous") {
+      await setContinuousBackdrop(true);
+    }
+  };
+
+  const graphicsDialogContent = (() => {
+    if (!graphicsDialog) return null;
+    if (graphicsDialog.type === "gpuTheme") {
+      return {
+        title: t.gpuThemeWarningTitle,
+        message: t.gpuThemeWarningMessage,
+        confirmLabel: t.gpuThemeWarningConfirm,
+      };
+    }
+    if (graphicsDialog.type === "hardware") {
+      return graphicsDialog.enabled
+        ? {
+            title: t.hardwareAccelerationOnTitle,
+            message: t.hardwareAccelerationOnMessage,
+            warning: t.hardwareAccelerationRestartWarning,
+            confirmLabel: t.saveAndRestart,
+          }
+        : {
+            title: t.hardwareAccelerationOffTitle,
+            message: t.hardwareAccelerationOffMessage,
+            warning: t.hardwareAccelerationRestartWarning,
+            confirmLabel: t.saveAndRestart,
+          };
+    }
+    return {
+      title: t.continuousBackdropWarningTitle,
+      message: t.continuousBackdropWarningMessage,
+      warning: t.continuousBackdropWarningCapture,
+      confirmLabel: t.enable,
+    };
+  })();
 
   useEffect(() => {
     loadCurrentUserProfile();
@@ -309,17 +398,19 @@ const Settings = () => {
           </div>
 
           <div className="themePaletteGrid" role="radiogroup" aria-label={t.defaultThemes}>
-            {themeOptions.map((option) => (
+            {themeOptions.map((option) => {
+              const unavailable = GPU_THEMES.includes(option.id) && !gpuThemesAvailable;
+              return (
               <button
                 key={option.id}
                 type="button"
                 role="radio"
                 aria-checked={theme === option.id}
-                className={`themePalette ${theme === option.id ? "active" : ""}`}
-                onClick={() => {
-                  setCustomThemeOpen(false);
-                  setTheme(option.id);
-                }}
+                aria-disabled={unavailable}
+                disabled={unavailable}
+                title={unavailable ? t.gpuThemeUnavailable : undefined}
+                className={`themePalette ${theme === option.id ? "active" : ""} ${unavailable ? "unavailable" : ""}`}
+                onClick={() => selectTheme(option.id)}
               >
                 <span className="themePalettePreview" aria-hidden="true">
                   <span style={{ background: option.colors[0] }} />
@@ -328,7 +419,7 @@ const Settings = () => {
                 </span>
                 <span className="themePaletteCopy">
                   <strong>{option.label}</strong>
-                  <small>{option.hint}</small>
+                  <small>{unavailable ? t.gpuThemeUnavailable : option.hint}</small>
                 </span>
                 {theme === option.id && (
                   <span className="themeSelectedMark" aria-hidden="true">
@@ -336,7 +427,8 @@ const Settings = () => {
                   </span>
                 )}
               </button>
-            ))}
+              );
+            })}
           </div>
 
           <div className="customThemePanel">
@@ -441,6 +533,69 @@ const Settings = () => {
             </button>
           </div>
         </section>
+
+        {canUseGraphicsSettings && (
+          <section className="settingsCard graphicsCard">
+            <div className="settingsCardHeader">
+              <h2>{t.graphicsSection}</h2>
+              <p>{t.graphicsSectionDesc}</p>
+            </div>
+
+            <div className="settingsRow appearanceUtilityRow">
+              <div>
+                <span className="settingsLabel">{t.hardwareAcceleration}</span>
+                <p className="settingsHint">{t.hardwareAccelerationHint}</p>
+                {graphics.restartRequired && (
+                  <p className="settingsHint graphicsRestartHint">
+                    {t.hardwareAccelerationRestartPending}{" "}
+                    <button type="button" className="graphicsInlineButton" onClick={relaunchApp}>
+                      {t.restartNow}
+                    </button>
+                  </p>
+                )}
+              </div>
+
+              <button
+                type="button"
+                role="switch"
+                aria-checked={graphics.hardwareAcceleration}
+                aria-label={t.hardwareAcceleration}
+                className={`settingsSwitch ${graphics.hardwareAcceleration ? "active" : ""}`}
+                onClick={() => setGraphicsDialog({ type: "hardware", enabled: !graphics.hardwareAcceleration })}
+              >
+                <span className="settingsSwitchThumb"></span>
+              </button>
+            </div>
+
+            <div className="settingsRow appearanceUtilityRow">
+              <div>
+                <span className="settingsLabel">{t.continuousBackdrop}</span>
+                <p className="settingsHint">
+                  {continuousBackdropAvailable ? t.continuousBackdropHint : t.continuousBackdropUnavailable}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                role="switch"
+                aria-checked={graphics.continuousBackdrop}
+                aria-label={t.continuousBackdrop}
+                disabled={!continuousBackdropAvailable}
+                className={`settingsSwitch ${graphics.continuousBackdrop && continuousBackdropAvailable ? "active" : ""}`}
+                onClick={() => {
+                  if (!continuousBackdropAvailable) return;
+                  if (graphics.continuousBackdrop) {
+                    setContinuousBackdrop(false);
+                    return;
+                  }
+                  setGraphicsDialog({ type: "continuous" });
+                }}
+              >
+                <span className="settingsSwitchThumb"></span>
+              </button>
+            </div>
+          </section>
+        )}
 
         <section className="settingsCard">
           <div className="settingsCardHeader">
@@ -639,6 +794,29 @@ const Settings = () => {
           )}
         </section>
       </div>
+
+      <ConfirmDialog
+        isOpen={!!graphicsDialog}
+        title={graphicsDialogContent?.title}
+        message={graphicsDialogContent?.message}
+        warning={graphicsDialogContent?.warning}
+        confirmLabel={graphicsDialogContent?.confirmLabel}
+        cancelLabel={t.commonCancel}
+        confirmVariant="primary"
+        onConfirm={confirmGraphicsDialog}
+        onCancel={closeGraphicsDialog}
+      >
+        {graphicsDialog?.type === "gpuTheme" && (
+          <label className="confirmDialogCheckbox">
+            <input
+              type="checkbox"
+              checked={dontShowGpuWarning}
+              onChange={(event) => setDontShowGpuWarning(event.target.checked)}
+            />
+            {t.dontShowAgain}
+          </label>
+        )}
+      </ConfirmDialog>
     </div>
   );
 };

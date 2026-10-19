@@ -11,6 +11,10 @@ const ConfirmDialog = ({
   onConfirm,
   onCancel,
   isProcessing = false,
+  // "danger" para acciones destructivas; "primary" para confirmaciones normales.
+  confirmVariant = "danger",
+  // Contenido extra bajo el mensaje (p. ej. una casilla "No volver a mostrar").
+  children = null,
 }) => {
   const cancelButtonRef = useRef(null);
 
@@ -50,6 +54,7 @@ const ConfirmDialog = ({
           <h3 id="confirmDialogTitle">{title}</h3>
           <p id="confirmDialogMessage">{message}</p>
           {warning && <p className="confirmDialogWarning">{warning}</p>}
+          {children}
         </div>
 
         <div className="confirmDialogActions">
@@ -64,7 +69,7 @@ const ConfirmDialog = ({
           </button>
           <button
             type="button"
-            className="confirmDialogButton danger"
+            className={`confirmDialogButton ${confirmVariant === "primary" ? "primary" : "danger"}`}
             onClick={onConfirm}
             disabled={isProcessing}
           >
