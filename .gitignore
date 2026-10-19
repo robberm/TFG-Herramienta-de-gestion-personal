@@ -4,6 +4,9 @@
 .env
 .env.*
 !.env.example
+gmo.env
+**/gmo.env
+jwt.secret
 
 # =========================
 # Uploads / generated user files
@@ -25,6 +28,7 @@ productivity_config.json
 !docs/
 !docs/ARQUITECTURA_Y_SEGURIDAD.md
 !docs/CAPA_BLOQUEO_EXTRA.md
+!docs/AWS_SETUP.md
 
 # =========================
 # Java / Spring Boot

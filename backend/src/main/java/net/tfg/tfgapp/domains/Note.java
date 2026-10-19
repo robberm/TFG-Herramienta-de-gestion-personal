@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.Length;
 
 import java.time.LocalDateTime;
 
@@ -19,8 +20,12 @@ public class Note {
     @Column(length = 180, nullable = false)
     private String title = "";
 
-    @Lob
-    @Column(nullable = false)
+    /**
+     * LONG32 se traduce a LONGTEXT en MySQL y a TEXT en PostgreSQL. Con @Lob +
+     * @Column sin longitud, Hibernate 6 generaba TINYTEXT (255 bytes) y las notas
+     * largas fallaban al guardarse.
+     */
+    @Column(nullable = false, length = Length.LONG32)
     private String content = "";
 
     @Column(length = 16, nullable = false)

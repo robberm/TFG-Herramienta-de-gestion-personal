@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -56,6 +57,18 @@ public interface EventRepo extends JpaRepository<Event, Long> {
               AND a.personalUser.id = :userId
             """)
     boolean existsActiveEventOfCategory(@Param("category") Event.EventCategory category, @Param("now") LocalDateTime now, @Param("userId") Long userId);
+
+    @Query("""
+            SELECT DISTINCT e FROM Event e JOIN e.assignments a
+            WHERE a.personalUser.id = :userId
+              AND e.category IN :categories
+              AND e.startTime < :to
+              AND e.endTime >= :from
+            """)
+    List<Event> findUserEventsOfCategoriesInRange(@Param("userId") Long userId,
+                                                  @Param("categories") Collection<Event.EventCategory> categories,
+                                                  @Param("from") LocalDateTime from,
+                                                  @Param("to") LocalDateTime to);
 
     @Query("""
         SELECT e FROM Event e

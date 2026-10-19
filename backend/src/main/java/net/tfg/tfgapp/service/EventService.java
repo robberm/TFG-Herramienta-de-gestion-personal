@@ -2,6 +2,7 @@ package net.tfg.tfgapp.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import net.tfg.tfgapp.DTOs.events.EventRequest;
+import net.tfg.tfgapp.components.ActiveEventScheduleCache;
 import net.tfg.tfgapp.components.SessionStore;
 import net.tfg.tfgapp.domains.Event;
 import net.tfg.tfgapp.domains.AdminUser;
@@ -36,9 +37,13 @@ public class EventService {
     @Autowired
     private ReminderScheduler reminderScheduler;
 
+    @Autowired
+    private ActiveEventScheduleCache eventScheduleCache;
+
     public <S extends Event> S save(S entity) {
         S savedEvent = eventRepo.save(entity);
         reminderScheduler.scheduleReminder(savedEvent);
+        eventScheduleCache.invalidate();
         return savedEvent;
     }
 
@@ -133,6 +138,7 @@ public class EventService {
 
             Event updatedEvent = eventRepo.save(existingEvent);
             reminderScheduler.rescheduleReminder(updatedEvent);
+            eventScheduleCache.invalidate();
             return Optional.of(updatedEvent);
         }
 
@@ -178,6 +184,7 @@ public class EventService {
 
         reminderScheduler.cancelReminder(id);
         eventRepo.deleteById(id);
+        eventScheduleCache.invalidate();
     }
 
     public void deleteAdminAssignedEventCascade(Long adminId, Event event) {
@@ -196,8 +203,8 @@ public class EventService {
     }
 
     private boolean isEventCategoryActive(String category, Long userId) {
-        Event.EventCategory eventCategory = Event.EventCategory.valueOf(category);
-        return eventRepo.existsActiveEventOfCategory(eventCategory, LocalDateTime.now(), userId);
+        // Se consulta cada 5 s: se resuelve en memoria, sin ir a la BD.
+        return eventScheduleCache.isCategoryActive(Event.EventCategory.valueOf(category), userId);
     }
 
     @Scheduled(fixedDelay = 5000)

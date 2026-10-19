@@ -1,10 +1,10 @@
 package net.tfg.tfgapp.service;
 
 import jakarta.annotation.PostConstruct;
+import net.tfg.tfgapp.components.ActiveEventScheduleCache;
 import net.tfg.tfgapp.components.SessionStore;
 import net.tfg.tfgapp.domains.Event;
 import net.tfg.tfgapp.events.BlockingEvent;
-import net.tfg.tfgapp.repos.EventRepo;
 import net.tfg.tfgapp.service.interfaces.IStorageService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
@@ -27,7 +27,7 @@ public class BlockingService {
     private final SimpMessageSendingOperations messagingTemplate;
     private final ApplicationEventPublisher eventPublisher;
     private final IStorageService storageService;
-    private final EventRepo eventRepo;
+    private final ActiveEventScheduleCache eventScheduleCache;
     private final SessionStore sessionStore;
 
     private volatile boolean isBlocking = false;
@@ -40,12 +40,12 @@ public class BlockingService {
     public BlockingService(SimpMessageSendingOperations messagingTemplate,
                            ApplicationEventPublisher eventPublisher,
                            IStorageService storageService,
-                           EventRepo eventRepo,
+                           ActiveEventScheduleCache eventScheduleCache,
                            SessionStore sessionStore) {
         this.messagingTemplate = messagingTemplate;
         this.eventPublisher = eventPublisher;
         this.storageService = storageService;
-        this.eventRepo = eventRepo;
+        this.eventScheduleCache = eventScheduleCache;
         this.sessionStore = sessionStore;
     }
 
@@ -190,16 +190,8 @@ public class BlockingService {
     }
 
     private boolean isFocusModeLockedByTag() {
-        Long loggedUserId = sessionStore.getLoggedUserId();
-        if (loggedUserId == null) {
-            return false;
-        }
-
-        return eventRepo.existsActiveEventOfCategory(
-                Event.EventCategory.FOCUS,
-                Instant.now().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime(),
-                loggedUserId
-        );
+        // Se consulta cada segundo: se resuelve en memoria, sin ir a la BD.
+        return eventScheduleCache.isCategoryActive(Event.EventCategory.FOCUS, sessionStore.getLoggedUserId());
     }
 
     public boolean isEffectiveFocusModeEnabled() {

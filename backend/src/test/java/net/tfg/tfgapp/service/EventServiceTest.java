@@ -1,6 +1,7 @@
 package net.tfg.tfgapp.service;
 
 import net.tfg.tfgapp.DTOs.events.EventRequest;
+import net.tfg.tfgapp.components.ActiveEventScheduleCache;
 import net.tfg.tfgapp.domains.Event;
 import net.tfg.tfgapp.domains.PersonalUser;
 import net.tfg.tfgapp.repos.EventRepo;
@@ -18,6 +19,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,6 +30,9 @@ class EventServiceTest {
 
     @Mock
     private ReminderScheduler reminderScheduler;
+
+    @Mock
+    private ActiveEventScheduleCache eventScheduleCache;
 
     @InjectMocks
     private EventService eventService;
@@ -59,6 +65,8 @@ class EventServiceTest {
         assertThat(events).extracting(Event::getRecurrenceSeriesId).doesNotContainNull().containsOnly(events.get(0).getRecurrenceSeriesId());
         assertThat(events).allSatisfy(event -> assertThat(event.getUser().getId()).isEqualTo(7L));
         assertThat(events).extracting(Event::getId).doesNotHaveDuplicates();
+        // Los eventos nuevos (aquí MANDATORY) deben verse en la caché de bloqueo sin esperar a la resincronización.
+        verify(eventScheduleCache, atLeastOnce()).invalidate();
     }
 
     @Test

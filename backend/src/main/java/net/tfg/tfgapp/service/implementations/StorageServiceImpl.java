@@ -1,6 +1,7 @@
 package net.tfg.tfgapp.service.implementations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.tfg.tfgapp.components.S3ProfileImageClient;
 import net.tfg.tfgapp.service.interfaces.IStorageService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +22,12 @@ public class StorageServiceImpl implements IStorageService {
     private static final String UPLOADS_DIRECTORY = "./uploads";
     private static final String PROFILE_IMAGES_DIRECTORY = "profile-images";
     private static final long MAX_PROFILE_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
+
+    private final S3ProfileImageClient s3ProfileImageClient;
+
+    public StorageServiceImpl(S3ProfileImageClient s3ProfileImageClient) {
+        this.s3ProfileImageClient = s3ProfileImageClient;
+    }
 
     @Override
     public Config loadConfig() {
@@ -109,8 +116,8 @@ public class StorageServiceImpl implements IStorageService {
     }
 
     /**
-     * Guarda o reemplaza la imagen de perfil de un usuario dentro del sistema de archivos.
-     * Si existe una imagen previa, se elimina antes de almacenar la nueva.
+     * Guarda o reemplaza la imagen de perfil de un usuario, en S3 (modo s3) o en disco (modo local).
+     * Si existe una imagen previa, se elimina.
      *
      * @param file fichero recibido desde el frontend
      * @param userId identificador del usuario propietario de la imagen
@@ -120,6 +127,10 @@ public class StorageServiceImpl implements IStorageService {
     @Override
     public String saveProfileImage(MultipartFile file, Long userId, String previousImagePath) {
         validateProfileImage(file);
+
+        if (s3ProfileImageClient.isEnabled()) {
+            return saveProfileImageToS3(file, userId, previousImagePath);
+        }
 
         try {
             Path profileImagesDirectory = ensureProfileImagesDirectoryExists();
@@ -153,7 +164,12 @@ public class StorageServiceImpl implements IStorageService {
             return;
         }
 
+        if (s3ProfileImageClient.isEnabled()) {
+            s3ProfileImageClient.delete(profileImagePath);
+        }
+
         try {
+            // También en modo s3: limpia la copia local si la foto se creó antes de migrar.
             Path imagePath = resolveProfileImagePath(profileImagePath);
             Files.deleteIfExists(imagePath);
         } catch (IOException e) {
@@ -171,6 +187,28 @@ public class StorageServiceImpl implements IStorageService {
     @Override
     public Path resolveProfileImagePath(String profileImagePath) {
         return Paths.get(UPLOADS_DIRECTORY, profileImagePath).normalize();
+    }
+
+    private String saveProfileImageToS3(MultipartFile file, Long userId, String previousImagePath) {
+        String extension = extractAndValidateExtension(file.getOriginalFilename());
+        String key = PROFILE_IMAGES_DIRECTORY + "/" + buildProfileImageFilename(userId, extension);
+
+        try {
+            s3ProfileImageClient.upload(key, file.getBytes(), file.getContentType());
+        } catch (IOException e) {
+            throw new RuntimeException("Error al leer la imagen de perfil.", e);
+        }
+
+        // La anterior se borra solo cuando la nueva ya está subida, para no dejar al usuario sin foto.
+        if (previousImagePath != null && !previousImagePath.isBlank()) {
+            try {
+                deleteProfileImage(previousImagePath);
+            } catch (RuntimeException ignored) {
+                // Una foto antigua huérfana no debe hacer fallar el cambio de foto.
+            }
+        }
+
+        return key;
     }
 
     private Path ensureProfileImagesDirectoryExists() throws IOException {

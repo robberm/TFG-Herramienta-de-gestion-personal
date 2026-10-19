@@ -14,10 +14,19 @@ const { exec, spawn } = require("child_process");
 const net = require("net");
 const { promisify } = require("util");
 const { createBackdropSampler } = require("./backdropSampler");
+const {
+  CONFIG_FILE_NAME,
+  loadRuntimeConfig,
+  getOrCreateJwtSecret,
+  isRemoteDatabase,
+  getMissingRequiredKeys,
+  buildChildEnv,
+} = require("./runtimeConfig");
 
 let mainWindow = null;
 let blockWindow = null;
 let backendProcess = null;
+let runtimeConfig = { values: {}, sourcePath: null };
 
 let currentWindowMode = "opaque";
 let isRecreatingWindow = false;
@@ -68,6 +77,8 @@ const ERROR_MESSAGES = {
   DATABASE_TIMEOUT: "MySQL no disponible en localhost:",
   BACKEND_START_FAILED: "Error arrancando el backend:",
   BACKEND_STOP_FAILED: "Error cerrando el backend:",
+  CONFIG_MISSING_TITLE: "Falta la configuración de GMO",
+  CONFIG_MISSING_BODY: `No se han encontrado las credenciales de la base de datos. Crea el fichero ${CONFIG_FILE_NAME} (puedes partir de ${CONFIG_FILE_NAME}.example) en %APPDATA%/GMO o en resources/config.`,
 };
 
 /** Textos técnicos de arranque que se guardan en fichero, sin sacar nada por consola. */
@@ -86,6 +97,9 @@ const STARTUP_MESSAGES = {
   BACKEND_TIMEOUT: "Backend no respondió a tiempo; se abrirá la UI igualmente.",
   BACKEND_READY: "Backend disponible en localhost:",
   DOCKER_SETUP_FAILED: "Error preparando Docker/MySQL:",
+  CONFIG_LOADED: "Configuración cargada desde:",
+  CONFIG_NOT_FOUND: `No se encontró ${CONFIG_FILE_NAME}; se usan solo las variables de entorno del sistema.`,
+  REMOTE_DATABASE: "BD remota configurada: se omite Docker/MySQL local.",
 };
 
 // Así los comandos de Docker se pueden usar con await y queda más limpio.
@@ -98,6 +112,29 @@ const DB_POLL_INTERVAL_MS = 1_500;
 const DOCKER_TIMEOUT_MS = 120_000;
 const BACKEND_PORT = 8080;
 const BACKEND_TIMEOUT_MS = 60_000;
+
+/**
+ * Parámetros de la JVM del backend local. Es un servidor con un solo cliente (esta app),
+ * así que se prima la memoria sobre el rendimiento máximo:
+ * - SerialGC: recolector de un solo hilo, sin las estructuras ni los hilos extra de G1.
+ * - TieredStopAtLevel=1: solo el compilador rápido (C1); menos code cache y menos hilos.
+ * - Min/MaxHeapFreeRatio: el heap devuelve al sistema la memoria que deja de usar.
+ * - MaxMetaspaceSize / ReservedCodeCacheSize: topes con margen sobre lo medido
+ *   (~93 MB de metaspace y ~28 MB de code cache con la app en uso).
+ * - Xss512k: pila más pequeña por hilo (el backend no usa recursión profunda).
+ */
+const BACKEND_JVM_ARGS = [
+  "-Xms32m",
+  "-Xmx256m",
+  "-XX:+UseSerialGC",
+  "-XX:MinHeapFreeRatio=10",
+  "-XX:MaxHeapFreeRatio=30",
+  "-XX:TieredStopAtLevel=1",
+  "-XX:ReservedCodeCacheSize=64m",
+  "-XX:MaxMetaspaceSize=192m",
+  "-Xss512k",
+  "-XX:+UseStringDeduplication",
+];
 
 /**
  * Guarda trazas de arranque en disco. Esto ayuda en instalaciones empaquetadas,
@@ -233,9 +270,11 @@ async function startDockerCompose() {
   }
 
   logStartup(`${STARTUP_MESSAGES.COMPOSE_RUNNING} ${composePath}`);
+  // Las credenciales del MySQL local salen de gmo.env, no del compose.yml.
   await execAsync(`docker compose -f "${composePath}" up -d`, {
     windowsHide: true,
     shell: "cmd.exe",
+    env: buildChildEnv(runtimeConfig),
   });
 }
 
@@ -373,11 +412,14 @@ function startBackend() {
 
   const javaPath = isDevMode() ? "java" : getEmbeddedJavaPath();
 
-  backendProcess = spawn(javaPath, ["-Xms64m", "-Xmx256m", "-jar", jarPath], {
+  backendProcess = spawn(javaPath, [...BACKEND_JVM_ARGS, "-jar", jarPath], {
     cwd: path.dirname(jarPath),
     windowsHide: true,
     detached: false,
     stdio: "ignore",
+    env: buildChildEnv(runtimeConfig, {
+      JWT_SECRET: getOrCreateJwtSecret(app),
+    }),
   });
 
   backendProcess.on("error", (error) => {
@@ -826,18 +868,40 @@ async function waitForBackendReady(timeoutMs = BACKEND_TIMEOUT_MS) {
 }
 
 /**
- * Secuencia de arranque: Docker/MySQL -> Backend -> Renderer.
+ * Secuencia de arranque: configuración -> (Docker/MySQL si la BD es local) -> Backend -> Renderer.
  */
 app.whenReady().then(async () => {
-  try {
-    await ensureDockerDatabaseReady();
-  } catch (error) {
-    const details = error?.message || String(error);
-    logStartup(`${STARTUP_MESSAGES.DOCKER_SETUP_FAILED} ${details}`);
+  runtimeConfig = loadRuntimeConfig(app);
+  logStartup(
+    runtimeConfig.sourcePath
+      ? `${STARTUP_MESSAGES.CONFIG_LOADED} ${runtimeConfig.sourcePath}`
+      : STARTUP_MESSAGES.CONFIG_NOT_FOUND,
+  );
+
+  const missingKeys = getMissingRequiredKeys(runtimeConfig).filter(
+    (key) => !process.env[key],
+  );
+  if (missingKeys.length > 0) {
     dialog.showErrorBox(
-      ERROR_MESSAGES.DOCKER_SETUP_TITLE,
-      `${ERROR_MESSAGES.DOCKER_SETUP_BODY}\n\nDetalle: ${details}`,
+      ERROR_MESSAGES.CONFIG_MISSING_TITLE,
+      `${ERROR_MESSAGES.CONFIG_MISSING_BODY}\n\nFalta: ${missingKeys.join(", ")}`,
     );
+  }
+
+  if (isRemoteDatabase(runtimeConfig)) {
+    // Con RDS no hace falta Docker: se ahorra arranque y la RAM de Docker Desktop.
+    logStartup(STARTUP_MESSAGES.REMOTE_DATABASE);
+  } else {
+    try {
+      await ensureDockerDatabaseReady();
+    } catch (error) {
+      const details = error?.message || String(error);
+      logStartup(`${STARTUP_MESSAGES.DOCKER_SETUP_FAILED} ${details}`);
+      dialog.showErrorBox(
+        ERROR_MESSAGES.DOCKER_SETUP_TITLE,
+        `${ERROR_MESSAGES.DOCKER_SETUP_BODY}\n\nDetalle: ${details}`,
+      );
+    }
   }
 
   startBackend();

@@ -29,7 +29,7 @@ public class Goal extends Objective {
      */
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
-    @Column(name = "is_numeric", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    @Column(name = "is_numeric", nullable = false)
     private Boolean numeric = false;
 
     /**
