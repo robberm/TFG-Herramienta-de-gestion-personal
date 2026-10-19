@@ -48,7 +48,7 @@ const backdropSamplers = new WeakMap();
 // porque el flujo continuo falló en su renderer.
 const transparentWindows = new WeakSet();
 const continuousCaptureFailed = new WeakSet();
-const BACKDROP_WINDOW_CHANGE_DEBOUNCE_MS = 150;
+const BACKDROP_DISPLAY_CHECK_THROTTLE_MS = 150;
 
 /**
  * Modos de ventana principal:
@@ -653,32 +653,43 @@ async function getBackdropCaptureInfo(win) {
   };
 }
 
-/** Avisa al renderer de movimientos, cambios de tamaño y de foco (para el flujo continuo). */
+/**
+ * Avisa al renderer del flujo continuo cuando la ventana cambia de pantalla (hay que capturar
+ * otra) y cuando cambia el foco. La posición dentro de la pantalla la lee el propio renderer
+ * en cada muestra (window.screenX/Y), porque "moved" solo llega al soltar la ventana.
+ */
 function attachBackdropWindowEvents(win) {
-  let debounceTimer = null;
+  let throttleTimer = null;
+  let lastDisplayId = null;
 
-  const notifyChange = () => {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(async () => {
+  const checkDisplay = () => {
+    if (throttleTimer) return;
+    throttleTimer = setTimeout(async () => {
+      throttleTimer = null;
       if (win.isDestroyed() || !usesContinuousBackdrop(win)) return;
+      const displayId = screen.getDisplayMatching(win.getBounds()).id;
+      if (displayId === lastDisplayId) return;
+      lastDisplayId = displayId;
       try {
         win.webContents.send("backdrop:window-changed", await getBackdropCaptureInfo(win));
       } catch (_) {
-        // Si no se puede consultar la pantalla, el renderer sigue con la última región.
+        // Si no se puede consultar la pantalla, el renderer sigue con la última.
       }
-    }, BACKDROP_WINDOW_CHANGE_DEBOUNCE_MS);
+    }, BACKDROP_DISPLAY_CHECK_THROTTLE_MS);
   };
   const notifyFocus = () => {
     if (!win.isDestroyed()) win.webContents.send("backdrop:focus-changed", win.isFocused());
   };
 
-  win.on("moved", notifyChange);
-  win.on("resized", notifyChange);
-  win.on("maximize", notifyChange);
-  win.on("unmaximize", notifyChange);
+  // "move"/"resize" se emiten durante el arrastre; "moved"/"resized" al terminar.
+  win.on("move", checkDisplay);
+  win.on("moved", checkDisplay);
+  win.on("resize", checkDisplay);
+  win.on("maximize", checkDisplay);
+  win.on("unmaximize", checkDisplay);
   win.on("focus", notifyFocus);
   win.on("blur", notifyFocus);
-  win.once("closed", () => clearTimeout(debounceTimer));
+  win.once("closed", () => clearTimeout(throttleTimer));
 }
 
 function openInitialWindow() {

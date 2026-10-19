@@ -112,9 +112,25 @@ export function createContinuousBackdropSource(electronAPI) {
 
   const emit = (sample) => listeners.forEach((listener) => listener(sample));
 
+  // Posición de la ventana leída en cada muestra: el aviso "moved" del proceso principal solo
+  // llega al soltar la ventana (y a veces ni eso), así que mientras se arrastra se recortaría
+  // la zona antigua. window.screenX/Y siguen la ventana en vivo, en las mismas unidades (DIP)
+  // que los límites de la pantalla.
+  const getLiveWindowBounds = () => {
+    const { screenX, screenY, outerWidth, outerHeight } = window;
+    if ([screenX, screenY, outerWidth, outerHeight].every(Number.isFinite) && outerWidth > 0 && outerHeight > 0) {
+      return { x: screenX, y: screenY, width: outerWidth, height: outerHeight };
+    }
+    return info.windowBounds;
+  };
+
   const sample = () => {
     if (!info || !video.videoWidth || document.hidden) return;
-    const region = getRegionInVideo(info, video.videoWidth, video.videoHeight);
+    const region = getRegionInVideo(
+      { ...info, windowBounds: getLiveWindowBounds() },
+      video.videoWidth,
+      video.videoHeight,
+    );
     if (!region) return;
 
     context.drawImage(video, region.x, region.y, region.width, region.height, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
