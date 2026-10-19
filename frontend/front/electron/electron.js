@@ -986,9 +986,11 @@ app.whenReady().then(async () => {
       : STARTUP_MESSAGES.CONFIG_NOT_FOUND,
   );
 
-  const missingKeys = getMissingRequiredKeys(runtimeConfig).filter(
-    (key) => !process.env[key],
-  );
+  // El MySQL local de Docker funciona sin configuración (credenciales de desarrollo por
+  // defecto); solo una BD remota exige DB_USERNAME/DB_PASSWORD en gmo.env.
+  const missingKeys = isRemoteDatabase(runtimeConfig)
+    ? getMissingRequiredKeys(runtimeConfig).filter((key) => !process.env[key])
+    : [];
   if (missingKeys.length > 0) {
     dialog.showErrorBox(
       ERROR_MESSAGES.CONFIG_MISSING_TITLE,

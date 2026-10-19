@@ -1,19 +1,20 @@
 name: tfgapp
 
-# MySQL local para desarrollo. Las credenciales se leen del fichero .env de esta carpeta
-# (copia .env.example a .env). Si ya tenías la BD creada, usa las mismas credenciales:
-# MySQL solo las aplica la primera vez que inicializa el volumen.
+# MySQL local para desarrollo: funciona sin configurar nada. Solo escucha en 127.0.0.1, así
+# que sus credenciales por defecto no son un secreto (las de RDS sí, y van en gmo.env/.env).
+# Se pueden cambiar en un .env de esta carpeta, pero MySQL solo las aplica la primera vez
+# que inicializa el volumen: con la BD ya creada hay que seguir usando las mismas.
 services:
   db:
     image: mysql:latest
     container_name: db_app
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Define MYSQL_ROOT_PASSWORD en .env}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-admin}
       # BD local histórica: se mantiene tfgapp_db para no perder los datos del volumen existente.
       # En RDS la BD se llama gmoapp_db (ver docs/AWS_SETUP.md).
       MYSQL_DATABASE: tfgapp_db
-      MYSQL_USER: ${DB_USERNAME:?Define DB_USERNAME en .env}
-      MYSQL_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en .env}
+      MYSQL_USER: ${DB_USERNAME:-rmgadmin}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-africa}
     ports:
       # Solo accesible desde este equipo, no desde la red local.
       - "127.0.0.1:3310:3306"
