@@ -43,6 +43,16 @@ class FlywaySchemaIT {
                 "SELECT COUNT(*) FROM flyway_schema_history WHERE success = 1", Integer.class);
         assertThat(applied).isGreaterThanOrEqualTo(2);
 
+        String latestVersion = jdbcTemplate.queryForObject(
+                "SELECT version FROM flyway_schema_history WHERE success = 1 "
+                        + "ORDER BY installed_rank DESC LIMIT 1", String.class);
+        assertThat(latestVersion).isEqualTo("3");
+
+        Integer todoTable = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM information_schema.TABLES "
+                        + "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'todo_items'", Integer.class);
+        assertThat(todoTable).isEqualTo(1);
+
         jdbcTemplate.update("INSERT INTO users (token_version, password, username) VALUES (0, 'x', 'it_note_owner')");
         Long ownerId = jdbcTemplate.queryForObject("SELECT id FROM users WHERE username = 'it_note_owner'", Long.class);
         String longContent = "á".repeat(20_000); // 40 KB en UTF-8: no cabía en TINYTEXT (255 bytes)
