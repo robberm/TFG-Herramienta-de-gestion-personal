@@ -6,15 +6,28 @@ import React, {
   useMemo,
   useState,
 } from "react";
+import { startBackdropContrast } from "./theme/backdropContrast";
 
 const DarkModeContext = createContext();
 
-const THEME_CLASSES = ["light", "dark", "truedark", "translucent", "custom"];
+const THEMES = ["light", "dark", "truedark", "translucent", "acrylic", "custom"];
+// Acrylic reutiliza los estilos de componentes del tema translúcido y solo cambia tokens.
+const THEME_BASE_CLASSES = {
+  acrylic: ["translucent"],
+};
+// Modo de ventana que pide cada tema al proceso principal de Electron.
+const THEME_WINDOW_MODES = {
+  translucent: "transparent",
+  acrylic: "acrylic",
+};
+
+const getWindowModeForTheme = (theme) => THEME_WINDOW_MODES[theme] || "opaque";
 const THEME_STORAGE_KEY = "appTheme";
 const CUSTOM_COLOR_STORAGE_KEY = "customThemeColor";
 const DEFAULT_CUSTOM_COLOR = "#6c63ff";
+const REACTIVE_CONTRAST_STORAGE_KEY = "reactiveContrast";
 
-const isValidTheme = (theme) => THEME_CLASSES.includes(theme);
+const isValidTheme = (theme) => THEMES.includes(theme);
 const isValidHexColor = (color) => /^#[0-9a-f]{6}$/i.test(color || "");
 
 const getStoredTheme = () => {
@@ -34,9 +47,12 @@ const getStoredCustomColor = () => {
   return isValidHexColor(storedColor) ? storedColor : DEFAULT_CUSTOM_COLOR;
 };
 
+const getStoredReactiveContrast = () =>
+  localStorage.getItem(REACTIVE_CONTRAST_STORAGE_KEY) !== "false";
+
 const applyThemeToBody = (theme, customColor) => {
-  document.body.classList.remove(...THEME_CLASSES);
-  document.body.classList.add(theme);
+  document.body.classList.remove(...THEMES);
+  document.body.classList.add(...(THEME_BASE_CLASSES[theme] || []), theme);
   document.body.style.setProperty("--custom-theme-color", customColor);
 };
 
@@ -54,6 +70,7 @@ const getCurrentRoute = () => {
 export const DarkModeProvider = ({ children }) => {
   const [theme, setTheme] = useState(getStoredTheme);
   const [customThemeColor, setCustomThemeColorState] = useState(getStoredCustomColor);
+  const [reactiveContrast, setReactiveContrast] = useState(getStoredReactiveContrast);
 
   useEffect(() => {
     applyThemeToBody(theme, customThemeColor);
@@ -65,28 +82,41 @@ export const DarkModeProvider = ({ children }) => {
 
   useEffect(() => {
     if (window.electronAPI?.setWindowTransparencyMode) {
+      const mode = getWindowModeForTheme(theme);
       window.electronAPI.setWindowTransparencyMode({
-        transparent: theme === "translucent",
+        transparent: mode !== "opaque",
+        mode,
         route: getCurrentRoute(),
       });
     }
   }, [theme]);
 
+  useEffect(() => {
+    localStorage.setItem(REACTIVE_CONTRAST_STORAGE_KEY, String(reactiveContrast));
+    window.electronAPI?.setBackdropSampling?.(reactiveContrast);
+  }, [reactiveContrast]);
+
+  // Solo el translúcido deja ver el escritorio sin filtrar; Acrylic ya garantiza un fondo oscuro.
+  useEffect(() => {
+    if (theme !== "translucent" || !reactiveContrast) return undefined;
+    if (!window.electronAPI?.onBackdropSample) return undefined;
+
+    return startBackdropContrast(window.electronAPI);
+  }, [reactiveContrast, theme]);
+
   const switchTheme = useCallback((nextTheme) => {
     if (!isValidTheme(nextTheme)) return;
 
-    const wasTransparent = theme === "translucent";
-    const willBeTransparent = nextTheme === "translucent";
+    const currentMode = getWindowModeForTheme(theme);
+    const nextMode = getWindowModeForTheme(nextTheme);
 
     localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
     setTheme(nextTheme);
 
-    if (
-      window.electronAPI?.setWindowTransparencyMode &&
-      wasTransparent !== willBeTransparent
-    ) {
+    if (window.electronAPI?.setWindowTransparencyMode && currentMode !== nextMode) {
       window.electronAPI.setWindowTransparencyMode({
-        transparent: willBeTransparent,
+        transparent: nextMode !== "opaque",
+        mode: nextMode,
         route: getCurrentRoute(),
       });
     }
@@ -121,6 +151,8 @@ export const DarkModeProvider = ({ children }) => {
       translucentMode: theme === "translucent",
       customThemeColor,
       setCustomThemeColor,
+      reactiveContrast,
+      setReactiveContrast,
       toggleDarkMode,
       toggleTranslucentMode,
       setTheme: switchTheme,
@@ -128,6 +160,7 @@ export const DarkModeProvider = ({ children }) => {
     }),
     [
       customThemeColor,
+      reactiveContrast,
       setCustomThemeColor,
       switchTheme,
       theme,

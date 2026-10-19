@@ -3,8 +3,12 @@ const SOCKJS_WEBSOCKET_URL = "ws://localhost:8080/ws/websocket";
 const RULE_ID_START = 10_000;
 const REFRESH_ALARM = "refresh-focus-policy";
 const REFRESH_PERIOD_MINUTES = 0.5;
+// Chrome duerme el service worker tras ~30s sin actividad; un WebSocket con tráfico lo mantiene vivo.
+const SOCKET_KEEPALIVE_MS = 20_000;
+const SOCKET_RECONNECT_MS = 2_000;
 const BLOCKED_PAGE_URL = chrome.runtime.getURL("blocked.html");
 let focusSocket = null;
+let keepAliveTimer = null;
 let activeDomains = null;
 
 function isDomain(value) {
@@ -142,9 +146,20 @@ function connectFocusSocket() {
     }
   };
 
+  socket.onopen = () => {
+    clearInterval(keepAliveTimer);
+    // Heartbeat STOMP (EOL) para que el worker no se duerma y el socket siga recibiendo cambios.
+    keepAliveTimer = setInterval(() => {
+      if (socket.readyState === WebSocket.OPEN) sendSockJsFrame(socket, "\n");
+    }, SOCKET_KEEPALIVE_MS);
+  };
+
   socket.onclose = () => {
-    if (focusSocket === socket) focusSocket = null;
-    setTimeout(connectFocusSocket, 5000);
+    if (focusSocket === socket) {
+      focusSocket = null;
+      clearInterval(keepAliveTimer);
+    }
+    setTimeout(connectFocusSocket, SOCKET_RECONNECT_MS);
   };
 
   socket.onerror = () => socket.close();
@@ -153,16 +168,20 @@ function connectFocusSocket() {
 chrome.runtime.onInstalled.addListener(async () => {
   chrome.alarms.create(REFRESH_ALARM, { periodInMinutes: REFRESH_PERIOD_MINUTES });
   await refreshPolicy();
-  connectFocusSocket();
 });
 
 chrome.runtime.onStartup.addListener(async () => {
   chrome.alarms.create(REFRESH_ALARM, { periodInMinutes: REFRESH_PERIOD_MINUTES });
   await refreshPolicy();
-  connectFocusSocket();
 });
 chrome.webNavigation.onCommitted.addListener(onTopFrameNavigation);
 chrome.webNavigation.onHistoryStateUpdated.addListener(onTopFrameNavigation);
 chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === REFRESH_ALARM) refreshPolicy();
+  if (alarm.name !== REFRESH_ALARM) return;
+  connectFocusSocket();
+  refreshPolicy();
 });
+
+// Cada vez que el worker despierta (navegación, alarma...) se reabre el socket y se sincroniza.
+connectFocusSocket();
+refreshPolicy();

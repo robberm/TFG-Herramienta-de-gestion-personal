@@ -1,0 +1,1226 @@
+{
+  "backend/mvnw": {
+    "mtime": 1739636593.794323,
+    "seen": 1791457678.8200076,
+    "ast_hash": "2fe09837c0b4dfabab4c4b206bcd0850",
+    "semantic_hash": "2fe09837c0b4dfabab4c4b206bcd0850"
+  },
+  "backend/pom.xml": {
+    "mtime": 1786272704.7509122,
+    "seen": 1791457678.8200123,
+    "ast_hash": "11e7b88d7ca1c169c75be132062803b1",
+    "semantic_hash": "11e7b88d7ca1c169c75be132062803b1"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/DTOs/apprestrict/BlockedApplicationRequest.java": {
+    "mtime": 1774290042.771448,
+    "seen": 1791457678.820014,
+    "ast_hash": "469d59c5c6647203cd93a08738e5f9ab",
+    "semantic_hash": "469d59c5c6647203cd93a08738e5f9ab"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/DTOs/apprestrict/FocusSettingsRequest.java": {
+    "mtime": 1778538990.5676491,
+    "seen": 1791457678.8200152,
+    "ast_hash": "c206b18261b1011b7acb2a4c5c9c7ff1",
+    "semantic_hash": "c206b18261b1011b7acb2a4c5c9c7ff1"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/DTOs/apprestrict/InstalledApplicationDTO.java": {
+    "mtime": 1774289542.2948053,
+    "seen": 1791457678.820016,
+    "ast_hash": "054a6f5607feaff70e1d71e8115e1f0d",
+    "semantic_hash": "054a6f5607feaff70e1d71e8115e1f0d"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/DTOs/apprestrict/InstalledApplicationRegistryEntry.java": {
+    "mtime": 1774289593.2655096,
+    "seen": 1791457678.8200166,
+    "ast_hash": "7e45ca62d0a928922af4c736a5a04a13",
+    "semantic_hash": "7e45ca62d0a928922af4c736a5a04a13"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/DTOs/apprestrict/ResolvedExecutableDTO.java": {
+    "mtime": 1774289617.028895,
+    "seen": 1791457678.8200173,
+    "ast_hash": "ab11f8022d3fb35e9f11395f82c46952",
+    "semantic_hash": "ab11f8022d3fb35e9f11395f82c46952"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/DTOs/errors/ApiErrorResponse.java": {
+    "mtime": 1778538990.569164,
+    "seen": 1791457678.8200183,
+    "ast_hash": "175722bdccf9009583db98ee70c5451b",
+    "semantic_hash": "175722bdccf9009583db98ee70c5451b"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/DTOs/events/EventRequest.java": {
+    "mtime": 1786270289.8855565,
+    "seen": 1791457678.820019,
+    "ast_hash": "781b48b05908e9b7694f2bd184eb879a",
+    "semantic_hash": "781b48b05908e9b7694f2bd184eb879a"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/DTOs/notes/NoteRequest.java": {
+    "mtime": 1786270294.5457,
+    "seen": 1791457678.8200197,
+    "ast_hash": "71d3d7d479e14c74e556bbc9dbc4fa82",
+    "semantic_hash": "71d3d7d479e14c74e556bbc9dbc4fa82"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/DTOs/objectives/GoalProgressRequest.java": {
+    "mtime": 1782236859.2984655,
+    "seen": 1791457678.8200202,
+    "ast_hash": "4d6fd0aa0542d92871fc955b0dca3e05",
+    "semantic_hash": "4d6fd0aa0542d92871fc955b0dca3e05"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/DTOs/objectives/GoalRequest.java": {
+    "mtime": 1782155449.5495474,
+    "seen": 1791457678.8200212,
+    "ast_hash": "a458a8cd2997d390b8d556a7a00760cf",
+    "semantic_hash": "a458a8cd2997d390b8d556a7a00760cf"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/DTOs/objectives/HabitCompletionRequest.java": {
+    "mtime": 1782236859.2994864,
+    "seen": 1791457678.820022,
+    "ast_hash": "94f4ce6a41512dcefd68f4e86fef8a65",
+    "semantic_hash": "94f4ce6a41512dcefd68f4e86fef8a65"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/DTOs/objectives/HabitRequest.java": {
+    "mtime": 1775988994.252838,
+    "seen": 1791457678.8200228,
+    "ast_hash": "08ad97aad5aa3f98efe3d3051f9f8456",
+    "semantic_hash": "08ad97aad5aa3f98efe3d3051f9f8456"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/DTOs/reminders/ReminderDTO.java": {
+    "mtime": 1775315465.5920453,
+    "seen": 1791457678.8200235,
+    "ast_hash": "23e9f9371f98d70219086bdb5b0885a0",
+    "semantic_hash": "23e9f9371f98d70219086bdb5b0885a0"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/DTOs/todos/TodoRequest.java": {
+    "mtime": 1791225612.0020769,
+    "seen": 1791457678.8200243,
+    "ast_hash": "8069fa3751f0930a0fd12f4051bfd81a",
+    "semantic_hash": "8069fa3751f0930a0fd12f4051bfd81a"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/DTOs/users/AdminCreateOrganizationRequest.java": {
+    "mtime": 1776168511.6310468,
+    "seen": 1791457678.8200247,
+    "ast_hash": "8897627055965aa0863dbeb38e362b42",
+    "semantic_hash": "8897627055965aa0863dbeb38e362b42"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/DTOs/users/AdminCreateUserRequest.java": {
+    "mtime": 1776159014.7312784,
+    "seen": 1791457678.8200257,
+    "ast_hash": "5008e9505ffee19d4398dba8b2f3df87",
+    "semantic_hash": "5008e9505ffee19d4398dba8b2f3df87"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/DTOs/users/ChangePasswordRequest.java": {
+    "mtime": 1775315465.5621676,
+    "seen": 1791457678.8200264,
+    "ast_hash": "75396fbedccb5729a635c3189c067e12",
+    "semantic_hash": "75396fbedccb5729a635c3189c067e12"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/DTOs/users/ChangeUsernameRequest.java": {
+    "mtime": 1775315465.568624,
+    "seen": 1791457678.820027,
+    "ast_hash": "efa80450a4f0f5cd3c715d460757b05d",
+    "semantic_hash": "efa80450a4f0f5cd3c715d460757b05d"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/DTOs/users/DeleteAccountRequest.java": {
+    "mtime": 1782236859.2994864,
+    "seen": 1791457678.8200278,
+    "ast_hash": "093729e3e499004988b1bb90cb62438a",
+    "semantic_hash": "093729e3e499004988b1bb90cb62438a"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/DTOs/users/LoginRequest.java": {
+    "mtime": 1775315465.5567422,
+    "seen": 1791457678.8200288,
+    "ast_hash": "cc9f5a7f41a4593139e3ba0d4ccafdb9",
+    "semantic_hash": "cc9f5a7f41a4593139e3ba0d4ccafdb9"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/DTOs/users/UserProfileResponse.java": {
+    "mtime": 1776159073.1536715,
+    "seen": 1791457678.8200297,
+    "ast_hash": "6250c6c0274c9a9ae2ad9141e3773bd3",
+    "semantic_hash": "6250c6c0274c9a9ae2ad9141e3773bd3"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/DTOs/users/UserSummaryResponse.java": {
+    "mtime": 1782236859.3005104,
+    "seen": 1791457678.8200307,
+    "ast_hash": "48d894440053ac8c43633c561787dcd7",
+    "semantic_hash": "48d894440053ac8c43633c561787dcd7"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/TfgappApplication.java": {
+    "mtime": 1771764245.0984714,
+    "seen": 1791457678.8200314,
+    "ast_hash": "a976219281c38ff070465af33f670b28",
+    "semantic_hash": "a976219281c38ff070465af33f670b28"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/components/SessionStore.java": {
+    "mtime": 1770324553.3274539,
+    "seen": 1791457678.8200324,
+    "ast_hash": "0d483cab4873bad6ed6ca7e787ea6aef",
+    "semantic_hash": "0d483cab4873bad6ed6ca7e787ea6aef"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/config/ReminderConfig.java": {
+    "mtime": 1775316757.2343116,
+    "seen": 1791457678.820033,
+    "ast_hash": "b31e39933a93154458b91a0af3276675",
+    "semantic_hash": "b31e39933a93154458b91a0af3276675"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/config/WebConfig.java": {
+    "mtime": 1790751658.0474806,
+    "seen": 1791457678.8200336,
+    "ast_hash": "9ae2c61199be5ea3f8eb1494cb0207f1",
+    "semantic_hash": "9ae2c61199be5ea3f8eb1494cb0207f1"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/config/WebSocketConfig.java": {
+    "mtime": 1749472013.1466355,
+    "seen": 1791457678.8200343,
+    "ast_hash": "f86a53c981a8efccbc0ff3eb30cb2d8c",
+    "semantic_hash": "f86a53c981a8efccbc0ff3eb30cb2d8c"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/controller/AdminController.java": {
+    "mtime": 1782376582.1034684,
+    "seen": 1791457678.820035,
+    "ast_hash": "940c34a3fb40692041e2753b3e2e0805",
+    "semantic_hash": "940c34a3fb40692041e2753b3e2e0805"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/controller/AppController.java": {
+    "mtime": 1790751657.724064,
+    "seen": 1791457678.8200357,
+    "ast_hash": "3ef6c235710b431d9986976e8b201120",
+    "semantic_hash": "3ef6c235710b431d9986976e8b201120"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/controller/BlockController.java": {
+    "mtime": 1778538990.5721984,
+    "seen": 1791457678.8200362,
+    "ast_hash": "94dd8c36c88328ccf1161413f131dec9",
+    "semantic_hash": "94dd8c36c88328ccf1161413f131dec9"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/controller/CalendarController.java": {
+    "mtime": 1786270292.4081128,
+    "seen": 1791457678.820037,
+    "ast_hash": "27ab9fce8fa9d1cabdff79ecbd0341ad",
+    "semantic_hash": "27ab9fce8fa9d1cabdff79ecbd0341ad"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/controller/NoteController.java": {
+    "mtime": 1786270296.874143,
+    "seen": 1791457678.8200374,
+    "ast_hash": "fee709ed0d3c122eba8272b7319a21eb",
+    "semantic_hash": "fee709ed0d3c122eba8272b7319a21eb"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/controller/SessionController.java": {
+    "mtime": 1782236859.304086,
+    "seen": 1791457678.820038,
+    "ast_hash": "9525f63f8df177a6c0a2893af0a8b89e",
+    "semantic_hash": "9525f63f8df177a6c0a2893af0a8b89e"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/controller/TodoController.java": {
+    "mtime": 1791225612.0025756,
+    "seen": 1791457678.8200386,
+    "ast_hash": "be104a7c327b767c6497a3c0df78e599",
+    "semantic_hash": "be104a7c327b767c6497a3c0df78e599"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/controller/UserController.java": {
+    "mtime": 1782376582.1679747,
+    "seen": 1791457678.8200395,
+    "ast_hash": "b7134e5976908fe67ddd9b7a2cc70c8a",
+    "semantic_hash": "b7134e5976908fe67ddd9b7a2cc70c8a"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/controller/objectives/GoalController.java": {
+    "mtime": 1782376582.124355,
+    "seen": 1791457678.8200402,
+    "ast_hash": "3b6b4d416e61affb2fe8e2b88ac93343",
+    "semantic_hash": "3b6b4d416e61affb2fe8e2b88ac93343"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/controller/objectives/HabitController.java": {
+    "mtime": 1782376582.1486542,
+    "seen": 1791457678.820041,
+    "ast_hash": "a759e412a22d858c22560eb61ffc758c",
+    "semantic_hash": "a759e412a22d858c22560eb61ffc758c"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/controller/objectives/ObjectiveLogController.java": {
+    "mtime": 1782236859.3087485,
+    "seen": 1791457678.8200417,
+    "ast_hash": "b8da67802b57b0a5d75f6801e809a131",
+    "semantic_hash": "b8da67802b57b0a5d75f6801e809a131"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/domains/AdminUser.java": {
+    "mtime": 1782236859.3092606,
+    "seen": 1791457678.8200421,
+    "ast_hash": "cb5a3520ab6bb6e78c63ad0719c156aa",
+    "semantic_hash": "cb5a3520ab6bb6e78c63ad0719c156aa"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/domains/Event.java": {
+    "mtime": 1786270289.0319147,
+    "seen": 1791457678.820043,
+    "ast_hash": "b9484a7cb75c30172a46e1216dac3f95",
+    "semantic_hash": "b9484a7cb75c30172a46e1216dac3f95"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/domains/EventAssignment.java": {
+    "mtime": 1782238584.584407,
+    "seen": 1791457678.8200438,
+    "ast_hash": "e171177367f5b0e5aa8e4feb15170183",
+    "semantic_hash": "e171177367f5b0e5aa8e4feb15170183"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/domains/Goal.java": {
+    "mtime": 1782236859.311307,
+    "seen": 1791457678.8200448,
+    "ast_hash": "c1cb2445843877b147a26e742a707a17",
+    "semantic_hash": "c1cb2445843877b147a26e742a707a17"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/domains/Habit.java": {
+    "mtime": 1775746103.0578234,
+    "seen": 1791457678.8200457,
+    "ast_hash": "07d2584d8c905c55a3bb944dcce0714d",
+    "semantic_hash": "07d2584d8c905c55a3bb944dcce0714d"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/domains/Note.java": {
+    "mtime": 1786270667.12385,
+    "seen": 1791457678.8200464,
+    "ast_hash": "3314f6b65919dbf2a40ef7f644db9413",
+    "semantic_hash": "3314f6b65919dbf2a40ef7f644db9413"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/domains/Objective.java": {
+    "mtime": 1782238584.622404,
+    "seen": 1791457678.8200471,
+    "ast_hash": "ecc3ba5e8b789bdbea80edb1a70ea4e9",
+    "semantic_hash": "ecc3ba5e8b789bdbea80edb1a70ea4e9"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/domains/ObjectiveAssignment.java": {
+    "mtime": 1782238584.585426,
+    "seen": 1791457678.8200479,
+    "ast_hash": "eade2d35047639beebeeeb3159df1301",
+    "semantic_hash": "eade2d35047639beebeeeb3159df1301"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/domains/ObjectiveLog.java": {
+    "mtime": 1782238584.5859828,
+    "seen": 1791457678.8200483,
+    "ast_hash": "15d14cadcc54d0d931e2b1d4d2b67c43",
+    "semantic_hash": "15d14cadcc54d0d931e2b1d4d2b67c43"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/domains/Organization.java": {
+    "mtime": 1782236859.313347,
+    "seen": 1791457678.820049,
+    "ast_hash": "22c35508ebbe420cd40e5fa25a4257c7",
+    "semantic_hash": "22c35508ebbe420cd40e5fa25a4257c7"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/domains/PersonalUser.java": {
+    "mtime": 1782236859.3138573,
+    "seen": 1791457678.82005,
+    "ast_hash": "822608bb10d11cb1e3e490914e49d312",
+    "semantic_hash": "822608bb10d11cb1e3e490914e49d312"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/domains/TodoItem.java": {
+    "mtime": 1791225612.0030751,
+    "seen": 1791457678.8200505,
+    "ast_hash": "d833721df2d3c26f99003c408da8f581",
+    "semantic_hash": "d833721df2d3c26f99003c408da8f581"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/domains/User.java": {
+    "mtime": 1782236859.314879,
+    "seen": 1791457678.8200512,
+    "ast_hash": "7c881f9efdbdc0c4d1057d46da6d808a",
+    "semantic_hash": "7c881f9efdbdc0c4d1057d46da6d808a"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/enumerates/GoalStatus.java": {
+    "mtime": 1775741083.2276163,
+    "seen": 1791457678.820052,
+    "ast_hash": "6cbf4774ff69c234638c431c3a060910",
+    "semantic_hash": "6cbf4774ff69c234638c431c3a060910"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/enumerates/ObjectivePriority.java": {
+    "mtime": 1775746029.5904734,
+    "seen": 1791457678.8200526,
+    "ast_hash": "abef1ad6a0dbafd21ae3b8d612ee7859",
+    "semantic_hash": "abef1ad6a0dbafd21ae3b8d612ee7859"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/enumerates/UserRole.java": {
+    "mtime": 1776158132.0515583,
+    "seen": 1791457678.8200533,
+    "ast_hash": "55043a7d70d0934deb559224fb7a2feb",
+    "semantic_hash": "55043a7d70d0934deb559224fb7a2feb"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/events/BlockingEvent.java": {
+    "mtime": 1762191362.2569702,
+    "seen": 1791457678.820054,
+    "ast_hash": "1a471254213f9ed6c0bd917dd70f4c08",
+    "semantic_hash": "1a471254213f9ed6c0bd917dd70f4c08"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/events/BlockingEventListener.java": {
+    "mtime": 1762191362.2629876,
+    "seen": 1791457678.8200545,
+    "ast_hash": "46e205f2f8698120e3ef443bbc50e9a4",
+    "semantic_hash": "46e205f2f8698120e3ef443bbc50e9a4"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/exception/ApiException.java": {
+    "mtime": 1778538990.5797744,
+    "seen": 1791457678.8200552,
+    "ast_hash": "81ff5743301cc806f2f9f6f025ce81b7",
+    "semantic_hash": "81ff5743301cc806f2f9f6f025ce81b7"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/exception/GlobalExceptionHandler.java": {
+    "mtime": 1782376582.0927925,
+    "seen": 1791457678.8200557,
+    "ast_hash": "92c07950edf82e68ee57d34615366b73",
+    "semantic_hash": "92c07950edf82e68ee57d34615366b73"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/mappers/LoginMapper.java": {
+    "mtime": 1782236859.317438,
+    "seen": 1791457678.8200567,
+    "ast_hash": "e2dc35d803cd37f7790abc4112e4ab55",
+    "semantic_hash": "e2dc35d803cd37f7790abc4112e4ab55"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/mappers/ReminderMapper.java": {
+    "mtime": 1782236859.3179488,
+    "seen": 1791457678.8200572,
+    "ast_hash": "14f4532deac6d06226406090663d7487",
+    "semantic_hash": "14f4532deac6d06226406090663d7487"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/repos/AdminUserRepo.java": {
+    "mtime": 1782236859.3189738,
+    "seen": 1791457678.8200579,
+    "ast_hash": "33f5d0a8bd395cc134e653641bf130e3",
+    "semantic_hash": "33f5d0a8bd395cc134e653641bf130e3"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/repos/EventAssignmentRepo.java": {
+    "mtime": 1782236859.3194842,
+    "seen": 1791457678.8200586,
+    "ast_hash": "2795538073f33f3d0902fc9266d44ed6",
+    "semantic_hash": "2795538073f33f3d0902fc9266d44ed6"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/repos/EventRepo.java": {
+    "mtime": 1782236859.3205054,
+    "seen": 1791457678.820059,
+    "ast_hash": "3516940e58bdb45a72d14898b555cbe8",
+    "semantic_hash": "3516940e58bdb45a72d14898b555cbe8"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/repos/GoalRepo.java": {
+    "mtime": 1782236859.3215675,
+    "seen": 1791457678.82006,
+    "ast_hash": "70f12a5349d41a43f28105901b50d0e2",
+    "semantic_hash": "70f12a5349d41a43f28105901b50d0e2"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/repos/HabitRepo.java": {
+    "mtime": 1782236859.3220773,
+    "seen": 1791457678.8200626,
+    "ast_hash": "d61026570c52c76095e0618ab00e121a",
+    "semantic_hash": "d61026570c52c76095e0618ab00e121a"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/repos/NoteRepo.java": {
+    "mtime": 1786270295.3268156,
+    "seen": 1791457678.820063,
+    "ast_hash": "fb1941d6e90e2b7995b445ab92dd936c",
+    "semantic_hash": "fb1941d6e90e2b7995b445ab92dd936c"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/repos/ObjectiveAssignmentRepo.java": {
+    "mtime": 1782236859.323099,
+    "seen": 1791457678.820064,
+    "ast_hash": "d27a979a66f1a8ec2496de695cb51f1e",
+    "semantic_hash": "d27a979a66f1a8ec2496de695cb51f1e"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/repos/ObjectiveLogRepo.java": {
+    "mtime": 1782236859.323611,
+    "seen": 1791457678.8200645,
+    "ast_hash": "cf8a740934c6441a0d2c795f60fc50e7",
+    "semantic_hash": "cf8a740934c6441a0d2c795f60fc50e7"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/repos/OrganizationRepo.java": {
+    "mtime": 1776158168.366468,
+    "seen": 1791457678.8200653,
+    "ast_hash": "4d08333e1ae1e3326a0ff4856851fe07",
+    "semantic_hash": "4d08333e1ae1e3326a0ff4856851fe07"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/repos/PersonalUserRepo.java": {
+    "mtime": 1782236859.3241217,
+    "seen": 1791457678.8200657,
+    "ast_hash": "f678ca085c4013aff803fb7c842b464b",
+    "semantic_hash": "f678ca085c4013aff803fb7c842b464b"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/repos/TodoItemRepo.java": {
+    "mtime": 1791225612.0030751,
+    "seen": 1791457678.8200665,
+    "ast_hash": "7ac3ead347435485da7b34b8d82b4c57",
+    "semantic_hash": "7ac3ead347435485da7b34b8d82b4c57"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/repos/UserRepo.java": {
+    "mtime": 1782236859.3246338,
+    "seen": 1791457678.8200672,
+    "ast_hash": "bb3dc524f439e9b8a736644f0c0b154b",
+    "semantic_hash": "bb3dc524f439e9b8a736644f0c0b154b"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/schedulers/ReminderScheduler.java": {
+    "mtime": 1782236859.326164,
+    "seen": 1791457678.8200681,
+    "ast_hash": "f851ac76b034941e2b2185a7d9e95bd9",
+    "semantic_hash": "f851ac76b034941e2b2185a7d9e95bd9"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/security/JwtTokenService.java": {
+    "mtime": 1782236859.3266757,
+    "seen": 1791457678.8200686,
+    "ast_hash": "ba8c03cf562bb32bad10aab40aea7dd3",
+    "semantic_hash": "ba8c03cf562bb32bad10aab40aea7dd3"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/security/JwtUtil.java": {
+    "mtime": 1786272705.563587,
+    "seen": 1791457678.8200693,
+    "ast_hash": "65ffc31d30e9dcd2dabd83b3f1e0b264",
+    "semantic_hash": "65ffc31d30e9dcd2dabd83b3f1e0b264"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/security/SecurityConfig.java": {
+    "mtime": 1772717051.3809848,
+    "seen": 1791457678.8200698,
+    "ast_hash": "b9086339f7246f45b12a61361d5acbc6",
+    "semantic_hash": "b9086339f7246f45b12a61361d5acbc6"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/security/TokenService.java": {
+    "mtime": 1782236859.3287222,
+    "seen": 1791457678.820071,
+    "ast_hash": "d8dd26a91ca98d965837a33d4f734f2e",
+    "semantic_hash": "d8dd26a91ca98d965837a33d4f734f2e"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/AccServiceImplements.java": {
+    "mtime": 1782236859.3292327,
+    "seen": 1791457678.8200715,
+    "ast_hash": "cbf9c5b53d5847ce69d0df45bdcdc2cb",
+    "semantic_hash": "cbf9c5b53d5847ce69d0df45bdcdc2cb"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/AppRestrictionService.java": {
+    "mtime": 1791023115.23408,
+    "seen": 1791457678.8200722,
+    "ast_hash": "d2726c1fb42f48fc4a3bccee487c6925",
+    "semantic_hash": "d2726c1fb42f48fc4a3bccee487c6925"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/BlockingService.java": {
+    "mtime": 1778538990.5853405,
+    "seen": 1791457678.8200727,
+    "ast_hash": "02bf534c805633b834e437ccbc3e74d2",
+    "semantic_hash": "02bf534c805633b834e437ccbc3e74d2"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/EventService.java": {
+    "mtime": 1786270291.5787141,
+    "seen": 1791457678.8200734,
+    "ast_hash": "ac0f120b6d887cb6cbee3fc4161abc1d",
+    "semantic_hash": "ac0f120b6d887cb6cbee3fc4161abc1d"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/InstalledApplicationService.java": {
+    "mtime": 1774290002.050537,
+    "seen": 1791457678.820074,
+    "ast_hash": "014aa429d4e4ddd3044211df5ddc7990",
+    "semantic_hash": "014aa429d4e4ddd3044211df5ddc7990"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/NoteService.java": {
+    "mtime": 1786270296.1007924,
+    "seen": 1791457678.8200748,
+    "ast_hash": "d32b67a67725e4dba0e7ccced2fb3154",
+    "semantic_hash": "d32b67a67725e4dba0e7ccced2fb3154"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/TodoService.java": {
+    "mtime": 1791225612.0035758,
+    "seen": 1791457678.8200753,
+    "ast_hash": "aead1aa6f5f10f74d8cc8014854651f1",
+    "semantic_hash": "aead1aa6f5f10f74d8cc8014854651f1"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/UserService.java": {
+    "mtime": 1782236859.3317952,
+    "seen": 1791457678.8200767,
+    "ast_hash": "5adc07560b40844ae683812cc52280df",
+    "semantic_hash": "5adc07560b40844ae683812cc52280df"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/implementations/AdminServiceImpl.java": {
+    "mtime": 1782236859.3323655,
+    "seen": 1791457678.8200777,
+    "ast_hash": "de50b21daf5362058c6fb46e4e0f49e6",
+    "semantic_hash": "de50b21daf5362058c6fb46e4e0f49e6"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/implementations/GoalServiceImpl.java": {
+    "mtime": 1782236859.3339014,
+    "seen": 1791457678.8200781,
+    "ast_hash": "a56a4f76b2e7a2e74b51c76b2df43297",
+    "semantic_hash": "a56a4f76b2e7a2e74b51c76b2df43297"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/implementations/HabitServiceImpl.java": {
+    "mtime": 1782236859.334929,
+    "seen": 1791457678.8200788,
+    "ast_hash": "d11b5a5f719d36ceb51622c16a33d00d",
+    "semantic_hash": "d11b5a5f719d36ceb51622c16a33d00d"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/implementations/HeuristicInstalledApplicationExecutableResolver.java": {
+    "mtime": 1782236859.3359578,
+    "seen": 1791457678.8200796,
+    "ast_hash": "d382e0c914f4b5945910b5482b4462ba",
+    "semantic_hash": "d382e0c914f4b5945910b5482b4462ba"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/implementations/ObjectiveLogServiceImpl.java": {
+    "mtime": 1782236859.336511,
+    "seen": 1791457678.82008,
+    "ast_hash": "accf3d3fa4ca033854fc13858f9b241a",
+    "semantic_hash": "accf3d3fa4ca033854fc13858f9b241a"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/implementations/ObjectiveServiceBase.java": {
+    "mtime": 1775746520.9052846,
+    "seen": 1791457678.820081,
+    "ast_hash": "3c5ccf13570c2ea809883c5e912360fc",
+    "semantic_hash": "3c5ccf13570c2ea809883c5e912360fc"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/implementations/ReminderService.java": {
+    "mtime": 1775316083.2130582,
+    "seen": 1791457678.8200815,
+    "ast_hash": "2fba35f0344bc56c8678720997301170",
+    "semantic_hash": "2fba35f0344bc56c8678720997301170"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/implementations/StorageServiceImpl.java": {
+    "mtime": 1790751694.2238932,
+    "seen": 1791457678.8200822,
+    "ast_hash": "612c58d640552bc249ccf0149e9489be",
+    "semantic_hash": "612c58d640552bc249ccf0149e9489be"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/implementations/WindowsRegistryInstalledApplicationProvider.java": {
+    "mtime": 1774289702.0065825,
+    "seen": 1791457678.8200827,
+    "ast_hash": "bd32908b3a1eb95fb199b4ac2f94cec5",
+    "semantic_hash": "bd32908b3a1eb95fb199b4ac2f94cec5"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/interfaces/AccountService.java": {
+    "mtime": 1782236859.337545,
+    "seen": 1791457678.8200834,
+    "ast_hash": "bea9fb643e61e315298737e55910490b",
+    "semantic_hash": "bea9fb643e61e315298737e55910490b"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/interfaces/IAdminService.java": {
+    "mtime": 1776707644.8859859,
+    "seen": 1791457678.8200843,
+    "ast_hash": "b139f694dce475258f55a0ccce24496f",
+    "semantic_hash": "b139f694dce475258f55a0ccce24496f"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/interfaces/IGoalService.java": {
+    "mtime": 1782236859.3380568,
+    "seen": 1791457678.8200848,
+    "ast_hash": "8199e67fb9f248ad430b35b4c5791a1e",
+    "semantic_hash": "8199e67fb9f248ad430b35b4c5791a1e"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/interfaces/IHabitService.java": {
+    "mtime": 1782236859.3390796,
+    "seen": 1791457678.8200855,
+    "ast_hash": "cf715f95870fb8160f01cf83bed89935",
+    "semantic_hash": "cf715f95870fb8160f01cf83bed89935"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/interfaces/IObjectiveLogService.java": {
+    "mtime": 1775746494.723585,
+    "seen": 1791457678.820086,
+    "ast_hash": "056ffb72ec64575e4c5117feaf385ce0",
+    "semantic_hash": "056ffb72ec64575e4c5117feaf385ce0"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/interfaces/IObjectiveService.java": {
+    "mtime": 1775746457.1594572,
+    "seen": 1791457678.8200865,
+    "ast_hash": "21886ca6a40732ca568ffe3fafb6e200",
+    "semantic_hash": "21886ca6a40732ca568ffe3fafb6e200"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/interfaces/IReminderService.java": {
+    "mtime": 1775316083.2252555,
+    "seen": 1791457678.8200872,
+    "ast_hash": "dfa72a48394e58eb1d64ea26e78a8b56",
+    "semantic_hash": "dfa72a48394e58eb1d64ea26e78a8b56"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/interfaces/IStorageService.java": {
+    "mtime": 1790751656.7821238,
+    "seen": 1791457678.8200884,
+    "ast_hash": "19ee4fb6c0998dbaaafd869e1ab630c8",
+    "semantic_hash": "19ee4fb6c0998dbaaafd869e1ab630c8"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/interfaces/IUserService.java": {
+    "mtime": 1776707644.8869927,
+    "seen": 1791457678.8200889,
+    "ast_hash": "b9494f390beb9ccdf0859282f62bce01",
+    "semantic_hash": "b9494f390beb9ccdf0859282f62bce01"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/interfaces/InstalledApplicationExecutableResolver.java": {
+    "mtime": 1774289742.8301826,
+    "seen": 1791457678.8200896,
+    "ast_hash": "ba112574f3bcc30ff0afe82164214778",
+    "semantic_hash": "ba112574f3bcc30ff0afe82164214778"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/service/interfaces/InstalledApplicationProvider.java": {
+    "mtime": 1774290002.0562496,
+    "seen": 1791457678.82009,
+    "ast_hash": "5dc814e403ad968e9d190df60ccbaf98",
+    "semantic_hash": "5dc814e403ad968e9d190df60ccbaf98"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/utils/Constants.java": {
+    "mtime": 1770324532.9189136,
+    "seen": 1791457678.8200908,
+    "ast_hash": "8c20f037e8a697382d1e508c276448fc",
+    "semantic_hash": "8c20f037e8a697382d1e508c276448fc"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/utils/WindowsUtils.java": {
+    "mtime": 1778538990.5884256,
+    "seen": 1791457678.8200917,
+    "ast_hash": "fd4045ea4353f8ed5d3530c29a1f9010",
+    "semantic_hash": "fd4045ea4353f8ed5d3530c29a1f9010"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/validation/PasswordPolicy.java": {
+    "mtime": 1772665056.1768906,
+    "seen": 1791457678.8200922,
+    "ast_hash": "1b659228f845bcafd4a54619d9319a48",
+    "semantic_hash": "1b659228f845bcafd4a54619d9319a48"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/validation/RegexPasswordPolicy.java": {
+    "mtime": 1772665109.2740355,
+    "seen": 1791457678.820093,
+    "ast_hash": "0525fb5546348de28438ef0670454044",
+    "semantic_hash": "0525fb5546348de28438ef0670454044"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/validation/events/EventRequestValidator.java": {
+    "mtime": 1786270290.730141,
+    "seen": 1791457678.8200934,
+    "ast_hash": "171734ebf962623d966fdc7be2525ffb",
+    "semantic_hash": "171734ebf962623d966fdc7be2525ffb"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/validation/objectives/HabitValidator.java": {
+    "mtime": 1782376582.1395679,
+    "seen": 1791457678.820094,
+    "ast_hash": "8880898b6c0a62f25f29f822f003693d",
+    "semantic_hash": "8880898b6c0a62f25f29f822f003693d"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/xi18n/LanguageResolver.java": {
+    "mtime": 1782376582.0780394,
+    "seen": 1791457678.8200948,
+    "ast_hash": "781030db8baf2d1bcf8f78fcbe0b5b7f",
+    "semantic_hash": "781030db8baf2d1bcf8f78fcbe0b5b7f"
+  },
+  "backend/src/main/java/net/tfg/tfgapp/xi18n/TextConstants.java": {
+    "mtime": 1782376582.158878,
+    "seen": 1791457678.8200955,
+    "ast_hash": "5692b106c60aac07abc6e5d5bdcc7224",
+    "semantic_hash": "5692b106c60aac07abc6e5d5bdcc7224"
+  },
+  "backend/src/test/java/net/tfg/tfgapp/service/EventServiceTest.java": {
+    "mtime": 1786272768.0699549,
+    "seen": 1791457678.8200963,
+    "ast_hash": "4d2cbfab59131a7678627bc22f4fe4e4",
+    "semantic_hash": "4d2cbfab59131a7678627bc22f4fe4e4"
+  },
+  "backend/src/test/java/net/tfg/tfgapp/service/TodoServiceTest.java": {
+    "mtime": 1791225612.0040758,
+    "seen": 1791457678.8200967,
+    "ast_hash": "0ee55f4e5327876751eca0a607a4e21d",
+    "semantic_hash": "0ee55f4e5327876751eca0a607a4e21d"
+  },
+  "frontend/browser-extension/_locales/en/messages.json": {
+    "mtime": 1791023358.8626006,
+    "seen": 1791457678.8200974,
+    "ast_hash": "c92cf6ac1eec429cf0b94c6826e55a02",
+    "semantic_hash": "c92cf6ac1eec429cf0b94c6826e55a02"
+  },
+  "frontend/browser-extension/_locales/es/messages.json": {
+    "mtime": 1791023359.2069364,
+    "seen": 1791457678.8200982,
+    "ast_hash": "32d0da0f98765adea0a2f4945fa974aa",
+    "semantic_hash": "32d0da0f98765adea0a2f4945fa974aa"
+  },
+  "frontend/browser-extension/background.js": {
+    "mtime": 1791199156.01955,
+    "seen": 1791457678.8200989,
+    "ast_hash": "95da3bb8034b72ec2f33681e48765aa1",
+    "semantic_hash": "95da3bb8034b72ec2f33681e48765aa1"
+  },
+  "frontend/browser-extension/blocked.js": {
+    "mtime": 1791023160.2237115,
+    "seen": 1791457678.8200996,
+    "ast_hash": "9dcd1a9aa8f00615bbbff249abbc64b1",
+    "semantic_hash": "9dcd1a9aa8f00615bbbff249abbc64b1"
+  },
+  "frontend/browser-extension/manifest.json": {
+    "mtime": 1791127259.6027908,
+    "seen": 1791457678.8201,
+    "ast_hash": "51c56e768de7294830c34f7418d839a2",
+    "semantic_hash": "51c56e768de7294830c34f7418d839a2"
+  },
+  "frontend/front/electron/backdropSampler.js": {
+    "mtime": 1791225613.1088858,
+    "seen": 1791457678.8201008,
+    "ast_hash": "c9569395baa38982e4523859cec3dc01",
+    "semantic_hash": "c9569395baa38982e4523859cec3dc01"
+  },
+  "frontend/front/electron/electron.js": {
+    "mtime": 1791225612.7832062,
+    "seen": 1791457678.8201013,
+    "ast_hash": "db3f552a09eddce54c93e6f5c317ee91",
+    "semantic_hash": "db3f552a09eddce54c93e6f5c317ee91"
+  },
+  "frontend/front/electron/preload.js": {
+    "mtime": 1791225612.7832062,
+    "seen": 1791457678.8201022,
+    "ast_hash": "c3d8aded853b68b02f22d887af251d22",
+    "semantic_hash": "c3d8aded853b68b02f22d887af251d22"
+  },
+  "frontend/front/package.json": {
+    "mtime": 1786271804.819563,
+    "seen": 1791457678.820103,
+    "ast_hash": "443faba494afcda8acbea48c5a6f143a",
+    "semantic_hash": "443faba494afcda8acbea48c5a6f143a"
+  },
+  "frontend/front/public/manifest.json": {
+    "mtime": 1741961691.0387893,
+    "seen": 1791457678.8201034,
+    "ast_hash": "d9d975cebe2ec20b6c652e1e4c12ccf0",
+    "semantic_hash": "d9d975cebe2ec20b6c652e1e4c12ccf0"
+  },
+  "frontend/front/scripts/i18n-audit.js": {
+    "mtime": 1778538990.5914488,
+    "seen": 1791457678.8201041,
+    "ast_hash": "02c6d893096339e01f2fa7735b578695",
+    "semantic_hash": "02c6d893096339e01f2fa7735b578695"
+  },
+  "frontend/front/src/App.js": {
+    "mtime": 1782835989.069817,
+    "seen": 1791457678.8201046,
+    "ast_hash": "e51b986b4ec224c49a7702778ac54a51",
+    "semantic_hash": "e51b986b4ec224c49a7702778ac54a51"
+  },
+  "frontend/front/src/AppRouter.js": {
+    "mtime": 1786270429.877581,
+    "seen": 1791457678.8201056,
+    "ast_hash": "4fcd12d561035160eb9f2b1dd5449806",
+    "semantic_hash": "4fcd12d561035160eb9f2b1dd5449806"
+  },
+  "frontend/front/src/DarkModeContext.jsx": {
+    "mtime": 1791225612.7837071,
+    "seen": 1791457678.820106,
+    "ast_hash": "77e9cd549c1cf709ec7b4cbce6f8b289",
+    "semantic_hash": "77e9cd549c1cf709ec7b4cbce6f8b289"
+  },
+  "frontend/front/src/api/adminApi.js": {
+    "mtime": 1778538990.5944812,
+    "seen": 1791457678.8201067,
+    "ast_hash": "bf8cbf0d8e6e67eafe4b902e76d80888",
+    "semantic_hash": "bf8cbf0d8e6e67eafe4b902e76d80888"
+  },
+  "frontend/front/src/api/apiClient.js": {
+    "mtime": 1779042719.832292,
+    "seen": 1791457678.8201075,
+    "ast_hash": "ccdf33f04d43899d475b2f63185a2c7e",
+    "semantic_hash": "ccdf33f04d43899d475b2f63185a2c7e"
+  },
+  "frontend/front/src/api/authApi.js": {
+    "mtime": 1778538990.5959964,
+    "seen": 1791457678.820108,
+    "ast_hash": "dd77bc1c8270fa8cc38f929bf4b22e0c",
+    "semantic_hash": "dd77bc1c8270fa8cc38f929bf4b22e0c"
+  },
+  "frontend/front/src/api/blockApi.js": {
+    "mtime": 1790751658.360791,
+    "seen": 1791457678.820109,
+    "ast_hash": "1dd054b22b1003a949042b37ffdd2792",
+    "semantic_hash": "1dd054b22b1003a949042b37ffdd2792"
+  },
+  "frontend/front/src/api/eventApi.js": {
+    "mtime": 1778538990.5975077,
+    "seen": 1791457678.8201094,
+    "ast_hash": "a72c4a4ba6975e3d6df98853cdda53a8",
+    "semantic_hash": "a72c4a4ba6975e3d6df98853cdda53a8"
+  },
+  "frontend/front/src/api/noteApi.js": {
+    "mtime": 1786270427.014988,
+    "seen": 1791457678.82011,
+    "ast_hash": "adcbd1fa1c67afde024428b2bb1a4a4a",
+    "semantic_hash": "adcbd1fa1c67afde024428b2bb1a4a4a"
+  },
+  "frontend/front/src/api/objectivesApi.js": {
+    "mtime": 1778538990.5975077,
+    "seen": 1791457678.8201106,
+    "ast_hash": "ff79b3d80f89d1cf4f2ce835a89efa0e",
+    "semantic_hash": "ff79b3d80f89d1cf4f2ce835a89efa0e"
+  },
+  "frontend/front/src/api/todoApi.js": {
+    "mtime": 1791225612.0045755,
+    "seen": 1791457678.8201113,
+    "ast_hash": "9deae8851df3a9ca9e2dc5c75e9ffcad",
+    "semantic_hash": "9deae8851df3a9ca9e2dc5c75e9ffcad"
+  },
+  "frontend/front/src/api/userApi.js": {
+    "mtime": 1782236859.3441966,
+    "seen": 1791457678.8201122,
+    "ast_hash": "11de83e99f9cd16dcc4b0400663db8f7",
+    "semantic_hash": "11de83e99f9cd16dcc4b0400663db8f7"
+  },
+  "frontend/front/src/components/AdminAssignmentSelector.jsx": {
+    "mtime": 1782835989.069817,
+    "seen": 1791457678.820113,
+    "ast_hash": "9f1786e11a0730aed9767d616ea6184a",
+    "semantic_hash": "9f1786e11a0730aed9767d616ea6184a"
+  },
+  "frontend/front/src/components/Error.js": {
+    "mtime": 1778538990.5990243,
+    "seen": 1791457678.8201134,
+    "ast_hash": "e6b5194fcde4f8c2942c45b2c2734fd5",
+    "semantic_hash": "e6b5194fcde4f8c2942c45b2c2734fd5"
+  },
+  "frontend/front/src/components/ErrorContext.js": {
+    "mtime": 1748988618.7745228,
+    "seen": 1791457678.8201141,
+    "ast_hash": "b944485f980f939725afbcd962de2c8a",
+    "semantic_hash": "b944485f980f939725afbcd962de2c8a"
+  },
+  "frontend/front/src/components/ProtectedRoute.js": {
+    "mtime": 1779743010.808654,
+    "seen": 1791457678.8201149,
+    "ast_hash": "2d62dbf939547f0e7af1e852e97aceab",
+    "semantic_hash": "2d62dbf939547f0e7af1e852e97aceab"
+  },
+  "frontend/front/src/components/layout/FocusModeListener.jsx": {
+    "mtime": 1778538990.600536,
+    "seen": 1791457678.8201158,
+    "ast_hash": "6ad290de68909415b4514fb06f82a3cd",
+    "semantic_hash": "6ad290de68909415b4514fb06f82a3cd"
+  },
+  "frontend/front/src/components/layout/MainLayout.js": {
+    "mtime": 1786270430.7864416,
+    "seen": 1791457678.8201163,
+    "ast_hash": "b719fab0327d3cb4b96a996fe7b04548",
+    "semantic_hash": "b719fab0327d3cb4b96a996fe7b04548"
+  },
+  "frontend/front/src/components/layout/ReminderListener.jsx": {
+    "mtime": 1782835989.0713336,
+    "seen": 1791457678.820117,
+    "ast_hash": "594414b5b2fde16606764e4dcfc66568",
+    "semantic_hash": "594414b5b2fde16606764e4dcfc66568"
+  },
+  "frontend/front/src/components/layout/UserMenu.js": {
+    "mtime": 1779743010.8091617,
+    "seen": 1791457678.8201177,
+    "ast_hash": "a24c32258b7737a3749583c57fa7f3ac",
+    "semantic_hash": "a24c32258b7737a3749583c57fa7f3ac"
+  },
+  "frontend/front/src/components/layout/WindowTitleBar.jsx": {
+    "mtime": 1779743010.8101861,
+    "seen": 1791457678.8201184,
+    "ast_hash": "ce8368cd158142c38b43bf853772f346",
+    "semantic_hash": "ce8368cd158142c38b43bf853772f346"
+  },
+  "frontend/front/src/components/shared/ConfirmDialog.jsx": {
+    "mtime": 1784309244.5928812,
+    "seen": 1791457678.8201191,
+    "ast_hash": "1575a698b6ff5a92d57eec10d2cd3e76",
+    "semantic_hash": "1575a698b6ff5a92d57eec10d2cd3e76"
+  },
+  "frontend/front/src/components/shared/CustomDatePicker.jsx": {
+    "mtime": 1786645060.386935,
+    "seen": 1791457678.8201199,
+    "ast_hash": "98cc041d96591fbd9857719747e8e9ad",
+    "semantic_hash": "98cc041d96591fbd9857719747e8e9ad"
+  },
+  "frontend/front/src/components/shared/CustomSelectDropdown.jsx": {
+    "mtime": 1786645059.2796996,
+    "seen": 1791457678.8201203,
+    "ast_hash": "f4745deea322c6ef665dcd4a5cff87b2",
+    "semantic_hash": "f4745deea322c6ef665dcd4a5cff87b2"
+  },
+  "frontend/front/src/components/shared/LocationIcon.jsx": {
+    "mtime": 1782835989.0728533,
+    "seen": 1791457678.820121,
+    "ast_hash": "0609de44de58ecd4c1560382e6abe80b",
+    "semantic_hash": "0609de44de58ecd4c1560382e6abe80b"
+  },
+  "frontend/front/src/constants/textConstants.js": {
+    "mtime": 1791225612.7842054,
+    "seen": 1791457678.8201218,
+    "ast_hash": "8bc9b92adcbacf33983f8b756ea68fc0",
+    "semantic_hash": "8bc9b92adcbacf33983f8b756ea68fc0"
+  },
+  "frontend/front/src/context/languageContext.js": {
+    "mtime": 1778538990.603174,
+    "seen": 1791457678.8201227,
+    "ast_hash": "cc1fc5d0e1a1fc3954178735a9511423",
+    "semantic_hash": "cc1fc5d0e1a1fc3954178735a9511423"
+  },
+  "frontend/front/src/features/calendar/Calendar.jsx": {
+    "mtime": 1782236859.3524306,
+    "seen": 1791457678.8201232,
+    "ast_hash": "faa050af1ad9e728a724c686cd757606",
+    "semantic_hash": "faa050af1ad9e728a724c686cd757606"
+  },
+  "frontend/front/src/features/calendar/CalendarHeader.js": {
+    "mtime": 1778538990.609237,
+    "seen": 1791457678.820124,
+    "ast_hash": "27689953f2f1f3b49dd53ac3ecd9db9c",
+    "semantic_hash": "27689953f2f1f3b49dd53ac3ecd9db9c"
+  },
+  "frontend/front/src/features/calendar/DailyCalendarView.jsx": {
+    "mtime": 1782835989.0816796,
+    "seen": 1791457678.8201244,
+    "ast_hash": "be78bc826a7ef5ff7cb7cab93c25431e",
+    "semantic_hash": "be78bc826a7ef5ff7cb7cab93c25431e"
+  },
+  "frontend/front/src/features/calendar/EventModal.jsx": {
+    "mtime": 1786645114.1733873,
+    "seen": 1791457678.820125,
+    "ast_hash": "332ad0355021c7c66c50de884ef4a7fd",
+    "semantic_hash": "332ad0355021c7c66c50de884ef4a7fd"
+  },
+  "frontend/front/src/features/calendar/MonthView.js": {
+    "mtime": 1784829074.9843583,
+    "seen": 1791457678.8201256,
+    "ast_hash": "14e25b491a01322c54b25963cb2bb7ec",
+    "semantic_hash": "14e25b491a01322c54b25963cb2bb7ec"
+  },
+  "frontend/front/src/features/calendar/TagColorCustomizer.jsx": {
+    "mtime": 1784309256.7556238,
+    "seen": 1791457678.8201265,
+    "ast_hash": "b0cdd3296c2b44666f32552233a4b8e0",
+    "semantic_hash": "b0cdd3296c2b44666f32552233a4b8e0"
+  },
+  "frontend/front/src/features/calendar/WeekView.js": {
+    "mtime": 1784829080.0341613,
+    "seen": 1791457678.820127,
+    "ast_hash": "3e2751ce42ccde308a653874375f5e67",
+    "semantic_hash": "3e2751ce42ccde308a653874375f5e67"
+  },
+  "frontend/front/src/features/calendar/utils/calendarLabels.js": {
+    "mtime": 1784309092.884557,
+    "seen": 1791457678.8201277,
+    "ast_hash": "7a94d4bac65111d417595ddf3de10d75",
+    "semantic_hash": "7a94d4bac65111d417595ddf3de10d75"
+  },
+  "frontend/front/src/features/home/DailyWidget.jsx": {
+    "mtime": 1782835989.0833206,
+    "seen": 1791457678.8201284,
+    "ast_hash": "c70338a50055ae146c344abb6601d81a",
+    "semantic_hash": "c70338a50055ae146c344abb6601d81a"
+  },
+  "frontend/front/src/features/home/HomeHeader.jsx": {
+    "mtime": 1782236859.3585756,
+    "seen": 1791457678.820129,
+    "ast_hash": "4793b5d5bf8ad1610f65a421379fcc07",
+    "semantic_hash": "4793b5d5bf8ad1610f65a421379fcc07"
+  },
+  "frontend/front/src/features/home/RemindersPanel.js": {
+    "mtime": 1782835989.0848687,
+    "seen": 1791457678.8201299,
+    "ast_hash": "926e79e9453f58df519c03fa8b2ea313",
+    "semantic_hash": "926e79e9453f58df519c03fa8b2ea313"
+  },
+  "frontend/front/src/features/home/TodoList.jsx": {
+    "mtime": 1791225612.022722,
+    "seen": 1791457678.8201303,
+    "ast_hash": "e9559754bda9da99c6890440f9be9586",
+    "semantic_hash": "e9559754bda9da99c6890440f9be9586"
+  },
+  "frontend/front/src/features/objectives/components/GoalModal.jsx": {
+    "mtime": 1782236859.3611367,
+    "seen": 1791457678.820131,
+    "ast_hash": "fb42152742a27b86906e58877f53e964",
+    "semantic_hash": "fb42152742a27b86906e58877f53e964"
+  },
+  "frontend/front/src/features/objectives/components/GoalsSection.jsx": {
+    "mtime": 1786645927.457518,
+    "seen": 1791457678.820132,
+    "ast_hash": "96b7117780535583a6d97d453f7b8306",
+    "semantic_hash": "96b7117780535583a6d97d453f7b8306"
+  },
+  "frontend/front/src/features/objectives/components/HabitBarChart.jsx": {
+    "mtime": 1782835989.0863986,
+    "seen": 1791457678.820133,
+    "ast_hash": "f06929980c7f11b8b1aa7df8e6b5e837",
+    "semantic_hash": "f06929980c7f11b8b1aa7df8e6b5e837"
+  },
+  "frontend/front/src/features/objectives/components/HabitModal.jsx": {
+    "mtime": 1779044398.7102191,
+    "seen": 1791457678.8201334,
+    "ast_hash": "1fd4ff63800d218a1f2cc89025fbee2f",
+    "semantic_hash": "1fd4ff63800d218a1f2cc89025fbee2f"
+  },
+  "frontend/front/src/features/objectives/components/HabitsSection.jsx": {
+    "mtime": 1786645802.9953103,
+    "seen": 1791457678.8201354,
+    "ast_hash": "ea70d9f89bef12dd6228194c5c5e1ce9",
+    "semantic_hash": "ea70d9f89bef12dd6228194c5c5e1ce9"
+  },
+  "frontend/front/src/features/objectives/components/ObjectivesDashboard.jsx": {
+    "mtime": 1782835989.0863986,
+    "seen": 1791457678.8201363,
+    "ast_hash": "639f018c2f8a59ea89649a0d60d1d30f",
+    "semantic_hash": "639f018c2f8a59ea89649a0d60d1d30f"
+  },
+  "frontend/front/src/features/objectives/components/PieChart.jsx": {
+    "mtime": 1784825455.3273802,
+    "seen": 1791457678.8201368,
+    "ast_hash": "996f96fadd46eb331d106bb59ae8626d",
+    "semantic_hash": "996f96fadd46eb331d106bb59ae8626d"
+  },
+  "frontend/front/src/features/objectives/utils/objectiveHelpers.js": {
+    "mtime": 1782236859.3657358,
+    "seen": 1791457678.8201375,
+    "ast_hash": "8ba8b150e2de87ff25ad68a43aff493a",
+    "semantic_hash": "8ba8b150e2de87ff25ad68a43aff493a"
+  },
+  "frontend/front/src/hooks/useCalendarEvents.js": {
+    "mtime": 1782835989.0879254,
+    "seen": 1791457678.8201382,
+    "ast_hash": "3082fb98c5cd042c7bd5e592fe3b46bf",
+    "semantic_hash": "3082fb98c5cd042c7bd5e592fe3b46bf"
+  },
+  "frontend/front/src/hooks/useTodayEvents.jsx": {
+    "mtime": 1773578514.0595703,
+    "seen": 1791457678.8201387,
+    "ast_hash": "454c134347cf3e881abdf6e98a8850eb",
+    "semantic_hash": "454c134347cf3e881abdf6e98a8850eb"
+  },
+  "frontend/front/src/index.jsx": {
+    "mtime": 1786272137.0141397,
+    "seen": 1791457678.8201394,
+    "ast_hash": "c80253a25b869ef34487e657013ecd0e",
+    "semantic_hash": "c80253a25b869ef34487e657013ecd0e"
+  },
+  "frontend/front/src/pages/AdminOrganizationSetupPage.jsx": {
+    "mtime": 1782236859.3678608,
+    "seen": 1791457678.8201401,
+    "ast_hash": "52e39e547cf967b5c936d4a6e2ad16af",
+    "semantic_hash": "52e39e547cf967b5c936d4a6e2ad16af"
+  },
+  "frontend/front/src/pages/AdminUsersPage.jsx": {
+    "mtime": 1784309190.387582,
+    "seen": 1791457678.8201408,
+    "ast_hash": "ffff3420efc6e14cb91035933cdcff12",
+    "semantic_hash": "ffff3420efc6e14cb91035933cdcff12"
+  },
+  "frontend/front/src/pages/Block.js": {
+    "mtime": 1791023109.683639,
+    "seen": 1791457678.8201416,
+    "ast_hash": "3b17f03ef3d238fbc775eef3fa1df8bd",
+    "semantic_hash": "3b17f03ef3d238fbc775eef3fa1df8bd"
+  },
+  "frontend/front/src/pages/Home.js": {
+    "mtime": 1791225612.0242567,
+    "seen": 1791457678.820142,
+    "ast_hash": "2966b872ebce3db37c5a47163841fef8",
+    "semantic_hash": "2966b872ebce3db37c5a47163841fef8"
+  },
+  "frontend/front/src/pages/Login.js": {
+    "mtime": 1784825385.1074314,
+    "seen": 1791457678.8201427,
+    "ast_hash": "5ec4333e64580a6e6c63188b47bc2d74",
+    "semantic_hash": "5ec4333e64580a6e6c63188b47bc2d74"
+  },
+  "frontend/front/src/pages/Notes.jsx": {
+    "mtime": 1786270427.997115,
+    "seen": 1791457678.8201437,
+    "ast_hash": "0eca5d83eb3379199536f6f1f497dae9",
+    "semantic_hash": "0eca5d83eb3379199536f6f1f497dae9"
+  },
+  "frontend/front/src/pages/Objectives.js": {
+    "mtime": 1784309179.801715,
+    "seen": 1791457678.8201442,
+    "ast_hash": "81b6f36456f271507e766c8cd9144c99",
+    "semantic_hash": "81b6f36456f271507e766c8cd9144c99"
+  },
+  "frontend/front/src/pages/Register.js": {
+    "mtime": 1782835989.0893185,
+    "seen": 1791457678.820145,
+    "ast_hash": "58f585b4751ea2f6cf328c27b45ea73b",
+    "semantic_hash": "58f585b4751ea2f6cf328c27b45ea73b"
+  },
+  "frontend/front/src/pages/Settings.js": {
+    "mtime": 1791225612.7852783,
+    "seen": 1791457678.8201454,
+    "ast_hash": "a6b0a8c1c02791f3a3d5f00123a9fb5f",
+    "semantic_hash": "a6b0a8c1c02791f3a3d5f00123a9fb5f"
+  },
+  "frontend/front/src/reportWebVitals.js": {
+    "mtime": 1741961690.8734527,
+    "seen": 1791457678.820146,
+    "ast_hash": "240e2381f826a9bb84d178b29b7b9abe",
+    "semantic_hash": "240e2381f826a9bb84d178b29b7b9abe"
+  },
+  "frontend/front/src/theme/backdropContrast.js": {
+    "mtime": 1791225613.1099558,
+    "seen": 1791457678.8201468,
+    "ast_hash": "f4005560c7388511e2cc408c4ec44d1e",
+    "semantic_hash": "f4005560c7388511e2cc408c4ec44d1e"
+  },
+  "frontend/front/src/theme/backdropTint.js": {
+    "mtime": 1791225613.1099558,
+    "seen": 1791457678.8201475,
+    "ast_hash": "6802a1b6399d425d8bacd6ef40538133",
+    "semantic_hash": "6802a1b6399d425d8bacd6ef40538133"
+  },
+  "frontend/front/src/utils/dateLabels.js": {
+    "mtime": 1784829068.6997855,
+    "seen": 1791457678.8201482,
+    "ast_hash": "8f17e91165437b4db46508496a0e0e54",
+    "semantic_hash": "8f17e91165437b4db46508496a0e0e54"
+  },
+  "frontend/front/src/utils/profileImage.js": {
+    "mtime": 1776707717.536984,
+    "seen": 1791457678.8201487,
+    "ast_hash": "4f17cd42cc69930c20d4f2f26ef861dd",
+    "semantic_hash": "4f17cd42cc69930c20d4f2f26ef861dd"
+  },
+  "frontend/front/vite.config.js": {
+    "mtime": 1786632886.409707,
+    "seen": 1791457678.8201494,
+    "ast_hash": "2fdfc9bac9b31a3d353af8233876a0ed",
+    "semantic_hash": "2fdfc9bac9b31a3d353af8233876a0ed"
+  },
+  "frontend/package.json": {
+    "mtime": 1786271791.4080963,
+    "seen": 1791457678.82015,
+    "ast_hash": "b863a451c20b637c594f283e0ecef705",
+    "semantic_hash": "b863a451c20b637c594f283e0ecef705"
+  },
+  "frontend/scripts/electron-dev.js": {
+    "mtime": 1781718975.097552,
+    "seen": 1791457678.8201509,
+    "ast_hash": "da1cd86c9d7072e666d8193487162dc6",
+    "semantic_hash": "da1cd86c9d7072e666d8193487162dc6"
+  },
+  "tools/blockScreen.ps1": {
+    "mtime": 1746383749.6956968,
+    "seen": 1791457678.8201516,
+    "ast_hash": "bc573717665ff32db92ca52565f9a2fe",
+    "semantic_hash": "bc573717665ff32db92ca52565f9a2fe"
+  },
+  "compose.yml": {
+    "mtime": 1782240749.4987462,
+    "seen": 1791457678.8201523,
+    "ast_hash": "e57dd12adb81cff45e905361bb5ee549",
+    "semantic_hash": "e57dd12adb81cff45e905361bb5ee549"
+  },
+  "docs/ARQUITECTURA_Y_SEGURIDAD.md": {
+    "mtime": 1786272942.9786234,
+    "seen": 1791457678.8201528,
+    "ast_hash": "90c209da2a0731d74a95e17e7794f6a4",
+    "semantic_hash": "90c209da2a0731d74a95e17e7794f6a4"
+  },
+  "docs/CAPA_BLOQUEO_EXTRA.md": {
+    "mtime": 1791127543.5781484,
+    "seen": 1791457678.8201537,
+    "ast_hash": "0d0a615cd2b2f49c24da397098480096",
+    "semantic_hash": "0d0a615cd2b2f49c24da397098480096"
+  },
+  "frontend/front/index.html": {
+    "mtime": 1786272136.2124062,
+    "seen": 1791457678.8201544,
+    "ast_hash": "24211c2d6ea0552c7ec5c59ab5fef32b",
+    "semantic_hash": "24211c2d6ea0552c7ec5c59ab5fef32b"
+  },
+  "frontend/front/public/index.html": {
+    "mtime": 1772432015.1621578,
+    "seen": 1791457678.820155,
+    "ast_hash": "456204649b3f8cb06d3f565540c8ff15",
+    "semantic_hash": "456204649b3f8cb06d3f565540c8ff15"
+  },
+  "frontend/front/public/robots.txt": {
+    "mtime": 1741961691.5714037,
+    "seen": 1791457678.8201556,
+    "ast_hash": "fa1ded1ed7c11438a9b0385b1e112850",
+    "semantic_hash": "fa1ded1ed7c11438a9b0385b1e112850"
+  },
+  "frontend/front/resources/docker/compose.yml": {
+    "mtime": 1782240749.5002832,
+    "seen": 1791457678.8201563,
+    "ast_hash": "e57dd12adb81cff45e905361bb5ee549",
+    "semantic_hash": "e57dd12adb81cff45e905361bb5ee549"
+  },
+  "frontend/front/public/rrs/white-waves-background.mp4": {
+    "mtime": 1749056691.0429285,
+    "seen": 1791457678.8201573,
+    "ast_hash": "aab6114051913384997eaaf11f28ba21",
+    "semantic_hash": "aab6114051913384997eaaf11f28ba21"
+  }
+}

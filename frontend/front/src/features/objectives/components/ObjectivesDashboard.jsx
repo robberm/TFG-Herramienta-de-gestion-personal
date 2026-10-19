@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   buildWeeklyHabitStats,
   calculateGlobalGoalsProgress,
@@ -7,6 +7,7 @@ import {
 } from "../utils/objectiveHelpers";
 import { useLanguage } from "../../../context/languageContext";
 import HabitBarChart from "./HabitBarChart";
+import HabitLineChart from "./HabitLineChart";
 
 const ObjectivesDashboard = ({
   goals,
@@ -19,6 +20,7 @@ const ObjectivesDashboard = ({
   onNextHabitWeek,
 }) => {
   const { language, t } = useLanguage();
+  const [habitChartType, setHabitChartType] = useState("bar");
   const todayIso = formatIsoDate(new Date());
   const currentWeekStart = getStartOfWeek(new Date());
   const isCurrentHabitWeek =
@@ -286,13 +288,41 @@ const ObjectivesDashboard = ({
             </button>
           </div>
 
-          <HabitBarChart
-            data={metrics.weeklyStats}
-            totalHabits={habits.length}
-            selectedDate={selectedHabitDate}
-            todayIso={todayIso}
-            onSelectDate={onSelectHabitDate}
-          />
+          <div className="habitChartToggle" role="group" aria-label={t.dashboardChartType}>
+            {[
+              ["bar", t.dashboardChartBars],
+              ["line", t.dashboardChartLines],
+            ].map(([type, label]) => (
+              <button
+                key={type}
+                type="button"
+                className={`habitChartToggleButton ${habitChartType === type ? "isActive" : ""}`}
+                onClick={() => setHabitChartType(type)}
+                aria-pressed={habitChartType === type}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {habitChartType === "bar" ? (
+            <HabitBarChart
+              data={metrics.weeklyStats}
+              totalHabits={habits.length}
+              selectedDate={selectedHabitDate}
+              todayIso={todayIso}
+              onSelectDate={onSelectHabitDate}
+            />
+          ) : (
+            <HabitLineChart
+              data={metrics.weeklyStats}
+              habits={habits}
+              logs={logs}
+              selectedDate={selectedHabitDate}
+              todayIso={todayIso}
+              onSelectDate={onSelectHabitDate}
+            />
+          )}
         </article>
       </div>
     </section>

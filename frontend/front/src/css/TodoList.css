@@ -1,0 +1,179 @@
+/* ============================================
+   HOME - TODO LIST (estilo Notion)
+   ============================================ */
+
+.todoListSection {
+  margin-top: 24px;
+  padding: 20px 22px;
+  border-radius: 16px;
+  border: 1px solid var(--border-color, #e9e5e0);
+  background-color: var(--bg-page);
+  box-sizing: border-box;
+}
+
+.todoListHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.todoListHeader h2 {
+  margin: 0;
+  font-size: 20px;
+  color: var(--text-main);
+}
+
+.todoListCounter {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.todoClearButton {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--panel-border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.todoClearButton:hover {
+  background: var(--bg-hover);
+  color: var(--text-main);
+}
+
+.todoProgressTrack {
+  height: 4px;
+  margin-bottom: 12px;
+  border-radius: 999px;
+  background: var(--bg-hover);
+  overflow: hidden;
+}
+
+.todoProgressFill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--link-active-bg);
+  transition: width 0.3s ease;
+}
+
+.todoItems {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.todoItem,
+.todoNewItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 34px;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.todoItem:hover {
+  background-color: var(--bg-hover);
+}
+
+.todoCheckbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  flex: 0 0 auto;
+  border-radius: 3px;
+  border: 1.5px solid var(--text-secondary);
+  background: transparent;
+  color: var(--link-active-text);
+  font-size: 10px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.todoItem.isDone .todoCheckbox {
+  border-color: var(--link-active-bg);
+  background-color: var(--link-active-bg);
+}
+
+.todoTitle {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 0;
+  font-size: 14px;
+  color: var(--text-main);
+  overflow-wrap: anywhere;
+  cursor: text;
+  transition: color 0.15s ease;
+}
+
+.todoItem.isDone .todoTitle {
+  color: var(--text-secondary);
+  text-decoration: line-through;
+}
+
+.todoTitleInput,
+.todoNewInput {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text-main);
+  font: inherit;
+  font-size: 14px;
+}
+
+.todoNewInput::placeholder {
+  color: var(--text-secondary);
+}
+
+.todoDeleteButton {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  flex: 0 0 auto;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+
+.todoItem:hover .todoDeleteButton,
+.todoDeleteButton:focus-visible {
+  opacity: 1;
+}
+
+.todoDeleteButton:hover {
+  background: var(--ui-control);
+  color: var(--text-main);
+}
+
+.todoNewIcon {
+  width: 16px;
+  flex: 0 0 auto;
+  text-align: center;
+  font-size: 18px;
+  color: var(--text-secondary);
+}
+
+.todoEmptyState {
+  margin: 4px 0 8px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}

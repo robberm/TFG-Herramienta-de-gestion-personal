@@ -381,6 +381,72 @@
   opacity: 0.35;
 }
 
+/* Selector barras / líneas de la actividad semanal */
+.habitChartToggle {
+  display: flex;
+  justify-content: center;
+  gap: 0.25rem;
+  margin: 0.5rem auto 0;
+  padding: 0.2rem;
+  width: fit-content;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+}
+
+.habitChartToggleButton {
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.3rem 0.8rem;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.habitChartToggleButton:hover {
+  background-color: var(--bg-hover);
+}
+
+.habitChartToggleButton.isActive {
+  background-color: var(--bg-hover);
+  color: var(--text-main);
+}
+
+.habitLineChart {
+  height: 200px;
+  padding-top: 1rem;
+  cursor: pointer;
+}
+
+.habitLineChart .recharts-wrapper:focus,
+.habitLineChart .recharts-surface:focus {
+  outline: none;
+}
+
+.habitLineGrid line {
+  stroke: var(--border-color);
+}
+
+.habitLineCursor {
+  stroke: var(--text-secondary);
+  stroke-dasharray: 4 4;
+}
+
+.habitLineSelectedTick {
+  fill: var(--text-main);
+  font-weight: 700;
+}
+
+.habitLineTooltip .recharts-default-tooltip {
+  background: var(--card-background) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 10px;
+  color: var(--text-main);
+  font-size: 0.8rem;
+}
+
 /* Goals Summary Panel */
 .goalsSummaryPanel {
   display: flex;
@@ -1394,6 +1460,10 @@ body.dark .tableRow:hover {
 
   .habitBarMiniChart {
     max-width: 30px;
+  }
+
+  .habitLineChart {
+    height: 160px;
   }
 
 

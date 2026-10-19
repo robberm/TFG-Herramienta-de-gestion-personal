@@ -10,8 +10,22 @@ contextBridge.exposeInMainWorld("electronAPI", {
   toggleMaximizeWindow: () => ipcRenderer.send("window:toggle-maximize"),
   closeWindow: () => ipcRenderer.send("window:close"),
 
-  setWindowTransparencyMode: ({ transparent, route }) =>
-    ipcRenderer.send("window:set-transparency-mode", { transparent, route }),
+  setWindowTransparencyMode: ({ transparent, mode, route }) =>
+    ipcRenderer.send("window:set-transparency-mode", {
+      transparent,
+      mode,
+      route,
+    }),
+
+  setBackdropSampling: (enabled) =>
+    ipcRenderer.send("backdrop:set-enabled", !!enabled),
+
+  /** Devuelve una función para dejar de escuchar las muestras del fondo. */
+  onBackdropSample: (callback) => {
+    const listener = (_event, sample) => callback(sample);
+    ipcRenderer.on("backdrop:sample", listener);
+    return () => ipcRenderer.removeListener("backdrop:sample", listener);
+  },
 
   isWindowMaximized: () => ipcRenderer.invoke("window:is-maximized"),
 
