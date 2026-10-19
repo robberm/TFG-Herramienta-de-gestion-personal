@@ -82,3 +82,9 @@ desktop.ini
 *.seed
 *.pid.lock
 .claude/worktrees/
+
+# =========================
+# Herramientas locales
+# =========================
+# Grafo de conocimiento de graphify: se regenera con /graphify y pesa varios MB.
+graphify-out/
