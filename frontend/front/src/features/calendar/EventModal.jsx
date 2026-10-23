@@ -182,6 +182,8 @@ const EventModal = ({
   isAdmin = false,
   managedUsers = EMPTY_MANAGED_USERS,
   defaultManagedUserId = null,
+  // Edita la configuración de una serie recurrente (panel de eventos programados).
+  isSeries = false,
 }) => {
   const { t, language } = useLanguage();
   const calendarLocale = language === "es" ? es : enUS;
@@ -248,9 +250,15 @@ const EventModal = ({
         targetUserId: defaultSingleUserId,
         targetUserIds: assignedUserIds,
         assignmentMode: inferredAssignmentMode,
-        recurrenceType: "NONE",
-        recurrenceEndDate: "",
-        recurrenceWeekdays: [],
+        recurrenceType: isSeries ? event.recurrenceType || "DAILY" : "NONE",
+        recurrenceEndDate:
+          isSeries && event.recurrenceEndDate ? String(event.recurrenceEndDate) : "",
+        recurrenceWeekdays:
+          isSeries && Array.isArray(event.recurrenceWeekdays)
+            ? event.recurrenceWeekdays
+            : isSeries
+              ? [startDate.getDay() === 0 ? 7 : startDate.getDay()]
+              : [],
       });
       setReminderMinutesBeforeList(
         Array.isArray(event.reminderMinutesBeforeList)
@@ -289,7 +297,7 @@ const EventModal = ({
     }
 
     setTimeout(() => titleInputRef.current?.focus(), 100);
-  }, [defaultManagedUserId, event, managedUsers, selectedDate]);
+  }, [defaultManagedUserId, event, isSeries, managedUsers, selectedDate]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -377,8 +385,12 @@ const EventModal = ({
     const startDateTime = `${formData.date}T${formData.startTime}`;
     const endDateTime = `${formData.date}T${formData.endTime}`;
 
+    // Una serie se guarda con toda su configuración de repetición; un evento suelto ya
+    // existente solo cambia esa ocurrencia.
+    const sendsRecurrence = !formData.id || isSeries;
+
     const eventData = {
-      id: formData.id,
+      id: isSeries ? null : formData.id,
       title: formData.title,
       description: formData.description,
       startTime: startDateTime,
@@ -397,13 +409,13 @@ const EventModal = ({
                             .map((value) => Number(value))
           : null,
       assignToAllUsers: isAdmin && formData.assignmentMode === "all",
-      recurrenceType: formData.id ? "NONE" : formData.recurrenceType,
+      recurrenceType: sendsRecurrence ? formData.recurrenceType : "NONE",
       recurrenceEndDate:
-        !formData.id && formData.recurrenceType !== "NONE"
+        sendsRecurrence && formData.recurrenceType !== "NONE"
           ? formData.recurrenceEndDate
           : null,
       recurrenceWeekdays:
-        !formData.id && formData.recurrenceType === "CUSTOM"
+        sendsRecurrence && formData.recurrenceType === "CUSTOM"
           ? formData.recurrenceWeekdays
           : null,
     };
@@ -470,12 +482,18 @@ const EventModal = ({
     { value: "WEEKLY", label: t.calendarRepeatWeekly },
     { value: "WEEKDAYS", label: t.calendarRepeatWeekdays },
     { value: "CUSTOM", label: t.calendarRepeatCustom },
-  ];
+  ].filter((option) => !isSeries || option.value !== "NONE");
 
   return (
     <div className="gcal-modal-overlay" onClick={onClose}>
       <div className="gcal-modal" onClick={(e) => e.stopPropagation()}>
         <div className="gcal-modal-header">
+          {isSeries && (
+            <div className="gcal-series-heading">
+              <strong>{t.calendarSeriesEditTitle}</strong>
+              <span>{t.calendarSeriesEditHint}</span>
+            </div>
+          )}
           <button className="gcal-close-btn" onClick={onClose} type="button">
             <svg
               viewBox="0 0 24 24"
@@ -649,13 +667,14 @@ const EventModal = ({
                 />
               </div>
 
-              {!event && (
+              {(!event || isSeries) && (
                 <div className="formGroup gcal-recurrence">
                   <label htmlFor="recurrenceType">{t.calendarRepeat}</label>
                   <CustomSelectDropdown
                     id="recurrenceType"
                     value={formData.recurrenceType}
                     options={recurrenceOptions}
+                    disabled={isAssignedEventReadOnly}
                     onChange={(value) => setFormData((prev) => ({ ...prev, recurrenceType: value }))}
                   />
                   {formData.recurrenceType !== "NONE" && (
@@ -663,6 +682,7 @@ const EventModal = ({
                       <span>{t.calendarRepeatUntil}</span>
                       <CustomDatePicker
                         min={formData.date}
+                        disabled={isAssignedEventReadOnly}
                         value={formData.recurrenceEndDate}
                         displayValue={formatDateValue(formData.recurrenceEndDate)}
                         locale={language === "es" ? "es-ES" : "en-US"}
@@ -680,6 +700,7 @@ const EventModal = ({
                           <button
                             type="button"
                             key={day}
+                            disabled={isAssignedEventReadOnly}
                             className={active ? "active" : ""}
                             onClick={() => setFormData((prev) => ({
                               ...prev,
@@ -833,7 +854,7 @@ const EventModal = ({
         isOpen={showDeleteConfirm}
         title={t.confirmDeleteTitle}
         message={`${t.confirmDeleteMessagePrefix} "${formData.title || ""}"?`}
-        warning={t.confirmDeleteWarning}
+        warning={isSeries ? t.calendarSeriesDeleteWarning : t.confirmDeleteWarning}
         confirmLabel={t.commonDelete}
         cancelLabel={t.commonCancel}
         onCancel={() => setShowDeleteConfirm(false)}

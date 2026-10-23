@@ -13,6 +13,7 @@ import {
 import { enUS, es } from "date-fns/locale";
 import { useLanguage } from "../../context/languageContext";
 import { getShortWeekdayLabel } from "../../utils/dateLabels";
+import { getCalendarDayKey } from "../../hooks/useEventDrag";
 
 /**
  * Convierte una fecha del backend a objeto Date de forma estable.
@@ -62,6 +63,9 @@ const MonthView = ({
   onDateClick,
   onEventClick,
   isAdmin = false,
+  onEventPointerDown,
+  canDragEvent = () => false,
+  draggingEventId = null,
 }) => {
   const { language, t } = useLanguage();
   const calendarLocale = language === "es" ? es : enUS;
@@ -106,6 +110,8 @@ const MonthView = ({
           isSameDay(day, selectedDate) ? "selected" : ""
         }`}
         key={day.toISOString()}
+        data-calendar-day={getCalendarDayKey(cloneDay)}
+        data-calendar-drop="day"
         onClick={() => onDateClick(cloneDay)}
       >
         <span className="day-number">{formattedDate}</span>
@@ -114,7 +120,11 @@ const MonthView = ({
           {dayEvents.map((event) => (
             <div
               key={event.id}
-              className={`event ${event.category || ""}`}
+              className={`event ${event.category || ""} ${
+                canDragEvent(event) ? "is-draggable" : ""
+              } ${event.id === draggingEventId ? "is-dragging" : ""}`}
+              data-calendar-event={event.id}
+              onPointerDown={(e) => onEventPointerDown?.(e, event, "day")}
               onClick={(e) => onEventClick(event, e)}
             >
               {event.title}

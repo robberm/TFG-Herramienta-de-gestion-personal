@@ -91,6 +91,43 @@ export const deleteCalendarEvent = async (eventId) => {
   });
 };
 
+/**
+ * Series de eventos recurrentes (una entrada por serie, no por ocurrencia).
+ *
+ * @param {number|null} targetUserId usuario gestionado (solo admin)
+ * @returns {Promise<Array<Object>>} resúmenes de serie
+ */
+export const fetchEventSeries = async (targetUserId = null) => {
+  const targetParam =
+    targetUserId != null
+      ? `?targetUserId=${encodeURIComponent(targetUserId)}`
+      : "";
+
+  const data = await apiRequest(`${EVENTS_BASE_URL}/series${targetParam}`, {
+    method: "GET",
+    includeJson: false,
+  });
+  return data.map((series) => ({
+    ...mapEventDates(series),
+    nextStartTime: safeParseDate(series.nextStartTime),
+  }));
+};
+
+/**
+ * Regenera todas las ocurrencias de una serie con una nueva configuración.
+ */
+export const updateEventSeries = async (seriesId, eventData) =>
+  apiRequest(`${EVENTS_BASE_URL}/series/${encodeURIComponent(seriesId)}`, {
+    method: "PUT",
+    body: JSON.stringify(eventData),
+  });
+
+export const deleteEventSeries = async (seriesId) =>
+  apiRequest(`${EVENTS_BASE_URL}/series/${encodeURIComponent(seriesId)}`, {
+    method: "DELETE",
+    includeJson: false,
+  });
+
 export const fetchEventCategories = () =>
   apiRequest(`${EVENTS_BASE_URL}/categories`, {
     method: "GET",

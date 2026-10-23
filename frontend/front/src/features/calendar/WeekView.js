@@ -3,6 +3,7 @@ import { format, startOfWeek, addDays, isSameDay, parseISO } from "date-fns";
 import { enUS, es } from "date-fns/locale";
 import { useLanguage } from "../../context/languageContext";
 import { getShortWeekdayLabel } from "../../utils/dateLabels";
+import { getCalendarDayKey } from "../../hooks/useEventDrag";
 
 const HOUR_HEIGHT_PX = 80;
 const MINUTES_PER_HOUR = 60;
@@ -173,7 +174,16 @@ const buildEventLayoutMap = (dayEvents) => {
   return new Map(positioned.map((item) => [item.id, item.style]));
 };
 
-const WeekView = ({ currentDate, events, onTimeSlotClick, onEventClick, isAdmin = false }) => {
+const WeekView = ({
+  currentDate,
+  events,
+  onTimeSlotClick,
+  onEventClick,
+  isAdmin = false,
+  onEventPointerDown,
+  canDragEvent = () => false,
+  draggingEventId = null,
+}) => {
   const { language, t } = useLanguage();
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
   const hours = Array.from({ length: 24 }, (_, i) => i);
@@ -208,6 +218,11 @@ const WeekView = ({ currentDate, events, onTimeSlotClick, onEventClick, isAdmin 
     if (event.isAllDay) return t.calendarAllDay;
     return format(parseCalendarDate(event.startTime), "HH:mm");
   };
+
+  const getDragClassName = (event) =>
+    `${canDragEvent(event) ? "is-draggable" : ""} ${
+      event.id === draggingEventId ? "is-dragging" : ""
+    }`;
 
   const getAllDayEventsForDay = (day) =>
     getEventsForDay(day).filter((event) => event.isAllDay);
@@ -287,11 +302,18 @@ const WeekView = ({ currentDate, events, onTimeSlotClick, onEventClick, isAdmin 
               {weekDays.map((day, index) => {
                 const dayAllDayEvents = getAllDayEventsForDay(day);
                 return (
-                  <div key={`all-day-${index}`} className="week-all-day-cell">
+                  <div
+                    key={`all-day-${index}`}
+                    className="week-all-day-cell"
+                    data-calendar-day={getCalendarDayKey(day)}
+                    data-calendar-drop="day"
+                  >
                     {dayAllDayEvents.map((event) => (
                       <div
                         key={`all-day-${event.id}`}
-                        className={`week-all-day-event-chip ${event.category || ""}`}
+                        className={`week-all-day-event-chip ${event.category || ""} ${getDragClassName(event)}`}
+                        data-calendar-event={event.id}
+                        onPointerDown={(e) => onEventPointerDown?.(e, event, "day")}
                         onClick={(e) => onEventClick(event, e)}
                       >
                         <div className="week-event-time">{t.calendarAllDay}</div>
@@ -332,7 +354,12 @@ const WeekView = ({ currentDate, events, onTimeSlotClick, onEventClick, isAdmin 
               const isToday = isSameDay(day, currentTime);
 
               return (
-                <div key={dayIndex} className="week-day-column">
+                <div
+                  key={dayIndex}
+                  className="week-day-column"
+                  data-calendar-day={getCalendarDayKey(day)}
+                  data-calendar-drop="time"
+                >
                   {hours.map((hour) => (
                     <div
                       key={hour}
@@ -351,8 +378,10 @@ const WeekView = ({ currentDate, events, onTimeSlotClick, onEventClick, isAdmin 
                       return (
                         <div
                           key={event.id}
-                          className={`week-event ${event.category || ""}`}
+                          className={`week-event ${event.category || ""} ${getDragClassName(event)}`}
                           style={style}
+                          data-calendar-event={event.id}
+                          onPointerDown={(e) => onEventPointerDown?.(e, event, "move")}
                           onClick={(e) => onEventClick(event, e)}
                         >
                           <div className="week-event-time">
@@ -361,6 +390,18 @@ const WeekView = ({ currentDate, events, onTimeSlotClick, onEventClick, isAdmin 
                           <div className="week-event-title">{event.title}</div>
                           {event.assignedByAdmin && !isAdmin && (
                             <div className="week-event-assigned">{t.calendarAssignedTag}</div>
+                          )}
+                          {canDragEvent(event) && (
+                            <>
+                              <div
+                                className="calendar-event-resize-handle is-start"
+                                onPointerDown={(e) => onEventPointerDown?.(e, event, "resize-start")}
+                              />
+                              <div
+                                className="calendar-event-resize-handle is-end"
+                                onPointerDown={(e) => onEventPointerDown?.(e, event, "resize-end")}
+                              />
+                            </>
                           )}
                         </div>
                       );

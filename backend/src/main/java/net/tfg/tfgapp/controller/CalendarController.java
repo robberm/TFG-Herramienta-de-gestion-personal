@@ -1,6 +1,7 @@
 package net.tfg.tfgapp.controller;
 
 import net.tfg.tfgapp.DTOs.events.EventRequest;
+import net.tfg.tfgapp.DTOs.events.EventSeriesSummary;
 import net.tfg.tfgapp.domains.AdminUser;
 import net.tfg.tfgapp.domains.Event;
 import net.tfg.tfgapp.domains.EventAssignment;
@@ -154,9 +155,70 @@ public class CalendarController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/series")
+    public ResponseEntity<List<EventSeriesSummary>> getSeries(@RequestParam(required = false) Long targetUserId,
+                                                              @RequestHeader("Authorization") String token) {
+        User currentUser = getCurrentUser(token);
+
+        if (currentUser.isAdmin()) {
+            if (targetUserId != null && !canAccessManagedUser(currentUser, userService.getUserById(targetUserId))) {
+                throw new SecurityException("No tienes permiso sobre ese usuario.");
+            }
+            return ResponseEntity.ok(eventService.summarizeSeries(
+                    eventService.findSeriesEventsForAdmin(currentUser.getId(), targetUserId)));
+        }
+
+        return ResponseEntity.ok(eventService.summarizeSeries(
+                eventService.findSeriesEventsByUsername(currentUser.getUsername())));
+    }
+
+    @PutMapping("/series/{seriesId}")
+    public ResponseEntity<List<Event>> updateSeries(@PathVariable String seriesId,
+                                                    @RequestBody EventRequest request,
+                                                    @RequestHeader("Authorization") String token) {
+        User currentUser = getCurrentUser(token);
+        requireEditableSeries(currentUser, seriesId, "modificar");
+        eventRequestValidator.requireValidDates(request);
+
+        List<PersonalUser> targets = resolveTargetUsers(currentUser, request);
+        if (targets.isEmpty()) {
+            throw new IllegalArgumentException("Debes seleccionar al menos un usuario.");
+        }
+        AdminUser audAdmin = currentUser.isAdmin() ? (AdminUser) currentUser : null;
+        return ResponseEntity.ok(eventService.regenerateSeries(seriesId, request, targets, audAdmin));
+    }
+
+    @DeleteMapping("/series/{seriesId}")
+    public ResponseEntity<Void> deleteSeries(@PathVariable String seriesId,
+                                             @RequestHeader("Authorization") String token) {
+        User currentUser = getCurrentUser(token);
+        requireEditableSeries(currentUser, seriesId, "eliminar");
+        eventService.deleteSeries(seriesId);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/categories")
     public ResponseEntity<List<String>> getCategories() {
         return ResponseEntity.ok(eventService.getCategories());
+    }
+
+    /**
+     * Misma regla que con un evento suelto, aplicada a todas las ocurrencias de la serie.
+     */
+    private void requireEditableSeries(User currentUser, String seriesId, String action) {
+        List<Event> occurrences = eventService.getSeriesEvents(seriesId);
+        if (occurrences.isEmpty()) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "Serie no encontrada.");
+        }
+
+        for (Event occurrence : occurrences) {
+            if (!canAccessEvent(currentUser, occurrence)) {
+                throw new SecurityException("No tienes permiso para " + action + " esta serie.");
+            }
+            if (!currentUser.isAdmin() && occurrence.getAudAdmin() != null) {
+                throw new SecurityException("No puedes " + action + " series asignadas por administrador.");
+            }
+        }
     }
 
     private User getCurrentUser(String authorizationHeader) {

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 
@@ -8,7 +8,9 @@ import MonthView from "./MonthView";
 import WeekView from "./WeekView";
 import DailyCalendarView from "./DailyCalendarView";
 import TagColorCustomizer from "./TagColorCustomizer";
+import RecurringEventsPanel from "./RecurringEventsPanel";
 import useCalendarEvents from "../../hooks/useCalendarEvents";
+import useEventDrag from "../../hooks/useEventDrag";
 import "../../css/Calendar.css";
 import { useLanguage } from "../../context/languageContext";
 import CustomSelectDropdown from "../../components/shared/CustomSelectDropdown";
@@ -25,6 +27,8 @@ const Calendar = () => {
     setSelectedManagedUserId,
     showModal,
     selectedEvent,
+    selectedSeries,
+    series,
     viewMode,
     setViewMode,
     fetchEvents,
@@ -35,11 +39,47 @@ const Calendar = () => {
     handleToday,
     handleSaveEvent,
     handleDeleteEvent,
+    canMoveEvent,
+    handleMoveEvent,
+    handleEditSeries,
+    handleSaveSeries,
+    handleDeleteSeries,
     handleDayTimeSlotClick,
     handleWeekTimeSlotClick,
     handleCloseModal,
     getHeaderDateText,
   } = useCalendarEvents();
+
+  const { dragPreview, beginEventDrag } = useEventDrag({
+    canDragEvent: canMoveEvent,
+    onEventMove: handleMoveEvent,
+  });
+
+  // Mientras se arrastra, el evento se pinta en su posición provisional.
+  const displayedEvents = useMemo(() => {
+    if (!dragPreview) return events;
+
+    return events.map((event) =>
+      event.id === dragPreview.eventId
+        ? { ...event, startTime: dragPreview.startTime, endTime: dragPreview.endTime }
+        : event,
+    );
+  }, [dragPreview, events]);
+
+  // En modo serie el modal trabaja con el id de la serie en lugar del de un evento.
+  const modalEvent = useMemo(
+    () =>
+      selectedSeries
+        ? { ...selectedSeries, id: selectedSeries.seriesId }
+        : selectedEvent,
+    [selectedEvent, selectedSeries],
+  );
+
+  const dragProps = {
+    onEventPointerDown: beginEventDrag,
+    canDragEvent: canMoveEvent,
+    draggingEventId: dragPreview?.eventId ?? null,
+  };
 
   useEffect(() => {
     const socket = new SockJS("http://localhost:8080/ws");
@@ -104,46 +144,57 @@ const Calendar = () => {
           <MonthView
             currentDate={currentDate}
             selectedDate={selectedDate}
-            events={events}
+            events={displayedEvents}
             onDateClick={handleDateClick}
             onEventClick={handleEventClick}
             isAdmin={isAdmin}
+            {...dragProps}
           />
         )}
 
         {viewMode === "week" && (
           <WeekView
             currentDate={currentDate}
-            events={events}
+            events={displayedEvents}
             onTimeSlotClick={handleWeekTimeSlotClick}
             onEventClick={handleEventClick}
             isAdmin={isAdmin}
+            {...dragProps}
           />
         )}
 
         {viewMode === "day" && (
           <DailyCalendarView
             currentDate={currentDate}
-            events={events}
+            events={displayedEvents}
             onTimeSlotClick={handleDayTimeSlotClick}
             onEventClick={handleEventClick}
             isAdmin={isAdmin}
+            {...dragProps}
           />
         )}
       </div>
+
+      <RecurringEventsPanel
+        series={series}
+        isAdmin={isAdmin}
+        onEdit={handleEditSeries}
+        onDelete={handleDeleteSeries}
+      />
 
       <TagColorCustomizer />
 
       {showModal && (
         <EventModal
-          event={selectedEvent}
+          event={modalEvent}
           selectedDate={selectedDate}
           onClose={handleCloseModal}
-          onSave={handleSaveEvent}
-          onDelete={handleDeleteEvent}
+          onSave={selectedSeries ? handleSaveSeries : handleSaveEvent}
+          onDelete={selectedSeries ? handleDeleteSeries : handleDeleteEvent}
           isAdmin={isAdmin}
           managedUsers={managedUsers}
           defaultManagedUserId={selectedManagedUserId}
+          isSeries={selectedSeries != null}
         />
       )}
     </div>

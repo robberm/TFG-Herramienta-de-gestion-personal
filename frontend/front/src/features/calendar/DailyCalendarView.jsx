@@ -2,6 +2,7 @@ import React from "react";
 import { format, isSameDay, parseISO } from "date-fns";
 import { useLanguage } from "../../context/languageContext";
 import LocationIcon from "../../components/shared/LocationIcon";
+import { getCalendarDayKey } from "../../hooks/useEventDrag";
 
 const HOUR_HEIGHT_PX = 80;
 const MINUTES_PER_HOUR = 60;
@@ -173,6 +174,9 @@ const DailyCalendarView = ({
   onTimeSlotClick,
   onEventClick,
   isAdmin = false,
+  onEventPointerDown,
+  canDragEvent = () => false,
+  draggingEventId = null,
 }) => {
   const { t } = useLanguage();
   const hours = Array.from({ length: 24 }, (_, i) => i);
@@ -281,6 +285,8 @@ const DailyCalendarView = ({
         </div>
 
         <div
+          data-calendar-day={getCalendarDayKey(currentDate)}
+          data-calendar-drop="time"
           style={{
             flex: 1,
             position: "relative",
@@ -337,12 +343,15 @@ const DailyCalendarView = ({
               return (
                 <div
                   key={event.id}
-                  className={`day-event ${event.category || ""}`}
+                  className={`day-event ${event.category || ""} ${
+                    canDragEvent(event) ? "is-draggable" : ""
+                  } ${event.id === draggingEventId ? "is-dragging" : ""}`}
                   style={{
                     ...style,
                     pointerEvents: "auto",
-                    cursor: "pointer",
                   }}
+                  data-calendar-event={event.id}
+                  onPointerDown={(e) => onEventPointerDown?.(e, event, "move")}
                   onClick={(e) => onEventClick(event, e)}
                 >
                   <div className="day-event-time">{formatEventTime(event)}</div>
@@ -354,6 +363,18 @@ const DailyCalendarView = ({
                     <div className="day-event-location">
                       <LocationIcon /> {event.location}
                     </div>
+                  )}
+                  {canDragEvent(event) && (
+                    <>
+                      <div
+                        className="calendar-event-resize-handle is-start"
+                        onPointerDown={(e) => onEventPointerDown?.(e, event, "resize-start")}
+                      />
+                      <div
+                        className="calendar-event-resize-handle is-end"
+                        onPointerDown={(e) => onEventPointerDown?.(e, event, "resize-end")}
+                      />
+                    </>
                   )}
                 </div>
               );

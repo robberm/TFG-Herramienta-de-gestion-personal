@@ -1216,3 +1216,371 @@ body.dark .day.disabled {
   height: 12px;
   flex: 0 0 auto;
 }
+
+
+/* Arrastrar y soltar eventos */
+.event.is-draggable,
+.week-event.is-draggable,
+.day-event.is-draggable,
+.week-all-day-event-chip.is-draggable {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.day-event:not(.is-draggable) {
+  cursor: pointer;
+}
+
+/* El original se queda como hueco: marca, ajustado a la rejilla, dónde caerá el evento. */
+body[data-calendar-drag="move"] .is-dragging,
+body[data-calendar-drag="day"] .is-dragging {
+  z-index: 25;
+  background-color: color-mix(in srgb, var(--event-work-color) 14%, transparent) !important;
+  color: transparent;
+  outline: 2px dashed color-mix(in srgb, var(--event-work-color) 70%, transparent);
+  outline-offset: -2px;
+  box-shadow: none;
+}
+
+body[data-calendar-drag="move"] .is-dragging *,
+body[data-calendar-drag="day"] .is-dragging * {
+  visibility: hidden;
+}
+
+body[data-calendar-drag="move"] .week-event.is-dragging,
+body[data-calendar-drag="move"] .day-event.is-dragging {
+  transition: top 0.09s ease-out;
+}
+
+/* Al estirar, el propio evento crece con un pequeño suavizado entre saltos de 15 min. */
+body[data-calendar-drag^="resize"] .is-dragging {
+  z-index: 25;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  transition: top 0.08s ease-out, height 0.08s ease-out;
+}
+
+/* Copia del evento que sigue al puntero (se cuelga de body). */
+.calendar-drag-ghost {
+  z-index: 10000;
+  pointer-events: none;
+  opacity: 0.96;
+  will-change: transform;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  transition:
+    scale 0.14s ease-out,
+    rotate 0.14s ease-out,
+    box-shadow 0.14s ease-out;
+}
+
+.calendar-drag-ghost.is-lifted {
+  scale: 1.04;
+  rotate: -1.5deg;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.32);
+}
+
+.calendar-drag-ghost.is-landing {
+  transition:
+    transform 0.18s cubic-bezier(0.2, 0.8, 0.3, 1),
+    width 0.18s cubic-bezier(0.2, 0.8, 0.3, 1),
+    height 0.18s cubic-bezier(0.2, 0.8, 0.3, 1),
+    scale 0.18s ease-out,
+    rotate 0.18s ease-out,
+    box-shadow 0.18s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .calendar-drag-ghost,
+  .calendar-drag-ghost.is-landing {
+    transition: none;
+  }
+
+  .calendar-drag-ghost.is-lifted {
+    rotate: none;
+    scale: none;
+  }
+}
+
+.calendar-event-resize-handle {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 7px;
+  cursor: ns-resize;
+  z-index: 1;
+}
+
+.calendar-event-resize-handle.is-start {
+  top: 0;
+}
+
+.calendar-event-resize-handle.is-end {
+  bottom: 0;
+}
+
+.calendar-event-resize-handle::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.75);
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.calendar-event-resize-handle.is-start::after {
+  top: 2px;
+}
+
+.calendar-event-resize-handle.is-end::after {
+  bottom: 2px;
+}
+
+.week-event:hover .calendar-event-resize-handle::after,
+.day-event:hover .calendar-event-resize-handle::after {
+  opacity: 1;
+}
+
+body[data-calendar-drag],
+body[data-calendar-drag] * {
+  cursor: grabbing !important;
+  user-select: none;
+}
+
+body[data-calendar-drag^="resize"],
+body[data-calendar-drag^="resize"] * {
+  cursor: ns-resize !important;
+}
+
+/* Panel de eventos programados (series recurrentes) */
+.calendar-series-module {
+  margin: 0.8rem 1rem 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-page);
+  color: var(--text-main);
+  overflow-anchor: none;
+}
+
+.calendar-series-header {
+  margin-bottom: 0.35rem;
+}
+
+.calendar-series-heading,
+.calendar-series-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.calendar-series-count {
+  min-width: 1.4rem;
+  padding: 0.05rem 0.45rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--event-work-color) 18%, transparent);
+  color: var(--text-main);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.calendar-series-hint {
+  margin: 0 0 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.calendar-series-empty {
+  padding: 1.1rem;
+  border: 1px dashed var(--border-color);
+  border-radius: 8px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.calendar-series-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.7rem;
+}
+
+.calendar-series-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-main);
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.calendar-series-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--series-color, var(--event-work-color));
+}
+
+.calendar-series-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.calendar-series-card.is-ended {
+  opacity: 0.6;
+}
+
+.calendar-series-card-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 0.85rem 0.6rem 1.1rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.calendar-series-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.calendar-series-title {
+  min-width: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calendar-series-tag {
+  flex: 0 0 auto;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--series-color, var(--event-work-color)) 20%, transparent);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.calendar-series-rule {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.calendar-series-weekdays {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.calendar-series-weekdays span {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: color-mix(in srgb, var(--text-main) 6%, transparent);
+}
+
+.calendar-series-weekdays span.active {
+  color: #fff;
+  background: var(--series-color, var(--event-work-color));
+}
+
+.calendar-series-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+}
+
+.calendar-series-progress {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.3rem 0.5rem;
+  font-size: 0.74rem;
+}
+
+.calendar-series-progress-bar {
+  grid-column: 1 / -1;
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text-main) 10%, transparent);
+  overflow: hidden;
+}
+
+.calendar-series-progress-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--series-color, var(--event-work-color));
+}
+
+.calendar-series-progress-count {
+  color: var(--text-secondary);
+}
+
+.calendar-series-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  padding: 0 0.85rem 0.7rem 1.1rem;
+}
+
+.calendar-series-actions button {
+  border: 1px solid var(--border-color);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text-main);
+  padding: 0.25rem 0.65rem;
+  font-size: 0.76rem;
+  cursor: pointer;
+}
+
+.calendar-series-actions button:hover {
+  background: var(--bg-hover);
+}
+
+.calendar-series-actions button.danger {
+  color: #e5484d;
+  border-color: color-mix(in srgb, #e5484d 45%, transparent);
+}
+
+.calendar-series-actions button.danger:hover {
+  background: color-mix(in srgb, #e5484d 12%, transparent);
+}
+
+.calendar-series-readonly {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 600px) {
+  .calendar-series-module {
+    margin: 0.8rem 0.5rem 0;
+  }
+
+  .calendar-series-grid {
+    grid-template-columns: 1fr;
+  }
+}

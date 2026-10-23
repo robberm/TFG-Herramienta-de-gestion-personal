@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -39,6 +40,11 @@ public class Event {
     private String recurrenceSeriesId;
     @Column(length = 16)
     private String recurrenceType;
+    private LocalDate recurrenceEndDate;
+    // Días ISO (1 = lunes ... 7 = domingo) separados por comas; solo en series CUSTOM.
+    @JsonIgnore
+    @Column(length = 20)
+    private String recurrenceWeekdays;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "EventsReminders", joinColumns = @JoinColumn(name = "event_id"))

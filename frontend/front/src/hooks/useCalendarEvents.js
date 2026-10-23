@@ -14,6 +14,9 @@ import {
   fetchEventsByRange,
   saveCalendarEvent,
   deleteCalendarEvent,
+  fetchEventSeries,
+  updateEventSeries,
+  deleteEventSeries,
 } from "../api/eventApi";
 import { getApiErrorMessage } from "../api/apiClient";
 import { getCurrentUserProfile } from "../api/userApi";
@@ -30,6 +33,9 @@ const useCalendarEvents = () => {
   const [events, setEvents] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  // Serie abierta en el modal desde el panel de eventos programados.
+  const [selectedSeries, setSelectedSeries] = useState(null);
+  const [series, setSeries] = useState([]);
   const [viewMode, setViewMode] = useState("month");
   const [profile, setProfile] = useState(null);
   const [managedUsers, setManagedUsers] = useState([]);
@@ -169,9 +175,31 @@ const useCalendarEvents = () => {
     fetchEvents();
   }, [fetchEvents]);
 
+  const fetchSeries = useCallback(async () => {
+    if (profile == null) return;
+
+    try {
+      const data = await fetchEventSeries(isAdmin ? selectedManagedUserId : null);
+      setSeries(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Error fetching event series:", error);
+    }
+  }, [isAdmin, profile, selectedManagedUserId]);
+
+  useEffect(() => {
+    fetchSeries();
+  }, [fetchSeries]);
+
+  /** Recarga las ocurrencias visibles y el panel de series tras cualquier cambio. */
+  const refreshCalendar = useCallback(
+    () => Promise.all([fetchEvents(), fetchSeries()]),
+    [fetchEvents, fetchSeries],
+  );
+
   const handleDateClick = useCallback((day) => {
     setSelectedDate(day);
     setSelectedEvent(null);
+    setSelectedSeries(null);
     setShowModal(true);
   }, []);
 
@@ -181,6 +209,7 @@ const useCalendarEvents = () => {
     }
 
     setSelectedEvent(event);
+    setSelectedSeries(null);
     setShowModal(true);
   }, []);
 
@@ -217,13 +246,13 @@ const useCalendarEvents = () => {
       try {
         await saveCalendarEvent(eventData);
         setShowModal(false);
-        await fetchEvents();
+        await refreshCalendar();
       } catch (error) {
         console.error("Error saving event:", error);
         setErrorMessage(getApiErrorMessage(error));
       }
     },
-    [fetchEvents, setErrorMessage],
+    [refreshCalendar, setErrorMessage],
   );
 
   const handleDeleteEvent = useCallback(
@@ -233,13 +262,119 @@ const useCalendarEvents = () => {
       try {
         await deleteCalendarEvent(eventId);
         setShowModal(false);
-        await fetchEvents();
+        await refreshCalendar();
       } catch (error) {
         console.error("Error deleting event:", error);
         setErrorMessage(getApiErrorMessage(error));
       }
     },
-    [fetchEvents, setErrorMessage],
+    [refreshCalendar, setErrorMessage],
+  );
+
+  const handleEditSeries = useCallback((seriesToEdit) => {
+    setSelectedSeries(seriesToEdit);
+    setSelectedEvent(null);
+    setShowModal(true);
+  }, []);
+
+  /**
+   * Guarda la nueva configuración de una serie: el backend regenera sus ocurrencias.
+   */
+  const handleSaveSeries = useCallback(
+    async (eventData) => {
+      if (!selectedSeries) return;
+
+      try {
+        await updateEventSeries(selectedSeries.seriesId, eventData);
+        setShowModal(false);
+        setSelectedSeries(null);
+        await refreshCalendar();
+      } catch (error) {
+        console.error("Error saving event series:", error);
+        setErrorMessage(getApiErrorMessage(error));
+      }
+    },
+    [refreshCalendar, selectedSeries, setErrorMessage],
+  );
+
+  const handleDeleteSeries = useCallback(
+    async (seriesId) => {
+      if (!seriesId) return;
+
+      try {
+        await deleteEventSeries(seriesId);
+        setShowModal(false);
+        setSelectedSeries(null);
+        await refreshCalendar();
+      } catch (error) {
+        console.error("Error deleting event series:", error);
+        setErrorMessage(getApiErrorMessage(error));
+      }
+    },
+    [refreshCalendar, setErrorMessage],
+  );
+
+  /**
+   * Un usuario normal no puede mover eventos que le ha asignado un administrador
+   * (misma regla que el modo solo lectura de EventModal).
+   */
+  const canMoveEvent = useCallback(
+    (event) => {
+      const isEventAssignedByAdmin =
+        event?.assignedByAdmin === true &&
+        Boolean(event?.assignedByAdminUsername) &&
+        event?.assignedByAdminUsername !== event?.assignedToUsername;
+
+      return !isEventAssignedByAdmin || isAdmin;
+    },
+    [isAdmin],
+  );
+
+  /**
+   * Guarda el nuevo horario de un evento arrastrado. Se aplica primero en local
+   * para que el evento no "salte" de vuelta mientras responde el backend.
+   */
+  const handleMoveEvent = useCallback(
+    async (event, startTime, endTime) => {
+      setEvents((prevEvents) =>
+        prevEvents.map((item) =>
+          item.id === event.id ? { ...item, startTime, endTime } : item,
+        ),
+      );
+
+      const assignedUserIds =
+        Array.isArray(event.assignedUserIds) && event.assignedUserIds.length > 0
+          ? event.assignedUserIds
+          : event.assignedToUserId != null
+            ? [event.assignedToUserId]
+            : null;
+
+      try {
+        await saveCalendarEvent({
+          id: event.id,
+          title: event.title,
+          description: event.description,
+          startTime: format(startTime, "yyyy-MM-dd'T'HH:mm:ss"),
+          endTime: format(endTime, "yyyy-MM-dd'T'HH:mm:ss"),
+          location: event.location,
+          category: event.category,
+          isAllDay: Boolean(event.isAllDay),
+          reminderMinutesBeforeList: event.reminderMinutesBeforeList ?? [],
+          targetUserId: null,
+          targetUserIds: isAdmin ? assignedUserIds : null,
+          assignToAllUsers: false,
+          recurrenceType: "NONE",
+          recurrenceEndDate: null,
+          recurrenceWeekdays: null,
+        });
+      } catch (error) {
+        console.error("Error moving event:", error);
+        setErrorMessage(getApiErrorMessage(error));
+      } finally {
+        await refreshCalendar();
+      }
+    },
+    [isAdmin, refreshCalendar, setErrorMessage],
   );
 
  const handleDayTimeSlotClick = useCallback(
@@ -248,6 +383,7 @@ const useCalendarEvents = () => {
      newDate.setHours(hour, 0, 0, 0);
      setSelectedDate(newDate);
      setSelectedEvent(null);
+     setSelectedSeries(null);
      setShowModal(true);
    },
    [currentDate],
@@ -258,11 +394,13 @@ const useCalendarEvents = () => {
     newDate.setHours(hour, 0, 0, 0);
     setSelectedDate(newDate);
     setSelectedEvent(null);
+    setSelectedSeries(null);
     setShowModal(true);
   }, []);
 
   const handleCloseModal = useCallback(() => {
     setShowModal(false);
+    setSelectedSeries(null);
   }, []);
 
   const getHeaderDateText = useCallback(() => {
@@ -295,9 +433,12 @@ const useCalendarEvents = () => {
     setSelectedManagedUserId,
     showModal,
     selectedEvent,
+    selectedSeries,
+    series,
     viewMode,
     setViewMode,
     fetchEvents,
+    refreshCalendar,
     handleDateClick,
     handleEventClick,
     handlePrevious,
@@ -305,6 +446,11 @@ const useCalendarEvents = () => {
     handleToday,
     handleSaveEvent,
     handleDeleteEvent,
+    canMoveEvent,
+    handleMoveEvent,
+    handleEditSeries,
+    handleSaveSeries,
+    handleDeleteSeries,
     handleDayTimeSlotClick,
     handleWeekTimeSlotClick,
     handleCloseModal,
