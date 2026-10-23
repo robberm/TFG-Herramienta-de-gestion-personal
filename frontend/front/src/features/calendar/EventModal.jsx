@@ -184,6 +184,8 @@ const EventModal = ({
   defaultManagedUserId = null,
   // Edita la configuración de una serie recurrente (panel de eventos programados).
   isSeries = false,
+  // Abre la serie a la que pertenece la ocurrencia abierta.
+  onEditSeries,
 }) => {
   const { t, language } = useLanguage();
   const calendarLocale = language === "es" ? es : enUS;
@@ -202,6 +204,7 @@ const EventModal = ({
     assignmentMode: "single",
     recurrenceType: "NONE",
     recurrenceEndDate: "",
+    recurrenceNoEnd: false,
     recurrenceWeekdays: [],
   });
   const [reminderMinutesBeforeList, setReminderMinutesBeforeList] = useState([]);
@@ -252,7 +255,10 @@ const EventModal = ({
         assignmentMode: inferredAssignmentMode,
         recurrenceType: isSeries ? event.recurrenceType || "DAILY" : "NONE",
         recurrenceEndDate:
-          isSeries && event.recurrenceEndDate ? String(event.recurrenceEndDate) : "",
+          isSeries && event.recurrenceEndDate
+            ? String(event.recurrenceEndDate)
+            : format(addMinutes(startDate, 60 * 24 * 90), "yyyy-MM-dd"),
+        recurrenceNoEnd: isSeries && !event.recurrenceEndDate,
         recurrenceWeekdays:
           isSeries && Array.isArray(event.recurrenceWeekdays)
             ? event.recurrenceWeekdays
@@ -289,6 +295,7 @@ const EventModal = ({
         assignmentMode: "single",
         recurrenceType: "NONE",
         recurrenceEndDate: format(addMinutes(startDateTime, 60 * 24 * 90), "yyyy-MM-dd"),
+        recurrenceNoEnd: false,
         recurrenceWeekdays: [startDateTime.getDay() === 0 ? 7 : startDateTime.getDay()],
       });
       setReminderMinutesBeforeList([]);
@@ -411,7 +418,7 @@ const EventModal = ({
       assignToAllUsers: isAdmin && formData.assignmentMode === "all",
       recurrenceType: sendsRecurrence ? formData.recurrenceType : "NONE",
       recurrenceEndDate:
-        sendsRecurrence && formData.recurrenceType !== "NONE"
+        sendsRecurrence && formData.recurrenceType !== "NONE" && !formData.recurrenceNoEnd
           ? formData.recurrenceEndDate
           : null,
       recurrenceWeekdays:
@@ -534,6 +541,17 @@ const EventModal = ({
               required
             />
           </div>
+
+          {!isSeries && event?.seriesId != null && (
+            <div className="gcal-series-notice">
+              <span>{t.calendarOccurrenceNotice}</span>
+              {onEditSeries && !isAssignedEventReadOnly && (
+                <button type="button" onClick={() => onEditSeries(event.seriesId)}>
+                  {t.calendarEditWholeSeries}
+                </button>
+              )}
+            </div>
+          )}
 
           <div className="gcal-datetime-section">
             <div className="gcal-section-icon">
@@ -678,6 +696,20 @@ const EventModal = ({
                     onChange={(value) => setFormData((prev) => ({ ...prev, recurrenceType: value }))}
                   />
                   {formData.recurrenceType !== "NONE" && (
+                    <label className="gcal-allday-toggle gcal-recurrence-noend">
+                      <input
+                        type="checkbox"
+                        checked={formData.recurrenceNoEnd}
+                        disabled={isAssignedEventReadOnly}
+                        onChange={(e) =>
+                          setFormData((prev) => ({ ...prev, recurrenceNoEnd: e.target.checked }))
+                        }
+                      />
+                      <span className="gcal-toggle-slider"></span>
+                      <span className="gcal-toggle-label">{t.calendarRepeatNoEnd}</span>
+                    </label>
+                  )}
+                  {formData.recurrenceType !== "NONE" && !formData.recurrenceNoEnd && (
                     <label className="gcal-recurrence-until">
                       <span>{t.calendarRepeatUntil}</span>
                       <CustomDatePicker

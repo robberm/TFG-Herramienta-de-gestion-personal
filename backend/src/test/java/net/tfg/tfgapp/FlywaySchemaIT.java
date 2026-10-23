@@ -46,13 +46,19 @@ class FlywaySchemaIT {
         String latestVersion = jdbcTemplate.queryForObject(
                 "SELECT version FROM flyway_schema_history WHERE success = 1 "
                         + "ORDER BY installed_rank DESC LIMIT 1", String.class);
-        assertThat(latestVersion).isEqualTo("4");
+        assertThat(latestVersion).isEqualTo("7");
 
-        Integer recurrenceConfigColumns = jdbcTemplate.queryForObject(
+        Integer seriesTables = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN "
+                        + "('event_series', 'event_series_reminders', 'event_series_exdates', 'event_series_assignments')",
+                Integer.class);
+        assertThat(seriesTables).isEqualTo(4);
+
+        Integer materializedColumns = jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM information_schema.COLUMNS "
                         + "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'events' "
-                        + "AND COLUMN_NAME IN ('recurrence_end_date', 'recurrence_weekdays')", Integer.class);
-        assertThat(recurrenceConfigColumns).isEqualTo(2);
+                        + "AND COLUMN_NAME LIKE 'recurrence%'", Integer.class);
+        assertThat(materializedColumns).isZero();
 
         Integer todoTable = jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM information_schema.TABLES "

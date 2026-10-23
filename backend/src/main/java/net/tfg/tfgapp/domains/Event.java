@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -36,15 +35,11 @@ public class Event {
     private EventCategory category;
     @Column(unique = false)
     private Boolean isAllDay;
-    @Column(length = 36)
-    private String recurrenceSeriesId;
-    @Column(length = 16)
-    private String recurrenceType;
-    private LocalDate recurrenceEndDate;
-    // Días ISO (1 = lunes ... 7 = domingo) separados por comas; solo en series CUSTOM.
+    // Solo en ocurrencias de una serie que se han editado o movido por separado.
     @JsonIgnore
-    @Column(length = 20)
-    private String recurrenceWeekdays;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "series_id")
+    private EventSeries series;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "EventsReminders", joinColumns = @JoinColumn(name = "event_id"))
@@ -180,6 +175,11 @@ public class Event {
     public String getAssignedToUsername() {
         PersonalUser assignedUser = getUser();
         return assignedUser != null ? assignedUser.getUsername() : null;
+    }
+
+    @JsonProperty("seriesId")
+    public Long getSeriesId() {
+        return series != null ? series.getId() : null;
     }
 
     @JsonProperty("assignedToUserId")

@@ -1,7 +1,9 @@
 package net.tfg.tfgapp.components;
 
 import net.tfg.tfgapp.domains.Event;
+import net.tfg.tfgapp.domains.EventSeries;
 import net.tfg.tfgapp.repos.EventRepo;
+import net.tfg.tfgapp.repos.EventSeriesRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -17,12 +19,14 @@ import static org.mockito.Mockito.*;
 class ActiveEventScheduleCacheTest {
 
     private EventRepo eventRepo;
+    private EventSeriesRepo eventSeriesRepo;
     private ActiveEventScheduleCache cache;
 
     @BeforeEach
     void setUp() {
         eventRepo = mock(EventRepo.class);
-        cache = new ActiveEventScheduleCache(eventRepo, 120);
+        eventSeriesRepo = mock(EventSeriesRepo.class);
+        cache = new ActiveEventScheduleCache(eventRepo, eventSeriesRepo, 120);
     }
 
     private static Event event(Event.EventCategory category, LocalDateTime start, LocalDateTime end) {
@@ -83,6 +87,26 @@ class ActiveEventScheduleCacheTest {
         // Durante los 30 s de reintento no vuelve a golpear la BD.
         cache.isCategoryActive(Event.EventCategory.FOCUS, 1L);
         verify(eventRepo, times(2)).findUserEventsOfCategoriesInRange(any(), any(), any(), any());
+    }
+
+    @Test
+    void calculatedOccurrenceOfARecurringSeriesCountsAsActive() {
+        LocalDateTime now = LocalDateTime.now();
+        // Serie diaria que empezó hace una semana y cuya ocurrencia de hoy está en curso.
+        EventSeries series = new EventSeries();
+        series.setCategory(Event.EventCategory.MANDATORY);
+        series.setRecurrenceType("DAILY");
+        series.setStartTime(now.minusDays(7).minusMinutes(10));
+        series.setEndTime(now.minusDays(7).plusMinutes(20));
+        when(eventRepo.findUserEventsOfCategoriesInRange(any(), any(), any(), any())).thenReturn(List.of());
+        when(eventSeriesRepo.findUserSeriesOfCategoriesInRange(eq(1L), any(), any(), any())).thenReturn(List.of(series));
+
+        assertThat(cache.isCategoryActive(Event.EventCategory.MANDATORY, 1L)).isTrue();
+        assertThat(cache.isCategoryActive(Event.EventCategory.FOCUS, 1L)).isFalse();
+
+        series.getExcludedDates().add(now.minusMinutes(10).toLocalDate());
+        cache.invalidate();
+        assertThat(cache.isCategoryActive(Event.EventCategory.MANDATORY, 1L)).isFalse();
     }
 
     @Test

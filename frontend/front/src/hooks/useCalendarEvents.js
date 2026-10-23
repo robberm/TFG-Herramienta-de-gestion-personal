@@ -70,12 +70,19 @@ const useCalendarEvents = () => {
        : fallbackBulkKey || `event-${event.id}`;
 
       if (!groupedByBatch.has(groupKey)) {
+        // Las ocurrencias de una serie ya traen a todos sus asignados.
+        const ownUserIds =
+          Array.isArray(event.assignedUserIds) && event.assignedUserIds.length > 0
+            ? event.assignedUserIds
+            : event.assignedToUserId != null
+              ? [event.assignedToUserId]
+              : [];
         groupedByBatch.set(groupKey, {
           ...event,
-          assignedUsersCount: 1,
-          assignedToUsername: event.assignedToUsername || null,
-          assignedUserIds:
-            event.assignedToUserId != null ? [event.assignedToUserId] : [],
+          assignedUsersCount: ownUserIds.length || 1,
+          assignedToUsername:
+            ownUserIds.length > 1 ? "Varios usuarios" : event.assignedToUsername || null,
+          assignedUserIds: ownUserIds,
         });
         return;
       }
@@ -277,6 +284,15 @@ const useCalendarEvents = () => {
     setShowModal(true);
   }, []);
 
+  /** Abre la serie de una ocurrencia desde su modal ("Editar toda la serie"). */
+  const handleEditSeriesById = useCallback(
+    (seriesId) => {
+      const found = series.find((item) => item.seriesId === seriesId);
+      if (found) handleEditSeries(found);
+    },
+    [handleEditSeries, series],
+  );
+
   /**
    * Guarda la nueva configuración de una serie: el backend regenera sus ocurrencias.
    */
@@ -449,6 +465,7 @@ const useCalendarEvents = () => {
     canMoveEvent,
     handleMoveEvent,
     handleEditSeries,
+    handleEditSeriesById,
     handleSaveSeries,
     handleDeleteSeries,
     handleDayTimeSlotClick,

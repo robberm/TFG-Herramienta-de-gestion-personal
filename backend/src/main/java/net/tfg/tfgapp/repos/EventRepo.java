@@ -29,25 +29,8 @@ public interface EventRepo extends JpaRepository<Event, Long> {
             """)
     List<Event> findEventsByUser(@Param("username") String username);
 
-    @Query("""
-            SELECT DISTINCT e FROM Event e JOIN e.assignments a
-            WHERE a.personalUser.username = :username AND e.recurrenceSeriesId IS NOT NULL
-            """)
-    List<Event> findSeriesEventsByUser(@Param("username") String username);
-
-    @Query("""
-            SELECT DISTINCT e FROM Event e JOIN e.assignments a
-            WHERE a.audAdmin.id = :adminId AND e.recurrenceSeriesId IS NOT NULL
-            """)
-    List<Event> findSeriesEventsForAdmin(@Param("adminId") Long adminId);
-
-    @Query("""
-            SELECT DISTINCT e FROM Event e JOIN e.assignments a
-            WHERE a.audAdmin.id = :adminId AND a.personalUser.id = :userId AND e.recurrenceSeriesId IS NOT NULL
-            """)
-    List<Event> findSeriesEventsForAdminAndUser(@Param("adminId") Long adminId, @Param("userId") Long userId);
-
-    List<Event> findByRecurrenceSeriesIdOrderByStartTimeAsc(String recurrenceSeriesId);
+    /** Ocurrencias editadas por separado de una serie. */
+    List<Event> findBySeries_Id(Long seriesId);
 
     @Query("""
             SELECT DISTINCT e FROM Event e JOIN e.assignments a

@@ -42,6 +42,7 @@ const Calendar = () => {
     canMoveEvent,
     handleMoveEvent,
     handleEditSeries,
+    handleEditSeriesById,
     handleSaveSeries,
     handleDeleteSeries,
     handleDayTimeSlotClick,
@@ -195,6 +196,7 @@ const Calendar = () => {
           managedUsers={managedUsers}
           defaultManagedUserId={selectedManagedUserId}
           isSeries={selectedSeries != null}
+          onEditSeries={handleEditSeriesById}
         />
       )}
     </div>

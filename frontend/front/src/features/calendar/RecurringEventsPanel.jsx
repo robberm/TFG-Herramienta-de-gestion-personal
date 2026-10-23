@@ -75,9 +75,11 @@ const RecurringEventsPanel = ({ series, isAdmin = false, onEdit, onDelete }) => 
   const [showEnded, setShowEnded] = useState(() => readStoredFlag(SHOW_ENDED_KEY));
   const [seriesToDelete, setSeriesToDelete] = useState(null);
 
-  const endedCount = series.filter((item) => item.upcomingCount === 0).length;
+  // Una serie ha terminado cuando ya no le queda ninguna ocurrencia por llegar.
+  const isEnded = (item) => item.nextStartTime == null;
+  const endedCount = series.filter(isEnded).length;
   const visibleSeries = useMemo(
-    () => (showEnded ? series : series.filter((item) => item.upcomingCount > 0)),
+    () => (showEnded ? series : series.filter((item) => item.nextStartTime != null)),
     [series, showEnded],
   );
 
@@ -150,16 +152,17 @@ const RecurringEventsPanel = ({ series, isAdmin = false, onEdit, onDelete }) => 
               {visibleSeries.map((item) => {
                 const readOnly = isSeriesReadOnly(item, isAdmin);
                 const activeWeekdays = getSeriesWeekdays(item);
-                const isEnded = item.upcomingCount === 0;
+                const ended = isEnded(item);
+                const hasEnd = item.occurrenceCount != null;
                 const doneRatio =
-                  item.occurrenceCount > 0
+                  hasEnd && item.occurrenceCount > 0
                     ? (item.occurrenceCount - item.upcomingCount) / item.occurrenceCount
                     : 0;
 
                 return (
                   <article
                     key={item.seriesId}
-                    className={`calendar-series-card ${isEnded ? "is-ended" : ""}`}
+                    className={`calendar-series-card ${ended ? "is-ended" : ""}`}
                     style={{
                       "--series-color": `var(--event-${String(item.category || "work").toLowerCase()}-color)`,
                     }}
@@ -194,8 +197,16 @@ const RecurringEventsPanel = ({ series, isAdmin = false, onEdit, onDelete }) => 
                       <div className="calendar-series-meta">
                         <span>{formatTimeRange(item)}</span>
                         <span>
-                          {formatDay(item.startTime)} → {formatDay(parseLocalDate(item.recurrenceEndDate))}
+                          {formatDay(item.startTime)} →{" "}
+                          {item.recurrenceEndDate
+                            ? formatDay(parseLocalDate(item.recurrenceEndDate))
+                            : t.calendarSeriesNoEnd}
                         </span>
+                        {item.editedOccurrenceCount > 0 && (
+                          <span>
+                            {item.editedOccurrenceCount} {t.calendarSeriesEdited}
+                          </span>
+                        )}
                         {isAdmin && item.assignedUsernames?.length > 0 && (
                           <span>
                             {t.calendarSeriesAssignedTo}: {item.assignedUsernames.join(", ")}
@@ -204,17 +215,21 @@ const RecurringEventsPanel = ({ series, isAdmin = false, onEdit, onDelete }) => 
                       </div>
 
                       <div className="calendar-series-progress">
-                        <div className="calendar-series-progress-bar">
-                          <span style={{ width: `${Math.round(doneRatio * 100)}%` }} />
-                        </div>
+                        {hasEnd && (
+                          <div className="calendar-series-progress-bar">
+                            <span style={{ width: `${Math.round(doneRatio * 100)}%` }} />
+                          </div>
+                        )}
                         <span className="calendar-series-progress-label">
-                          {isEnded
+                          {ended
                             ? t.calendarSeriesEnded
                             : `${t.calendarSeriesNext}: ${formatNext(item.nextStartTime)}`}
                         </span>
-                        <span className="calendar-series-progress-count">
-                          {item.upcomingCount}/{item.occurrenceCount} {t.calendarSeriesPending}
-                        </span>
+                        {hasEnd && (
+                          <span className="calendar-series-progress-count">
+                            {item.upcomingCount}/{item.occurrenceCount} {t.calendarSeriesPending}
+                          </span>
+                        )}
                       </div>
                     </button>
 

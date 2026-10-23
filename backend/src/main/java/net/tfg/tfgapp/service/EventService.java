@@ -2,11 +2,9 @@ package net.tfg.tfgapp.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import net.tfg.tfgapp.DTOs.events.EventRequest;
-import net.tfg.tfgapp.DTOs.events.EventSeriesSummary;
 import net.tfg.tfgapp.components.ActiveEventScheduleCache;
 import net.tfg.tfgapp.components.SessionStore;
 import net.tfg.tfgapp.domains.Event;
-import net.tfg.tfgapp.domains.EventAssignment;
 import net.tfg.tfgapp.domains.AdminUser;
 import net.tfg.tfgapp.domains.PersonalUser;
 import net.tfg.tfgapp.repos.EventRepo;
@@ -22,15 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.LinkedHashSet;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.Set;
-import java.util.UUID;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class EventService {
@@ -54,212 +43,17 @@ public class EventService {
         return savedEvent;
     }
 
-    @Transactional
-    public List<Event> createEvents(EventRequest request, List<PersonalUser> targets, AdminUser audAdmin) {
-        return createEvents(request, targets, audAdmin, null);
-    }
-
     /**
-     * Crea las ocurrencias de un evento. Con existingSeriesId se reutiliza ese id
-     * (al regenerar una serie editada desde el panel de eventos programados).
-     */
-    private List<Event> createEvents(EventRequest request, List<PersonalUser> targets, AdminUser audAdmin, String existingSeriesId) {
-        List<LocalDate> dates = resolveOccurrenceDates(request);
-        String recurrenceType = normalizedRecurrenceType(request);
-        String seriesId = dates.size() > 1
-                ? (existingSeriesId != null ? existingSeriesId : UUID.randomUUID().toString())
-                : null;
-        String weekdays = "CUSTOM".equals(recurrenceType) ? formatWeekdays(request.getRecurrenceWeekdays()) : null;
-        LocalDate originalDate = request.getStartTime().toLocalDate();
-        List<Event> created = new ArrayList<>();
-
-        for (LocalDate date : dates) {
-            long shiftDays = ChronoUnit.DAYS.between(originalDate, date);
-            Event event = new Event();
-            applyEventDetails(event, request);
-            event.setStartTime(request.getStartTime().plusDays(shiftDays));
-            event.setEndTime(request.getEndTime().plusDays(shiftDays));
-            event.setRecurrenceSeriesId(seriesId);
-            event.setRecurrenceType(seriesId == null ? null : recurrenceType);
-            event.setRecurrenceEndDate(seriesId == null ? null : request.getRecurrenceEndDate());
-            event.setRecurrenceWeekdays(seriesId == null ? null : weekdays);
-            for (PersonalUser target : targets) {
-                event.addAssignment(target, audAdmin);
-            }
-            created.add(save(event));
-        }
-        return created;
-    }
-
-    public List<Event> getSeriesEvents(String seriesId) {
-        return eventRepo.findByRecurrenceSeriesIdOrderByStartTimeAsc(seriesId);
-    }
-
-    public List<Event> findSeriesEventsByUsername(String username) {
-        return eventRepo.findSeriesEventsByUser(username);
-    }
-
-    public List<Event> findSeriesEventsForAdmin(Long adminId, Long userId) {
-        return userId == null
-                ? eventRepo.findSeriesEventsForAdmin(adminId)
-                : eventRepo.findSeriesEventsForAdminAndUser(adminId, userId);
-    }
-
-    /**
-     * Sustituye todas las ocurrencias de la serie por las que salen de la nueva configuración.
+     * Crea un evento suelto. Los eventos que se repiten van a {@link EventSeriesService}.
      */
     @Transactional
-    public List<Event> regenerateSeries(String seriesId, EventRequest request, List<PersonalUser> targets, AdminUser audAdmin) {
-        deleteSeries(seriesId);
-        return createEvents(request, targets, audAdmin, seriesId);
-    }
-
-    @Transactional
-    public void deleteSeries(String seriesId) {
-        List<Event> occurrences = eventRepo.findByRecurrenceSeriesIdOrderByStartTimeAsc(seriesId);
-        if (occurrences.isEmpty()) {
-            throw new EntityNotFoundException("Serie " + seriesId + " no encontrada.");
+    public Event createEvent(EventRequest request, List<PersonalUser> targets, AdminUser audAdmin) {
+        Event event = new Event();
+        applyEventDetails(event, request);
+        for (PersonalUser target : targets) {
+            event.addAssignment(target, audAdmin);
         }
-
-        for (Event occurrence : occurrences) {
-            reminderScheduler.cancelReminder(occurrence.getId());
-        }
-        eventRepo.deleteAll(occurrences);
-        eventRepo.flush();
-        eventScheduleCache.invalidate();
-    }
-
-    /**
-     * Agrupa ocurrencias por serie. Las series creadas antes de guardar la configuración
-     * completa no tienen fecha de fin ni días: se deducen de sus ocurrencias.
-     */
-    public List<EventSeriesSummary> summarizeSeries(List<Event> events) {
-        Map<String, List<Event>> bySeries = new LinkedHashMap<>();
-        events.stream()
-                .filter(event -> event.getRecurrenceSeriesId() != null)
-                .sorted(Comparator.comparing(Event::getStartTime))
-                .forEach(event -> bySeries.computeIfAbsent(event.getRecurrenceSeriesId(), key -> new ArrayList<>()).add(event));
-
-        LocalDateTime now = LocalDateTime.now();
-        List<EventSeriesSummary> summaries = new ArrayList<>();
-        for (Map.Entry<String, List<Event>> entry : bySeries.entrySet()) {
-            summaries.add(toSeriesSummary(entry.getKey(), entry.getValue(), now));
-        }
-        summaries.sort(Comparator.comparing(
-                (EventSeriesSummary summary) -> summary.nextStartTime() == null,
-                Comparator.naturalOrder()
-        ).thenComparing(summary -> summary.nextStartTime() != null ? summary.nextStartTime() : summary.startTime()));
-        return summaries;
-    }
-
-    private EventSeriesSummary toSeriesSummary(String seriesId, List<Event> occurrences, LocalDateTime now) {
-        Event first = occurrences.get(0);
-        Event last = occurrences.get(occurrences.size() - 1);
-        String recurrenceType = first.getRecurrenceType() != null ? first.getRecurrenceType() : "DAILY";
-
-        List<Event> upcoming = occurrences.stream()
-                .filter(event -> event.getEndTime().isAfter(now))
-                .toList();
-
-        List<Integer> weekdays = parseWeekdays(first.getRecurrenceWeekdays());
-        if (weekdays.isEmpty() && "CUSTOM".equals(recurrenceType)) {
-            weekdays = occurrences.stream()
-                    .map(event -> event.getStartTime().getDayOfWeek().getValue())
-                    .distinct()
-                    .sorted()
-                    .toList();
-        }
-
-        Set<Long> assignedUserIds = new LinkedHashSet<>();
-        Set<String> assignedUsernames = new LinkedHashSet<>();
-        for (EventAssignment assignment : first.getAssignments()) {
-            assignedUserIds.add(assignment.getPersonalUser().getId());
-            assignedUsernames.add(assignment.getPersonalUser().getUsername());
-        }
-
-        return new EventSeriesSummary(
-                seriesId,
-                first.getTitle(),
-                first.getDescription(),
-                first.getLocation(),
-                first.getCategory(),
-                first.getIsAllDay(),
-                new ArrayList<>(first.getReminderMinutesBeforeList()),
-                recurrenceType,
-                first.getStartTime(),
-                first.getEndTime(),
-                first.getRecurrenceEndDate() != null ? first.getRecurrenceEndDate() : last.getStartTime().toLocalDate(),
-                weekdays,
-                occurrences.size(),
-                upcoming.size(),
-                upcoming.isEmpty() ? null : upcoming.get(0).getStartTime(),
-                first.isAssignedByAdmin(),
-                first.getAssignedByAdminUsername(),
-                first.getAssignedToUsername(),
-                new ArrayList<>(assignedUserIds),
-                new ArrayList<>(assignedUsernames)
-        );
-    }
-
-    private String formatWeekdays(List<Integer> weekdays) {
-        if (weekdays == null) {
-            return null;
-        }
-        return weekdays.stream()
-                .filter(day -> day != null && day >= 1 && day <= 7)
-                .distinct()
-                .sorted()
-                .map(String::valueOf)
-                .collect(Collectors.joining(","));
-    }
-
-    private List<Integer> parseWeekdays(String weekdays) {
-        if (weekdays == null || weekdays.isBlank()) {
-            return List.of();
-        }
-        return Arrays.stream(weekdays.split(","))
-                .map(String::trim)
-                .filter(value -> !value.isEmpty())
-                .map(Integer::valueOf)
-                .toList();
-    }
-
-    private List<LocalDate> resolveOccurrenceDates(EventRequest request) {
-        LocalDate start = request.getStartTime().toLocalDate();
-        String type = normalizedRecurrenceType(request);
-        if ("NONE".equals(type)) {
-            return List.of(start);
-        }
-
-        LocalDate end = request.getRecurrenceEndDate();
-        Set<Integer> customDays = request.getRecurrenceWeekdays() == null
-                ? Set.of()
-                : new LinkedHashSet<>(request.getRecurrenceWeekdays());
-        List<LocalDate> dates = new ArrayList<>();
-        LocalDate cursor = start;
-        while (!cursor.isAfter(end) && dates.size() < 731) {
-            boolean include = switch (type) {
-                case "DAILY" -> true;
-                case "WEEKLY" -> cursor.getDayOfWeek() == start.getDayOfWeek();
-                case "WEEKDAYS" -> cursor.getDayOfWeek().getValue() <= 5;
-                case "CUSTOM" -> customDays.contains(cursor.getDayOfWeek().getValue());
-                default -> cursor.equals(start);
-            };
-            if (include) {
-                dates.add(cursor);
-            }
-            cursor = cursor.plusDays(1);
-        }
-        if (dates.isEmpty()) {
-            dates.add(start);
-        }
-        return dates;
-    }
-
-    private String normalizedRecurrenceType(EventRequest request) {
-        return request.getRecurrenceType() == null
-                ? "NONE"
-                : request.getRecurrenceType().toUpperCase();
+        return save(event);
     }
 
     public List<Event> findEventsByUserAndDateRange(String username, LocalDateTime start, LocalDateTime end) {
@@ -310,7 +104,7 @@ public class EventService {
         target.setReminderMinutesBeforeList(normalizeReminderOffsets(details.getReminderMinutesBeforeList()));
     }
 
-    private List<Integer> normalizeReminderOffsets(List<Integer> reminderMinutesBeforeList) {
+    static List<Integer> normalizeReminderOffsets(List<Integer> reminderMinutesBeforeList) {
         LinkedHashSet<Integer> normalized = new LinkedHashSet<>();
 
         if (reminderMinutesBeforeList != null) {

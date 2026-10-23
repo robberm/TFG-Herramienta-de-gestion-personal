@@ -72,7 +72,33 @@ export const fetchEventsByRange = async (startDate, endDate, targetUserId = null
   return data.map(mapEventDates);
 };
 
+const OCCURRENCE_ID_PATTERN = /^series:(\d+):(\d{4}-\d{2}-\d{2})$/;
+
+/**
+ * Las ocurrencias calculadas de una serie no tienen fila propia: su id es
+ * "series:{seriesId}:{yyyy-MM-dd}" y se gestionan con los endpoints de ocurrencia.
+ *
+ * @param {string|number} eventId id del evento
+ * @returns {{seriesId: string, date: string}|null} partes del id o null si es un evento normal
+ */
+export const parseOccurrenceId = (eventId) => {
+  const match = typeof eventId === "string" ? eventId.match(OCCURRENCE_ID_PATTERN) : null;
+  return match ? { seriesId: match[1], date: match[2] } : null;
+};
+
+const occurrenceUrl = ({ seriesId, date }) =>
+  `${EVENTS_BASE_URL}/series/${seriesId}/occurrences/${date}`;
+
 export const saveCalendarEvent = async (eventData) => {
+  const occurrence = parseOccurrenceId(eventData.id);
+  if (occurrence) {
+    // Editar una ocurrencia la convierte en un evento propio; el id textual no viaja.
+    return apiRequest(occurrenceUrl(occurrence), {
+      method: "PUT",
+      body: JSON.stringify({ ...eventData, id: null }),
+    });
+  }
+
   const isEditing = Boolean(eventData.id);
 
   return apiRequest(
@@ -85,7 +111,8 @@ export const saveCalendarEvent = async (eventData) => {
 };
 
 export const deleteCalendarEvent = async (eventId) => {
-  return apiRequest(`${EVENTS_BASE_URL}/${eventId}`, {
+  const occurrence = parseOccurrenceId(eventId);
+  return apiRequest(occurrence ? occurrenceUrl(occurrence) : `${EVENTS_BASE_URL}/${eventId}`, {
     method: "DELETE",
     includeJson: false,
   });
@@ -114,7 +141,7 @@ export const fetchEventSeries = async (targetUserId = null) => {
 };
 
 /**
- * Regenera todas las ocurrencias de una serie con una nueva configuración.
+ * Cambia la configuración de toda la serie (sus ocurrencias se calculan de nuevo).
  */
 export const updateEventSeries = async (seriesId, eventData) =>
   apiRequest(`${EVENTS_BASE_URL}/series/${encodeURIComponent(seriesId)}`, {

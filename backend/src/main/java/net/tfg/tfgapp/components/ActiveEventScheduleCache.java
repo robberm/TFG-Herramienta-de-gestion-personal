@@ -1,20 +1,24 @@
 package net.tfg.tfgapp.components;
 
 import net.tfg.tfgapp.domains.Event;
+import net.tfg.tfgapp.domains.EventSeries;
 import net.tfg.tfgapp.repos.EventRepo;
+import net.tfg.tfgapp.repos.EventSeriesRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 /**
- * Copia en memoria de los eventos FOCUS / MANDATORY del usuario logueado.
+ * Copia en memoria de los eventos FOCUS / MANDATORY del usuario logueado, incluidas
+ * las ocurrencias calculadas de sus series recurrentes.
  *
  * Los bucles de bloqueo (1 s) y de apagado (5 s) preguntaban a la BD en cada vuelta.
  * Con una BD remota eso son miles de consultas por hora y por usuario, así que ahora
@@ -37,13 +41,16 @@ public class ActiveEventScheduleCache {
     private static final Logger LOGGER = LoggerFactory.getLogger(ActiveEventScheduleCache.class);
 
     private final EventRepo eventRepo;
+    private final EventSeriesRepo eventSeriesRepo;
     private final long syncIntervalMs;
 
     private volatile Snapshot snapshot = Snapshot.EMPTY;
 
     public ActiveEventScheduleCache(EventRepo eventRepo,
+                                    EventSeriesRepo eventSeriesRepo,
                                     @Value("${events.schedule-sync-seconds:120}") long syncIntervalSeconds) {
         this.eventRepo = eventRepo;
+        this.eventSeriesRepo = eventSeriesRepo;
         this.syncIntervalMs = Math.max(10, syncIntervalSeconds) * 1000L;
     }
 
@@ -86,14 +93,20 @@ public class ActiveEventScheduleCache {
 
             LocalDateTime windowEnd = now.plusHours(WINDOW_HOURS);
             try {
-                List<Interval> intervals = eventRepo
-                        .findUserEventsOfCategoriesInRange(userId, TRACKED_CATEGORIES, now, windowEnd)
+                List<Interval> intervals = new ArrayList<>();
+                eventRepo.findUserEventsOfCategoriesInRange(userId, TRACKED_CATEGORIES, now, windowEnd)
                         .stream()
                         .filter(event -> event.getStartTime() != null && event.getEndTime() != null)
                         .map(event -> new Interval(event.getCategory(), event.getStartTime(), event.getEndTime()))
-                        .toList();
+                        .forEach(intervals::add);
+                for (EventSeries series : eventSeriesRepo.findUserSeriesOfCategoriesInRange(
+                        userId, TRACKED_CATEGORIES, now.toLocalDate().minusDays(1), windowEnd)) {
+                    for (EventSeries.Occurrence occurrence : series.occurrencesBetween(now, windowEnd)) {
+                        intervals.add(new Interval(series.getCategory(), occurrence.start(), occurrence.end()));
+                    }
+                }
 
-                Snapshot loaded = new Snapshot(userId, intervals, System.currentTimeMillis(), windowEnd);
+                Snapshot loaded = new Snapshot(userId, List.copyOf(intervals), System.currentTimeMillis(), windowEnd);
                 snapshot = loaded;
                 return loaded;
             } catch (RuntimeException e) {

@@ -2,13 +2,16 @@ package net.tfg.tfgapp.schedulers;
 
 import net.tfg.tfgapp.components.SessionStore;
 import net.tfg.tfgapp.domains.Event;
+import net.tfg.tfgapp.domains.EventSeries;
 import net.tfg.tfgapp.mappers.ReminderMapper;
 import net.tfg.tfgapp.repos.EventRepo;
+import net.tfg.tfgapp.repos.EventSeriesRepo;
 import net.tfg.tfgapp.service.ReminderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -17,8 +20,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
+import java.util.stream.Collectors;
 
 @Component
 public class ReminderScheduler {
@@ -28,11 +33,23 @@ public class ReminderScheduler {
      */
     private final Map<Long, List<ScheduledFuture<?>>> scheduledReminders = new ConcurrentHashMap<>();
 
+    /**
+     * Las series no tienen una fila por ocurrencia: cada {@link #SERIES_PLANNING_PERIOD_MS}
+     * se programan los avisos que caen en los próximos {@link #SERIES_LOOKAHEAD_MINUTES}
+     * minutos. Clave: "{seriesId}:{fecha}:{minutos antes}".
+     */
+    private static final long SERIES_PLANNING_PERIOD_MS = 5 * 60 * 1000;
+    private static final long SERIES_LOOKAHEAD_MINUTES = 10;
+    private final Map<String, ScheduledFuture<?>> scheduledSeriesReminders = new ConcurrentHashMap<>();
+
     @Autowired
     private TaskScheduler reminderTaskScheduler;
 
     @Autowired
     private EventRepo eventRepo;
+
+    @Autowired
+    private EventSeriesRepo eventSeriesRepo;
 
     @Autowired
     private ReminderService reminderService;
@@ -122,6 +139,86 @@ public class ReminderScheduler {
         if (futures != null) {
             futures.forEach((future) -> future.cancel(false));
         }
+    }
+
+    /**
+     * Programa los avisos de las series que caen en la siguiente ventana.
+     */
+    @Scheduled(initialDelay = 10_000, fixedDelay = SERIES_PLANNING_PERIOD_MS)
+    public void planSeriesReminders() {
+        scheduledSeriesReminders.values().removeIf(ScheduledFuture::isDone);
+
+        LocalDateTime now = LocalDateTime.now();
+        for (EventSeries series : eventSeriesRepo.findWithPendingReminders(now.toLocalDate())) {
+            planSeriesReminders(series, now);
+        }
+    }
+
+    /** Vuelve a programar los avisos de una serie tras crearla o editarla. */
+    public void rescheduleSeriesReminders(EventSeries series) {
+        cancelSeriesReminders(series.getId());
+        planSeriesReminders(series, LocalDateTime.now());
+    }
+
+    public void cancelSeriesReminders(Long seriesId) {
+        if (seriesId == null) {
+            return;
+        }
+
+        String prefix = seriesId + ":";
+        scheduledSeriesReminders.entrySet().removeIf(entry -> {
+            if (!entry.getKey().startsWith(prefix)) {
+                return false;
+            }
+            entry.getValue().cancel(false);
+            return true;
+        });
+    }
+
+    private void planSeriesReminders(EventSeries series, LocalDateTime now) {
+        if (series.getId() == null) {
+            return;
+        }
+
+        // Se copian ahora: el aviso se ejecuta fuera de la sesión de JPA.
+        Set<Long> assignedUserIds = series.getAssignments().stream()
+                .map(assignment -> assignment.getPersonalUser().getId())
+                .collect(Collectors.toSet());
+        LocalDateTime windowEnd = now.plusMinutes(SERIES_LOOKAHEAD_MINUTES);
+        for (Integer offsetMinutes : series.getReminderMinutesBeforeList()) {
+            if (offsetMinutes == null || offsetMinutes < 0) {
+                continue;
+            }
+
+            // Ocurrencias cuyo aviso (inicio - offset) cae dentro de [now, windowEnd).
+            LocalDateTime from = now.plusMinutes(offsetMinutes);
+            LocalDateTime to = windowEnd.plusMinutes(offsetMinutes);
+            for (EventSeries.Occurrence occurrence : series.occurrencesBetween(from, to)) {
+                LocalDateTime triggerTime = occurrence.start().minusMinutes(offsetMinutes);
+                if (triggerTime.isBefore(now) || !triggerTime.isBefore(windowEnd)) {
+                    continue;
+                }
+
+                String key = series.getId() + ":" + occurrence.date() + ":" + offsetMinutes;
+                scheduledSeriesReminders.computeIfAbsent(key, ignored -> reminderTaskScheduler.schedule(
+                        () -> executeSeriesReminder(series, assignedUserIds, occurrence, offsetMinutes),
+                        toDate(triggerTime)
+                ));
+            }
+        }
+    }
+
+    /**
+     * Envía el aviso de una ocurrencia si el usuario logueado es uno de los asignados.
+     */
+    private void executeSeriesReminder(EventSeries series, Set<Long> assignedUserIds,
+                                       EventSeries.Occurrence occurrence, Integer offsetMinutes) {
+        Long loggedUserId = sessionStore.getLoggedUserId();
+        if (loggedUserId == null || !assignedUserIds.contains(loggedUserId)) {
+            return;
+        }
+
+        reminderService.sendReminder(reminderMapper.toDto(series, occurrence, offsetMinutes));
     }
 
     /**

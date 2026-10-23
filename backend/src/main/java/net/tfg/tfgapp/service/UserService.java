@@ -5,6 +5,7 @@ import jakarta.persistence.PersistenceContext;
 import net.tfg.tfgapp.domains.AdminUser;
 import net.tfg.tfgapp.domains.Event;
 import net.tfg.tfgapp.domains.EventAssignment;
+import net.tfg.tfgapp.domains.EventSeries;
 import net.tfg.tfgapp.domains.Objective;
 import net.tfg.tfgapp.domains.ObjectiveAssignment;
 import net.tfg.tfgapp.domains.Organization;
@@ -140,6 +141,7 @@ public class UserService implements IUserService {
 
         detachFromOrganizationAndAdmin(managedUser);
         detachEventAssignments(managedUser);
+        detachSeriesAssignments(managedUser);
         Set<Integer> removedObjectiveIds = detachObjectiveAssignments(managedUser);
         reassignOrDeleteOwnedObjectives(managedUser, removedObjectiveIds);
         entityManager.flush();
@@ -188,6 +190,10 @@ public class UserService implements IUserService {
                 .setParameter("admin", adminUser)
                 .executeUpdate();
 
+        entityManager.createQuery("UPDATE EventSeriesAssignment a SET a.audAdmin = null WHERE a.audAdmin = :admin")
+                .setParameter("admin", adminUser)
+                .executeUpdate();
+
         entityManager.createQuery("UPDATE ObjectiveAssignment a SET a.audAdmin = null WHERE a.audAdmin = :admin")
                 .setParameter("admin", adminUser)
                 .executeUpdate();
@@ -232,6 +238,30 @@ public class UserService implements IUserService {
                 entityManager.remove(entityManager.contains(event) ? event : entityManager.merge(event));
             } else {
                 entityManager.merge(event);
+            }
+        }
+    }
+
+    /**
+     * Quita al usuario de sus series; las que se quedan sin nadie asignado se borran.
+     */
+    private void detachSeriesAssignments(PersonalUser personalUser) {
+        List<EventSeries> seriesList = entityManager.createQuery(
+                        "SELECT DISTINCT a.series FROM EventSeriesAssignment a WHERE a.personalUser = :user",
+                        EventSeries.class)
+                .setParameter("user", personalUser)
+                .getResultList();
+
+        for (EventSeries series : seriesList) {
+            series.getAssignments().removeIf(
+                    assignment -> assignment.getPersonalUser().getId().equals(personalUser.getId()));
+
+            if (series.getAssignments().isEmpty()) {
+                // Las ocurrencias editadas que sigan vivas (de otros usuarios) dejan de apuntar a la serie.
+                entityManager.createQuery("UPDATE Event e SET e.series = null WHERE e.series = :series")
+                        .setParameter("series", series)
+                        .executeUpdate();
+                entityManager.remove(series);
             }
         }
     }

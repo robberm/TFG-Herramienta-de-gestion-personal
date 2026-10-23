@@ -1,14 +1,18 @@
 package net.tfg.tfgapp.controller;
 
+import net.tfg.tfgapp.DTOs.events.CalendarEventView;
 import net.tfg.tfgapp.DTOs.events.EventRequest;
 import net.tfg.tfgapp.DTOs.events.EventSeriesSummary;
 import net.tfg.tfgapp.domains.AdminUser;
 import net.tfg.tfgapp.domains.Event;
 import net.tfg.tfgapp.domains.EventAssignment;
+import net.tfg.tfgapp.domains.EventSeries;
+import net.tfg.tfgapp.domains.EventSeriesAssignment;
 import net.tfg.tfgapp.domains.PersonalUser;
 import net.tfg.tfgapp.domains.User;
 import net.tfg.tfgapp.exception.ApiException;
 import net.tfg.tfgapp.security.JwtUtil;
+import net.tfg.tfgapp.service.EventSeriesService;
 import net.tfg.tfgapp.service.EventService;
 import net.tfg.tfgapp.service.UserService;
 import net.tfg.tfgapp.validation.events.EventRequestValidator;
@@ -26,8 +30,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -38,28 +44,37 @@ import java.util.Set;
 public class CalendarController {
 
     private final EventService eventService;
+    private final EventSeriesService eventSeriesService;
     private final JwtUtil jwtUtil;
     private final UserService userService;
     private final EventRequestValidator eventRequestValidator;
 
     public CalendarController(EventService eventService,
+                              EventSeriesService eventSeriesService,
                               JwtUtil jwtUtil,
                               UserService userService,
                               EventRequestValidator eventRequestValidator) {
         this.eventService = eventService;
+        this.eventSeriesService = eventSeriesService;
         this.jwtUtil = jwtUtil;
         this.userService = userService;
         this.eventRequestValidator = eventRequestValidator;
     }
 
+    /**
+     * Eventos guardados del rango más las ocurrencias calculadas de las series.
+     */
     @GetMapping("/range")
-    public ResponseEntity<List<Event>> getEventsBetween(
+    public ResponseEntity<List<CalendarEventView>> getEventsBetween(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end,
             @RequestParam(required = false) Long targetUserId,
             @RequestHeader("Authorization") String token) {
 
         User currentUser = getCurrentUser(token);
+        List<Event> events;
+        List<EventSeries> seriesList;
+        Long viewerUserId;
 
         if (currentUser.isAdmin()) {
             if (targetUserId != null) {
@@ -67,25 +82,50 @@ public class CalendarController {
                 if (!canAccessManagedUser(currentUser, target)) {
                     throw new SecurityException("No tienes permiso sobre ese usuario.");
                 }
-                return ResponseEntity.ok(eventService.findAssignedEventsForAdminAndUserInRange(currentUser.getId(), targetUserId, start, end));
+                events = eventService.findAssignedEventsForAdminAndUserInRange(currentUser.getId(), targetUserId, start, end);
+            } else {
+                events = eventService.findAssignedEventsForAdminInRange(currentUser.getId(), start, end);
             }
-
-            return ResponseEntity.ok(eventService.findAssignedEventsForAdminInRange(currentUser.getId(), start, end));
+            seriesList = eventSeriesService.findForAdminInRange(currentUser.getId(), targetUserId, start, end);
+            viewerUserId = targetUserId;
+        } else {
+            events = eventService.findEventsByUserAndDateRange(currentUser.getUsername(), start, end);
+            seriesList = eventSeriesService.findByUsernameInRange(currentUser.getUsername(), start, end);
+            viewerUserId = currentUser.getId();
         }
 
-        return ResponseEntity.ok(eventService.findEventsByUserAndDateRange(currentUser.getUsername(), start, end));
+        List<CalendarEventView> views = new ArrayList<>();
+        for (Event event : events) {
+            views.add(CalendarEventView.of(event));
+        }
+        views.addAll(eventSeriesService.occurrencesInRange(seriesList, start, end, viewerUserId));
+        views.sort(Comparator.comparing(CalendarEventView::startTime));
+        return ResponseEntity.ok(views);
     }
 
+    /**
+     * Crea un evento suelto o, si se repite, una serie (sin generar sus ocurrencias).
+     */
     @PostMapping
-    public ResponseEntity<List<Event>> createEvent(@RequestBody EventRequest request,
-                                         @RequestHeader("Authorization") String token) {
+    public ResponseEntity<CalendarEventView> createEvent(@RequestBody EventRequest request,
+                                                         @RequestHeader("Authorization") String token) {
         User currentUser = getCurrentUser(token);
 
         eventRequestValidator.requireValidDates(request);
         List<PersonalUser> targets = resolveTargetUsers(currentUser, request);
         AdminUser audAdmin = currentUser.isAdmin() ? (AdminUser) currentUser : null;
+
+        if (eventRequestValidator.isRecurring(request)) {
+            Optional<EventSeries> series = eventSeriesService.createSeries(request, targets, audAdmin);
+            if (series.isPresent()) {
+                EventSeries created = series.get();
+                return ResponseEntity.status(HttpStatus.CREATED).body(CalendarEventView.of(
+                        created, created.occurrenceOn(created.getAnchorDate()), currentUser.getId()));
+            }
+        }
+
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(eventService.createEvents(request, targets, audAdmin));
+                .body(CalendarEventView.of(eventService.createEvent(request, targets, audAdmin)));
     }
 
     @PutMapping("/{id}")
@@ -164,36 +204,62 @@ public class CalendarController {
             if (targetUserId != null && !canAccessManagedUser(currentUser, userService.getUserById(targetUserId))) {
                 throw new SecurityException("No tienes permiso sobre ese usuario.");
             }
-            return ResponseEntity.ok(eventService.summarizeSeries(
-                    eventService.findSeriesEventsForAdmin(currentUser.getId(), targetUserId)));
+            return ResponseEntity.ok(eventSeriesService.summarize(
+                    eventSeriesService.findForAdmin(currentUser.getId(), targetUserId), targetUserId));
         }
 
-        return ResponseEntity.ok(eventService.summarizeSeries(
-                eventService.findSeriesEventsByUsername(currentUser.getUsername())));
+        return ResponseEntity.ok(eventSeriesService.summarize(
+                eventSeriesService.findByUsername(currentUser.getUsername()), currentUser.getId()));
     }
 
     @PutMapping("/series/{seriesId}")
-    public ResponseEntity<List<Event>> updateSeries(@PathVariable String seriesId,
-                                                    @RequestBody EventRequest request,
-                                                    @RequestHeader("Authorization") String token) {
+    public ResponseEntity<EventSeriesSummary> updateSeries(@PathVariable Long seriesId,
+                                                           @RequestBody EventRequest request,
+                                                           @RequestHeader("Authorization") String token) {
         User currentUser = getCurrentUser(token);
-        requireEditableSeries(currentUser, seriesId, "modificar");
+        EventSeries series = requireEditableSeries(currentUser, seriesId, "modificar");
         eventRequestValidator.requireValidDates(request);
+        if (!eventRequestValidator.isRecurring(request)) {
+            throw new IllegalArgumentException("Una serie necesita una repetición.");
+        }
 
         List<PersonalUser> targets = resolveTargetUsers(currentUser, request);
         if (targets.isEmpty()) {
             throw new IllegalArgumentException("Debes seleccionar al menos un usuario.");
         }
         AdminUser audAdmin = currentUser.isAdmin() ? (AdminUser) currentUser : null;
-        return ResponseEntity.ok(eventService.regenerateSeries(seriesId, request, targets, audAdmin));
+        EventSeries updated = eventSeriesService.updateSeries(series, request, targets, audAdmin);
+        return ResponseEntity.ok(eventSeriesService.summarize(List.of(updated), currentUser.getId()).get(0));
     }
 
     @DeleteMapping("/series/{seriesId}")
-    public ResponseEntity<Void> deleteSeries(@PathVariable String seriesId,
+    public ResponseEntity<Void> deleteSeries(@PathVariable Long seriesId,
                                              @RequestHeader("Authorization") String token) {
         User currentUser = getCurrentUser(token);
-        requireEditableSeries(currentUser, seriesId, "eliminar");
-        eventService.deleteSeries(seriesId);
+        eventSeriesService.deleteSeries(requireEditableSeries(currentUser, seriesId, "eliminar"));
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Edita o mueve una sola ocurrencia: pasa a ser un evento propio y deja de salir en la serie.
+     */
+    @PutMapping("/series/{seriesId}/occurrences/{date}")
+    public ResponseEntity<CalendarEventView> updateOccurrence(@PathVariable Long seriesId,
+                                                              @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                                                              @RequestBody EventRequest request,
+                                                              @RequestHeader("Authorization") String token) {
+        User currentUser = getCurrentUser(token);
+        EventSeries series = requireEditableSeries(currentUser, seriesId, "modificar");
+        eventRequestValidator.requireValidDates(request);
+        return ResponseEntity.ok(CalendarEventView.of(eventSeriesService.editOccurrence(series, date, request)));
+    }
+
+    @DeleteMapping("/series/{seriesId}/occurrences/{date}")
+    public ResponseEntity<Void> deleteOccurrence(@PathVariable Long seriesId,
+                                                 @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                                                 @RequestHeader("Authorization") String token) {
+        User currentUser = getCurrentUser(token);
+        eventSeriesService.deleteOccurrence(requireEditableSeries(currentUser, seriesId, "eliminar"), date);
         return ResponseEntity.noContent().build();
     }
 
@@ -203,22 +269,38 @@ public class CalendarController {
     }
 
     /**
-     * Misma regla que con un evento suelto, aplicada a todas las ocurrencias de la serie.
+     * Misma regla que con un evento suelto: solo quien la tiene asignada (o el admin que
+     * la asignó) puede tocarla, y un usuario no puede tocar lo que le asignó un admin.
      */
-    private void requireEditableSeries(User currentUser, String seriesId, String action) {
-        List<Event> occurrences = eventService.getSeriesEvents(seriesId);
-        if (occurrences.isEmpty()) {
-            throw new ApiException(HttpStatus.NOT_FOUND, "Serie no encontrada.");
+    private EventSeries requireEditableSeries(User currentUser, Long seriesId, String action) {
+        EventSeries series = eventSeriesService.findById(seriesId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Serie no encontrada."));
+
+        if (!canAccessSeries(currentUser, series)) {
+            throw new SecurityException("No tienes permiso para " + action + " esta serie.");
+        }
+        if (!currentUser.isAdmin() && series.getAudAdmin() != null) {
+            throw new SecurityException("No puedes " + action + " series asignadas por administrador.");
+        }
+        return series;
+    }
+
+    private boolean canAccessSeries(User currentUser, EventSeries series) {
+        if (series.isAssignedTo(currentUser.getId())) {
+            return true;
+        }
+        if (!currentUser.isAdmin()) {
+            return false;
         }
 
-        for (Event occurrence : occurrences) {
-            if (!canAccessEvent(currentUser, occurrence)) {
-                throw new SecurityException("No tienes permiso para " + action + " esta serie.");
-            }
-            if (!currentUser.isAdmin() && occurrence.getAudAdmin() != null) {
-                throw new SecurityException("No puedes " + action + " series asignadas por administrador.");
+        for (EventSeriesAssignment assignment : series.getAssignments()) {
+            if (assignment.getAudAdmin() != null
+                    && assignment.getAudAdmin().getId().equals(currentUser.getId())
+                    && canAccessManagedUser(currentUser, assignment.getPersonalUser())) {
+                return true;
             }
         }
+        return false;
     }
 
     private User getCurrentUser(String authorizationHeader) {

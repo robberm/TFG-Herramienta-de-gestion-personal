@@ -1,6 +1,7 @@
 package net.tfg.tfgapp.mappers;
 
 import net.tfg.tfgapp.domains.Event;
+import net.tfg.tfgapp.domains.EventSeries;
 import net.tfg.tfgapp.DTOs.reminders.ReminderDTO;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +32,23 @@ public class ReminderMapper {
         dto.setAllDay(Boolean.TRUE.equals(event.getIsAllDay()));
         dto.setReminderMinutesBefore(reminderMinutesBefore);
         dto.setCategory(event.getCategory() != null ? event.getCategory().name() : null);
+        return dto;
+    }
+
+    /**
+     * Aviso de una ocurrencia calculada de una serie: no tiene id de evento propio.
+     */
+    public ReminderDTO toDto(EventSeries series, EventSeries.Occurrence occurrence, Integer reminderMinutesBefore) {
+        ReminderDTO dto = new ReminderDTO();
+        dto.setEventId(null);
+        dto.setTitle(series.getTitle());
+        dto.setDescription(series.getDescription());
+        dto.setLocation(series.getLocation());
+        dto.setStartTime(occurrence.start());
+        dto.setEndTime(occurrence.end());
+        dto.setAllDay(Boolean.TRUE.equals(series.getIsAllDay()));
+        dto.setReminderMinutesBefore(reminderMinutesBefore);
+        dto.setCategory(series.getCategory() != null ? series.getCategory().name() : null);
         return dto;
     }
 }
