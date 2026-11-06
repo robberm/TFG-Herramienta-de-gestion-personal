@@ -100,6 +100,9 @@ public class EventService {
         target.setLocation(details.getLocation());
         target.setCategory(details.getCategory() != null ? details.getCategory() : Event.EventCategory.PERSONAL);
         target.setIsAllDay(details.getIsAllDay() != null ? details.getIsAllDay() : false);
+        if (details.getShowInMonthView() != null) {
+            target.setShowInMonthView(details.getShowInMonthView());
+        }
 
         target.setReminderMinutesBeforeList(normalizeReminderOffsets(details.getReminderMinutesBeforeList()));
     }

@@ -202,6 +202,9 @@ const RecurringEventsPanel = ({ series, isAdmin = false, onEdit, onDelete }) => 
                             ? formatDay(parseLocalDate(item.recurrenceEndDate))
                             : t.calendarSeriesNoEnd}
                         </span>
+                        {item.showInMonthView === false && (
+                          <span>{t.calendarSeriesHiddenInMonth}</span>
+                        )}
                         {item.editedOccurrenceCount > 0 && (
                           <span>
                             {item.editedOccurrenceCount} {t.calendarSeriesEdited}

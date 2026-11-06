@@ -933,3 +933,7 @@ body.translucent .gcal-modal-footer {
 .gcal-recurrence-noend {
   margin: 0.6rem 0 0.2rem;
 }
+
+.gcal-month-visibility {
+  margin-left: 40px;
+}

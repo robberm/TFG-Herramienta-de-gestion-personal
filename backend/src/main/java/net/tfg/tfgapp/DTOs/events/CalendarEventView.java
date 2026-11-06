@@ -35,7 +35,8 @@ public record CalendarEventView(
         String assignedByAdminUsername,
         String assignedToUsername,
         Long assignedToUserId,
-        List<Long> assignedUserIds
+        List<Long> assignedUserIds,
+        boolean showInMonthView
 ) {
 
     public static String occurrenceId(Long seriesId, LocalDate date) {
@@ -65,7 +66,8 @@ public record CalendarEventView(
                 event.getAssignedByAdminUsername(),
                 event.getAssignedToUsername(),
                 event.getAssignedToUserId(),
-                assignedUserIds
+                assignedUserIds,
+                event.isShowInMonthView()
         );
     }
 
@@ -100,7 +102,8 @@ public record CalendarEventView(
                 shown != null && shown.getAudAdmin() != null ? shown.getAudAdmin().getUsername() : null,
                 shown != null ? shown.getPersonalUser().getUsername() : null,
                 shown != null ? shown.getPersonalUser().getId() : null,
-                assignedUserIds
+                assignedUserIds,
+                series.isShowInMonthView()
         );
     }
 }

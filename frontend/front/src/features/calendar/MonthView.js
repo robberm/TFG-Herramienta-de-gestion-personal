@@ -100,8 +100,10 @@ const MonthView = ({
     const formattedDate = format(day, dateFormat);
     const cloneDay = day;
 
-    const dayEvents = events.filter((event) =>
-      isSameDay(parseCalendarDate(event.startTime), cloneDay),
+    const dayEvents = events.filter(
+      (event) =>
+        event.showInMonthView !== false &&
+        isSameDay(parseCalendarDate(event.startTime), cloneDay),
     );
 
     days.push(

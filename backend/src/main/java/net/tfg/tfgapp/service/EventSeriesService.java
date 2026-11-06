@@ -100,6 +100,10 @@ public class EventSeriesService {
             throw new IllegalArgumentException("La repetición no genera ninguna fecha.");
         }
         series.replaceAssignments(targets, audAdmin);
+        // La visibilidad es de toda la serie, también de las ocurrencias editadas por separado.
+        for (Event edited : eventRepo.findBySeries_Id(series.getId())) {
+            edited.setShowInMonthView(series.isShowInMonthView());
+        }
         return saveAndReschedule(series);
     }
 
@@ -123,6 +127,7 @@ public class EventSeriesService {
         requireOccurrence(series, date);
 
         Event edited = new Event();
+        edited.setShowInMonthView(series.isShowInMonthView());
         eventService.applyEventDetails(edited, request);
         edited.setSeries(series);
         for (EventSeriesAssignment assignment : series.getAssignments()) {
@@ -214,7 +219,8 @@ public class EventSeriesService {
                 shown != null && shown.getAudAdmin() != null ? shown.getAudAdmin().getUsername() : null,
                 shown != null ? shown.getPersonalUser().getUsername() : null,
                 assignedUserIds,
-                assignedUsernames
+                assignedUsernames,
+                series.isShowInMonthView()
         );
     }
 
@@ -263,6 +269,9 @@ public class EventSeriesService {
         series.setLocation(request.getLocation());
         series.setCategory(request.getCategory() != null ? request.getCategory() : Event.EventCategory.PERSONAL);
         series.setIsAllDay(request.getIsAllDay() != null ? request.getIsAllDay() : false);
+        if (request.getShowInMonthView() != null) {
+            series.setShowInMonthView(request.getShowInMonthView());
+        }
         series.setStartTime(request.getStartTime().plusDays(shiftDays));
         series.setEndTime(request.getEndTime().plusDays(shiftDays));
         series.setRecurrenceType(type);

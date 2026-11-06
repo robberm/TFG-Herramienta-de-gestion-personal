@@ -33,6 +33,7 @@ public record EventSeriesSummary(
         String assignedByAdminUsername,
         String assignedToUsername,
         List<Long> assignedUserIds,
-        List<String> assignedUsernames
+        List<String> assignedUsernames,
+        boolean showInMonthView
 ) {
 }
