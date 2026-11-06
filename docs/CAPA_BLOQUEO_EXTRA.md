@@ -292,5 +292,23 @@ indique Focus desactivado. El último conjunto aplicado queda guardado en
   extensión recargada: `x.com` queda redirigido a `blocked.html` con Focus
   activo.
 
+### Apps y webs desbloqueadas durante el descanso (6 de noviembre de 2026)
+
+- **Problema:** durante el descanso se seguían cerrando las apps bloqueadas y la
+  extensión seguía redirigiendo los dominios, lo que anulaba el propio descanso.
+- **Archivos:** `BlockingService` (`areRestrictionsEnforced()`, aviso de fin de
+  descanso), `AppRestrictionService`, `AppController`, `FocusModeListener.jsx`,
+  `electron.js`.
+- **Comportamiento final:** la fase de trabajo bloquea; la de descanso no.
+  `/api/browser-blocking-policy` devuelve `focusModeEnabled: false` en el descanso
+  y la extensión retira sus reglas al recibir `/topic/focus-state`. Al terminar un
+  descanso de tipo notificación se avisa con sonido antes de reactivar el bloqueo.
+- **Compatibilidad:** la extensión no cambia, así que no hace falta recargarla.
+  `/topic/focus-events` deja de enviar `title` y `message`: envía `phase`
+  (`BREAK_START` o `BREAK_END`) y `breakDurationSeconds`, y el frontend compone el
+  texto en el idioma activo.
+- **Prueba realizada:** `BlockingServiceTest` cubre el levantamiento y la
+  restauración del bloqueo, y los avisos de inicio y fin de descanso.
+
 Los cambios posteriores se registrarán aquí con: archivos afectados, comportamiento
 final, compatibilidad y prueba realizada.

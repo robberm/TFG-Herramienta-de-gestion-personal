@@ -133,14 +133,29 @@ public class BlockingService {
         publishFocusState();
     }
 
+    // El texto lo compone el frontend: conoce el idioma y formatea la duración en minutos.
     private void notifyFocusBreak(int breakDurationSeconds) {
+        publishFocusNotification("BREAK_START", breakDurationSeconds);
+    }
+
+    private void publishFocusNotification(String phase, int breakDurationSeconds) {
         Map<String, Object> payload = new HashMap<>();
         payload.put("type", "FOCUS_NOTIFICATION");
-        payload.put("title", "Tiempo de descanso");
-        payload.put("message", "Descansa " + breakDurationSeconds + "s y vuelve al foco.");
+        payload.put("phase", phase);
         payload.put("breakDurationSeconds", breakDurationSeconds);
 
         messagingTemplate.convertAndSend("/topic/focus-events", payload);
+    }
+
+    /**
+     * Apps y webs se desbloquean durante el descanso, así que hay que avisar antes de que
+     * se vuelvan a cerrar. No aplica si el foco ya no sigue activo.
+     */
+    private void notifyBreakEnded() {
+        IStorageService.Config config = storageService.loadConfig();
+        if (!pauseScheduledBlocks && isEffectiveFocusEnabled(config)) {
+            publishFocusNotification("BREAK_END", getBreakDurationSeconds(config));
+        }
     }
 
     private void endBlocking() {
@@ -155,6 +170,7 @@ public class BlockingService {
         if (isBlocking) {
             endBlocking();
         } else {
+            notifyBreakEnded();
             publishFocusState();
         }
     }
@@ -197,6 +213,11 @@ public class BlockingService {
     public boolean isEffectiveFocusModeEnabled() {
         IStorageService.Config config = storageService.loadConfig();
         return isEffectiveFocusEnabled(config);
+    }
+
+    /** Apps y webs solo se bloquean durante el trabajo: el descanso tiene que ser un descanso. */
+    public boolean areRestrictionsEnforced() {
+        return !isOnBreak && isEffectiveFocusModeEnabled();
     }
 
     public Map<String, Object> getFocusState() {

@@ -817,6 +817,8 @@ function escapeHtml(value = "") {
     .replaceAll("'", "&#039;");
 }
 
+const REMINDER_VISIBLE_MS = 12000;
+
 function createReminderWindow(reminder) {
   const display = screen.getPrimaryDisplay();
   const width = 360;
@@ -854,6 +856,9 @@ function createReminderWindow(reminder) {
     },
   });
 
+  const isBreak = reminder?.kind === "break";
+  const eyebrow = escapeHtml(reminder?.eyebrow || "Próximo evento");
+  const closeLabel = escapeHtml(reminder?.closeLabel || "Cerrar");
   const title = escapeHtml(reminder?.title || "Evento");
   const description = escapeHtml(reminder?.description || "");
   const location = escapeHtml(reminder?.location || "");
@@ -880,13 +885,16 @@ function createReminderWindow(reminder) {
 
           body {
             margin: 0;
+            height: 100vh;
+            display: flex;
+            align-items: flex-end;
             background: transparent;
             overflow: hidden;
           }
 
           .card {
             width: 100%;
-            height: 100%;
+            max-height: 100%;
             padding: 18px;
             border-radius: 18px;
             background: rgba(22, 22, 22, 0.96);
@@ -896,9 +904,21 @@ function createReminderWindow(reminder) {
             display: flex;
             flex-direction: column;
             gap: 10px;
+            animation: reminder-in 320ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
+          }
+
+          .card.is-break {
+            border-color: rgba(125, 211, 168, 0.45);
+          }
+
+          .card.is-leaving {
+            animation: reminder-out 180ms ease-in both;
           }
 
           .eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.08em;
@@ -936,19 +956,65 @@ function createReminderWindow(reminder) {
           button:hover {
             background: rgba(255,255,255,0.08);
           }
+
+          .pulse {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #7dd3a8;
+            animation: reminder-pulse 1.2s ease-out 3;
+          }
+
+          @keyframes reminder-in {
+            from {
+              opacity: 0;
+              transform: translateY(18px) scale(0.97);
+            }
+          }
+
+          @keyframes reminder-out {
+            to {
+              opacity: 0;
+              transform: translateY(8px) scale(0.98);
+            }
+          }
+
+          @keyframes reminder-pulse {
+            from {
+              box-shadow: 0 0 0 0 rgba(125, 211, 168, 0.7);
+            }
+            to {
+              box-shadow: 0 0 0 12px rgba(125, 211, 168, 0);
+            }
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .card,
+            .card.is-leaving,
+            .pulse {
+              animation: none;
+            }
+          }
         </style>
       </head>
       <body>
-        <div class="card">
-          <div class="eyebrow">Próximo evento</div>
+        <div class="card${isBreak ? " is-break" : ""}" id="card">
+          <div class="eyebrow">${isBreak ? '<span class="pulse"></span>' : ""}${eyebrow}</div>
           <div class="title">${title}</div>
-          <div class="time">${isAllDay ? "Todo el día" : `Empieza a las ${startTime}`}</div>
+          ${isBreak ? "" : `<div class="time">${isAllDay ? "Todo el día" : `Empieza a las ${startTime}`}</div>`}
           ${location ? `<div class="location">📍 ${location}</div>` : ""}
           ${description ? `<div class="description">${description}</div>` : ""}
           <div class="actions">
-            <button onclick="window.close()">Cerrar</button>
+            <button onclick="dismiss()">${closeLabel}</button>
           </div>
         </div>
+        <script>
+          function dismiss() {
+            document.getElementById("card").classList.add("is-leaving");
+            setTimeout(function () { window.close(); }, 180);
+          }
+          setTimeout(dismiss, ${REMINDER_VISIBLE_MS - 200});
+        </script>
       </body>
     </html>
   `;
@@ -967,7 +1033,7 @@ function createReminderWindow(reminder) {
     if (!reminderWindow.isDestroyed()) {
       reminderWindow.close();
     }
-  }, 12000);
+  }, REMINDER_VISIBLE_MS);
 }
 
 /** Espera hasta que el backend HTTP esté escuchando en localhost:8080. */
