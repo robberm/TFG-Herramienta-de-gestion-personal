@@ -51,8 +51,8 @@
 .notesEmptyStack i:nth-child(3) { transform: translate(2px, -9px) rotate(-1deg); background: #f7e9b5; }
 .notesLoading { display: flex; gap: 18px; }
 .notesLoading i { width: min(240px, 28vw); height: 220px; border-radius: 22px; background: linear-gradient(100deg, #eee 20%, #fafafa 40%, #eee 60%); background-size: 300% 100%; animation: shimmer 1.5s infinite; }
-.noteEditorOverlay { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 28px; background: rgba(32, 29, 24, .42); backdrop-filter: blur(10px); animation: fadeIn .2s ease; }
-.noteEditor { width: min(720px, 100%); height: min(680px, calc(100vh - 56px)); border-radius: 28px; padding: 22px 25px; display: flex; flex-direction: column; color: #28251f; box-shadow: 0 30px 90px rgba(24, 20, 12, .35); animation: editorIn .38s cubic-bezier(.2,.9,.2,1); }
+.noteEditorOverlay { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 56px 28px 28px; background: rgba(32, 29, 24, .42); backdrop-filter: blur(10px); animation: fadeIn .2s ease; }
+.noteEditor { box-sizing: border-box; width: min(720px, 100%); height: min(680px, calc(100vh - 84px)); border-radius: 28px; padding: 22px 25px; display: flex; flex-direction: column; color: #28251f; box-shadow: 0 30px 90px rgba(24, 20, 12, .35); animation: editorIn .38s cubic-bezier(.2,.9,.2,1); }
 .noteEditor header, .noteEditor footer { display: flex; align-items: center; gap: 12px; }
 .noteEditor header { min-height: 38px; }
 .noteEditorClose { width: 34px; height: 34px; border: 0; border-radius: 50%; background: rgba(255,255,255,.42); font-size: 22px; cursor: pointer; }
@@ -66,13 +66,24 @@
 .noteEditorTitle::placeholder, .noteEditor textarea::placeholder { color: rgba(42,37,31,.4); }
 .noteEditor textarea { flex: 1; min-height: 180px; margin: 18px 0; border: 0; outline: 0; resize: none; background: transparent; color: inherit; font: 17px/1.7 "Segoe UI", sans-serif; }
 .noteEditor footer { border-top: 1px solid rgba(42,37,31,.12); padding-top: 16px; }
-.noteEditor footer span { margin-left: auto; color: rgba(42,37,31,.55); font-size: 12px; }
+.noteEditorMeta { margin-left: auto; display: flex; align-items: center; gap: 10px; color: rgba(42,37,31,.55); font-size: 12px; }
+.noteSaveStatus:empty { display: none; }
+.noteSaveStatus.is-error { color: #a03a2a; font-weight: 700; }
 .noteDeleteButton, .noteSaveButton { border: 0; border-radius: 12px; padding: 10px 15px; cursor: pointer; font-weight: 750; }
 .noteDeleteButton { background: rgba(255,255,255,.35); color: #a03a2a; }
-.noteSaveButton { background: #292621; color: #fff; min-width: 90px; }
+.noteSaveButton { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: #292621; color: #fff; min-width: 112px; transition: background-color .15s ease, transform .1s ease; }
+.noteSaveButton:active:not(:disabled) { transform: scale(.97); }
 .noteSaveButton:disabled { opacity: .45; cursor: default; }
+.noteSaveButton.is-saved, .noteSaveButton.is-saved:disabled { background: #2f7d4f; opacity: 1; }
+.noteSaveButton svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 22; animation: noteCheckDraw .26s ease-out both; }
+.noteDiscardButton { border: 0; background: transparent; color: #a03a2a; font-size: 12px; font-weight: 700; text-decoration: underline; cursor: pointer; }
+.noteEditorOverlay.is-closing { animation: noteOverlayOut .18s ease-in both; pointer-events: none; }
+.noteEditorOverlay.is-closing .noteEditor { animation: editorOut .18s ease-in both; }
 @keyframes noteRise { from { opacity: 0; transform: translateY(18px) scale(.97); } }
 @keyframes editorIn { from { opacity: 0; transform: translateY(28px) scale(.96); } }
+@keyframes editorOut { to { opacity: 0; transform: translateY(14px) scale(.98); } }
+@keyframes noteOverlayOut { to { opacity: 0; } }
+@keyframes noteCheckDraw { from { stroke-dashoffset: 22; } to { stroke-dashoffset: 0; } }
 @keyframes fadeIn { from { opacity: 0; } }
 @keyframes shimmer { to { background-position: -300% 0; } }
 @media (max-width: 768px) {
@@ -81,13 +92,13 @@
   .notesHero p { display: none; }
   .notesGrid { grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); }
   .noteCard { min-height: 190px; }
-  .noteEditorOverlay { padding: 10px; align-items: end; }
-  .noteEditor { height: calc(100vh - 20px); border-radius: 24px; padding: 18px; }
+  .noteEditorOverlay { padding: 52px 10px 10px; align-items: end; }
+  .noteEditor { height: calc(100vh - 62px); border-radius: 24px; padding: 18px; }
   .noteColorPicker { gap: 4px; }
   .noteColor { width: 18px; height: 18px; }
   .notePinButton { font-size: 0; }
 }
-@media (prefers-reduced-motion: reduce) { .noteCard, .noteEditor, .noteEditorOverlay, .notesLoading i { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .noteCard, .noteEditor, .noteEditorOverlay, .noteEditorOverlay.is-closing, .noteEditorOverlay.is-closing .noteEditor, .noteSaveButton svg, .notesLoading i { animation: none; } }
 body.dark .notesPage { --ink: #f2eee6; --muted: #aaa49a; }
 body.dark .notesSearch { background: rgba(43,41,37,.8); border-color: rgba(255,255,255,.1); }
 body.dark .notesSearch input { color: #f2eee6; }

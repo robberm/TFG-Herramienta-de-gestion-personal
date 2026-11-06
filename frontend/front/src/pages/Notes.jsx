@@ -1,4 +1,4 @@
-import React, { useEffect, useDeferredValue, useState } from "react";
+import React, { useCallback, useEffect, useDeferredValue, useRef, useState } from "react";
 import { createNote, deleteNote, fetchNotes, updateNote } from "../api/noteApi";
 import { getApiErrorMessage } from "../api/apiClient";
 import { useError } from "../components/ErrorContext";
@@ -7,6 +7,21 @@ import "../css/Notes.css";
 
 const COLORS = ["sand", "coral", "sky", "mint", "lilac"];
 const EMPTY_NOTE = { id: null, title: "", content: "", color: "sand", pinned: false };
+const AUTOSAVE_DELAY_MS = 1200;
+const SAVED_CONFIRMATION_MS = 450;
+const EDITOR_EXIT_MS = 180;
+
+const noteSnapshot = ({ title, content, color, pinned }) =>
+  JSON.stringify({ title, content, color, pinned });
+
+const hasText = (note) => Boolean(note.title.trim() || note.content.trim());
+
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const sortNotes = (notes) =>
+  [...notes].sort(
+    (a, b) => Number(b.pinned) - Number(a.pinned) || new Date(b.updatedAt) - new Date(a.updatedAt),
+  );
 
 const NoteGlyph = ({ pinned }) => (
   <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -26,8 +41,21 @@ const Notes = () => {
   const [draft, setDraft] = useState(EMPTY_NOTE);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  // idle | saving | saved | error
+  const [saveStatus, setSaveStatus] = useState("idle");
+  // null | saving | confirmed | exiting
+  const [closePhase, setClosePhase] = useState(null);
   const deferredQuery = useDeferredValue(query.trim().toLowerCase());
+
+  const draftRef = useRef(EMPTY_NOTE);
+  draftRef.current = draft;
+  // Último contenido que el backend confirmó: evita peticiones si no ha cambiado nada.
+  const savedSnapshotRef = useRef(noteSnapshot(EMPTY_NOTE));
+  // Guardados en serie: una nota nueva no puede crearse dos veces con dos POST simultáneos.
+  const saveQueueRef = useRef(Promise.resolve());
+  const autosaveTimerRef = useRef(null);
+  const closingRef = useRef(false);
+  const editorSessionRef = useRef(0);
 
   useEffect(() => {
     const load = async () => {
@@ -48,50 +76,171 @@ const Notes = () => {
   );
 
   const openNote = (note) => {
+    const next = note ? { ...note } : { ...EMPTY_NOTE };
+    editorSessionRef.current += 1;
+    draftRef.current = next;
+    savedSnapshotRef.current = noteSnapshot(next);
+    setSaveStatus("idle");
     setSelected(note?.id ?? "new");
-    setDraft(note ? { ...note } : { ...EMPTY_NOTE });
+    setDraft(next);
   };
 
-  const closeEditor = () => {
+  // Una nota sin texto no se guarda: ni se crea vacía ni se borra lo que ya tenía.
+  const isDirty = (note) =>
+    hasText(note) && noteSnapshot(note) !== savedSnapshotRef.current;
+
+  const persistDraft = useCallback((requestOptions) => {
+    const run = async () => {
+      const current = draftRef.current;
+      if (!isDirty(current)) return;
+
+      const session = editorSessionRef.current;
+      setSaveStatus("saving");
+      const saved = current.id
+        ? await updateNote(current.id, current, requestOptions)
+        : await createNote(current, requestOptions);
+
+      setNotes((notesNow) =>
+        sortNotes([saved, ...notesNow.filter((note) => note.id !== saved.id)]),
+      );
+      if (session !== editorSessionRef.current) return;
+
+      savedSnapshotRef.current = noteSnapshot(current);
+      // Solo el id: lo que se esté escribiendo ahora mismo no se toca.
+      draftRef.current = { ...draftRef.current, id: saved.id };
+      setDraft((latest) => ({ ...latest, id: saved.id, updatedAt: saved.updatedAt }));
+      setSelected(saved.id);
+      setSaveStatus("saved");
+    };
+
+    const result = saveQueueRef.current.then(run);
+    saveQueueRef.current = result.catch(() => {});
+    return result;
+  }, []);
+
+  const finishClosing = useCallback(async () => {
+    setClosePhase("exiting");
+    const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    await wait(reducedMotion ? 0 : EDITOR_EXIT_MS);
+
+    editorSessionRef.current += 1;
+    draftRef.current = { ...EMPTY_NOTE };
+    savedSnapshotRef.current = noteSnapshot(EMPTY_NOTE);
+    closingRef.current = false;
+    setClosePhase(null);
+    setSaveStatus("idle");
     setSelected(null);
     setDraft({ ...EMPTY_NOTE });
-  };
+  }, []);
 
-  const saveDraft = async () => {
-    if (!draft.title.trim() && !draft.content.trim()) return;
-    setSaving(true);
-    try {
-      const saved = draft.id
-        ? await updateNote(draft.id, draft)
-        : await createNote(draft);
-      setNotes((current) => {
-        const withoutSaved = current.filter((note) => note.id !== saved.id);
-        return [saved, ...withoutSaved].sort(
-          (a, b) => Number(b.pinned) - Number(a.pinned) || new Date(b.updatedAt) - new Date(a.updatedAt),
-        );
-      });
-      setSelected(saved.id);
-      setDraft({ ...saved });
-    } catch (error) {
-      setErrorMessage(getApiErrorMessage(error));
-    } finally {
-      setSaving(false);
-    }
+  /**
+   * Salir siempre guarda, también con Esc o al pulsar fuera. Si el guardado falla el editor
+   * sigue abierto: cerrarlo perdería el texto.
+   */
+  const requestClose = useCallback(
+    async ({ confirmSaved = false } = {}) => {
+      if (closingRef.current) return;
+      closingRef.current = true;
+      clearTimeout(autosaveTimerRef.current);
+      setClosePhase("saving");
+
+      try {
+        await persistDraft();
+      } catch (_error) {
+        closingRef.current = false;
+        setClosePhase(null);
+        setSaveStatus("error");
+        return;
+      }
+
+      if (confirmSaved) {
+        setClosePhase("confirmed");
+        await wait(SAVED_CONFIRMATION_MS);
+      }
+      await finishClosing();
+    },
+    [finishClosing, persistDraft],
+  );
+
+  const closeWithoutSaving = () => {
+    if (closingRef.current) return;
+    closingRef.current = true;
+    clearTimeout(autosaveTimerRef.current);
+    savedSnapshotRef.current = noteSnapshot(draftRef.current);
+    finishClosing();
   };
 
   const removeDraft = async () => {
-    if (!draft.id) {
-      closeEditor();
-      return;
-    }
+    if (closingRef.current) return;
+    closingRef.current = true;
+    clearTimeout(autosaveTimerRef.current);
+    setClosePhase("saving");
+
+    // Un POST en curso puede estar a punto de darle su id a la nota.
+    await saveQueueRef.current;
+    const current = draftRef.current;
+
     try {
-      await deleteNote(draft.id);
-      setNotes((current) => current.filter((note) => note.id !== draft.id));
-      closeEditor();
+      if (current.id) {
+        await deleteNote(current.id);
+        setNotes((notesNow) => notesNow.filter((note) => note.id !== current.id));
+      }
+      savedSnapshotRef.current = noteSnapshot(current);
+      await finishClosing();
     } catch (error) {
+      closingRef.current = false;
+      setClosePhase(null);
       setErrorMessage(getApiErrorMessage(error));
     }
   };
+
+  useEffect(() => {
+    if (selected === null || closingRef.current || !isDirty(draft)) return undefined;
+
+    autosaveTimerRef.current = setTimeout(() => {
+      persistDraft().catch(() => setSaveStatus("error"));
+    }, AUTOSAVE_DELAY_MS);
+
+    return () => clearTimeout(autosaveTimerRef.current);
+  }, [draft, persistDraft, selected]);
+
+  useEffect(() => {
+    if (selected === null) return undefined;
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") requestClose();
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [requestClose, selected]);
+
+  // Salidas sin pasar por el editor: cambio de ruta o cierre de la ventana.
+  useEffect(() => {
+    const flush = () => {
+      clearTimeout(autosaveTimerRef.current);
+      persistDraft({ keepalive: true }).catch(() => {});
+    };
+
+    window.addEventListener("pagehide", flush);
+    return () => {
+      window.removeEventListener("pagehide", flush);
+      flush();
+    };
+  }, [persistDraft]);
+
+  const isClosing = closePhase !== null;
+  const isSaveConfirmed = closePhase === "confirmed" || closePhase === "exiting";
+  const saveStatusLabel =
+    isSaveConfirmed
+      ? ""
+      : saveStatus === "saving"
+        ? t.commonSaving
+        : saveStatus === "error"
+          ? t.notesSaveFailed
+          : saveStatus === "saved" && !isDirty(draft)
+            ? t.notesSaved
+            : "";
 
   const formatDate = (value) =>
     new Intl.DateTimeFormat(language === "es" ? "es-ES" : "en-US", {
@@ -151,10 +300,13 @@ const Notes = () => {
       )}
 
       {selected !== null && (
-        <div className="noteEditorOverlay" onMouseDown={(event) => event.target === event.currentTarget && closeEditor()}>
+        <div
+          className={`noteEditorOverlay ${closePhase === "exiting" ? "is-closing" : ""}`}
+          onMouseDown={(event) => event.target === event.currentTarget && requestClose()}
+        >
           <section className={`noteEditor note-${draft.color}`} aria-modal="true" role="dialog">
             <header>
-              <button className="noteEditorClose" onClick={closeEditor} aria-label={t.commonCancel}>×</button>
+              <button className="noteEditorClose" onClick={() => requestClose()} aria-label={t.notesClose} title={t.notesClose}>×</button>
               <div className="noteColorPicker">
                 {COLORS.map((color) => (
                   <button
@@ -177,20 +329,46 @@ const Notes = () => {
               value={draft.title}
               maxLength={180}
               autoFocus
+              readOnly={isClosing}
               onChange={(event) => setDraft((current) => ({ ...current, title: event.target.value }))}
               placeholder={t.notesTitlePlaceholder}
             />
             <textarea
               value={draft.content}
               maxLength={50000}
+              readOnly={isClosing}
               onChange={(event) => setDraft((current) => ({ ...current, content: event.target.value }))}
               placeholder={t.notesBodyPlaceholder}
             />
             <footer>
               <button className="noteDeleteButton" onClick={removeDraft}>{t.commonDelete}</button>
-              <span>{draft.content.length.toLocaleString()} {t.notesCharacters}</span>
-              <button className="noteSaveButton" disabled={saving || (!draft.title.trim() && !draft.content.trim())} onClick={saveDraft}>
-                {saving ? t.commonSaving : t.commonSave}
+              {saveStatus === "error" && (
+                <button className="noteDiscardButton" onClick={closeWithoutSaving}>{t.notesCloseWithoutSaving}</button>
+              )}
+              <div className="noteEditorMeta">
+                <span>{draft.content.length.toLocaleString()} {t.notesCharacters}</span>
+                <span
+                  className={`noteSaveStatus ${saveStatus === "error" ? "is-error" : ""}`}
+                  role="status"
+                >
+                  {saveStatusLabel}
+                </span>
+              </div>
+              <button
+                className={`noteSaveButton ${isSaveConfirmed ? "is-saved" : ""}`}
+                disabled={isClosing || !hasText(draft)}
+                onClick={() => requestClose({ confirmSaved: true })}
+              >
+                {isSaveConfirmed ? (
+                  <>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5" /></svg>
+                    {t.notesSaved}
+                  </>
+                ) : closePhase === "saving" ? (
+                  t.commonSaving
+                ) : (
+                  t.commonSave
+                )}
               </button>
             </footer>
           </section>
