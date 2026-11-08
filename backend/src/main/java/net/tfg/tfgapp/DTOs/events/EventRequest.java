@@ -20,6 +20,8 @@ public class EventRequest {
     private String location;
     private Event.EventCategory category;
     private Boolean isAllDay;
+    // Null: se conserva el valor actual (p. ej. al arrastrar un evento).
+    private Boolean showInMonthView;
     private List<Integer> reminderMinutesBeforeList;
     private Long targetUserId;
     private List<Long> targetUserIds;

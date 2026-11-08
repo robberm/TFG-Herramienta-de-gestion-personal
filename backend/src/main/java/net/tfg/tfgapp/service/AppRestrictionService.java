@@ -39,7 +39,7 @@ public class AppRestrictionService {
     }
 
     private boolean shouldEnforceRestrictions() {
-        return blockingService.isEffectiveFocusModeEnabled();
+        return blockingService.areRestrictionsEnforced();
     }
 
     private void enforceRestrictions() {

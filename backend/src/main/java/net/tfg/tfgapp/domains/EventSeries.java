@@ -40,6 +40,8 @@ public class EventSeries {
     @Column(nullable = false)
     private Event.EventCategory category;
     private Boolean isAllDay;
+    @Column(nullable = false)
+    private boolean showInMonthView = true;
     // Inicio y fin de la primera ocurrencia: fijan la fecha ancla, la hora y la duración.
     @Column(nullable = false)
     private LocalDateTime startTime;

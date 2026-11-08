@@ -165,6 +165,60 @@ class EventSeriesServiceTest {
         verify(seriesRepo).delete(series);
     }
 
+    @Test
+    void seriesAreShownInMonthViewUnlessTheUserHidesThem() {
+        assertThat(service.createSeries(request("DAILY", null), List.of(owner), null).orElseThrow().isShowInMonthView())
+                .isTrue();
+
+        EventRequest hidden = request("DAILY", null);
+        hidden.setShowInMonthView(false);
+        EventSeries series = service.createSeries(hidden, List.of(owner), null).orElseThrow();
+
+        assertThat(series.isShowInMonthView()).isFalse();
+        assertThat(service.occurrencesInRange(List.of(series), LocalDateTime.of(2026, 8, 9, 0, 0),
+                LocalDateTime.of(2026, 8, 10, 0, 0), 7L).get(0).showInMonthView()).isFalse();
+    }
+
+    @Test
+    void movingAnOccurrenceOfAHiddenSeriesKeepsItHidden() {
+        EventRequest hidden = request("DAILY", null);
+        hidden.setShowInMonthView(false);
+        EventSeries series = service.createSeries(hidden, List.of(owner), null).orElseThrow();
+        when(eventService.save(any(Event.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        doCallRealMethod().when(eventService).applyEventDetails(any(), any());
+
+        // Arrastrar un evento no envía showInMonthView.
+        Event moved = service.editOccurrence(series, LocalDate.of(2026, 8, 11), request("NONE", null));
+
+        assertThat(moved.isShowInMonthView()).isFalse();
+    }
+
+    @Test
+    void hidingASeriesAlsoHidesItsEditedOccurrences() {
+        EventSeries series = service.createSeries(request("DAILY", null), List.of(owner), null).orElseThrow();
+        Event edited = new Event();
+        when(eventRepo.findBySeries_Id(1L)).thenReturn(List.of(edited));
+
+        EventRequest hidden = request("DAILY", null);
+        hidden.setShowInMonthView(false);
+        service.updateSeries(series, hidden, List.of(owner), null);
+
+        assertThat(series.isShowInMonthView()).isFalse();
+        assertThat(edited.isShowInMonthView()).isFalse();
+    }
+
+    @Test
+    void updatingASeriesWithoutTheFlagKeepsItsVisibility() {
+        EventRequest hidden = request("DAILY", null);
+        hidden.setShowInMonthView(false);
+        EventSeries series = service.createSeries(hidden, List.of(owner), null).orElseThrow();
+        when(eventRepo.findBySeries_Id(1L)).thenReturn(List.of());
+
+        service.updateSeries(series, request("DAILY", null), List.of(owner), null);
+
+        assertThat(series.isShowInMonthView()).isFalse();
+    }
+
     private EventRequest request(String recurrenceType, LocalDate until) {
         EventRequest request = new EventRequest();
         request.setTitle("Gimnasio");
