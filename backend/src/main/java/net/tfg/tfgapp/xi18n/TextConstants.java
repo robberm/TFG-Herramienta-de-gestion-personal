@@ -52,7 +52,7 @@ public final class TextConstants {
             Map.entry("ai.answerTooLong", "The answer is too long."),
             Map.entry("ai.topicTooLong", "A topic is too long (max 60 characters)."),
             Map.entry("ai.topicsEmpty", "Choose at least one topic."),
-            Map.entry("ai.topicsTooMany", "Too many topics (max 12).")));
+            Map.entry("ai.topicsTooMany", "Too many topics (max 12)."));
 
     public static final Map<String, String> ES = Map.ofEntries(
             Map.entry("auth.login.invalidCredentials", "Usuario o contraseña inválida."),
@@ -99,5 +99,5 @@ public final class TextConstants {
             Map.entry("ai.answerTooLong", "La respuesta es demasiado larga."),
             Map.entry("ai.topicTooLong", "Un tema es demasiado largo (máximo 60 caracteres)."),
             Map.entry("ai.topicsEmpty", "Elige al menos un tema."),
-            Map.entry("ai.topicsTooMany", "Demasiados temas (máximo 12).")));
+            Map.entry("ai.topicsTooMany", "Demasiados temas (máximo 12)."));
 }
