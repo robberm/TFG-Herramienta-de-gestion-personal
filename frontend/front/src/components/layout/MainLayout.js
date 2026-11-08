@@ -127,12 +127,38 @@ const UsersIcon = () => (
   </svg>
 );
 
+const MenuToggleIcon = () => (
+  <svg className="menuIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M4 6.5H20M4 12H20M4 17.5H20"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+    />
+  </svg>
+);
+
+const SIDEBAR_COLLAPSED_STORAGE_KEY = "sidebarCollapsed";
+
 const MainLayout = ({ children }) => {
   const { t } = useLanguage();
   const location = useLocation();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(
+    () => localStorage.getItem(SIDEBAR_COLLAPSED_STORAGE_KEY) === "true",
+  );
 
   const showSidebar = location.pathname !== "/";
+
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed((collapsed) => {
+      localStorage.setItem(SIDEBAR_COLLAPSED_STORAGE_KEY, String(!collapsed));
+      return !collapsed;
+    });
+  };
+
+  // Con la barra plegada solo se ven los iconos: el title muestra el nombre al pasar el ratón.
+  const getNavTitle = (label) => (isSidebarCollapsed ? label : undefined);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -155,39 +181,49 @@ const MainLayout = ({ children }) => {
         {isElectronEnvironment && <WindowTitleBar />}
 
         <div className="homeFrame">
-          <aside className="sideBar">
+          <aside className={`sideBar ${isSidebarCollapsed ? "collapsed" : ""}`}>
             <div className="menuHeader">
+              <button
+                type="button"
+                className="sidebarToggle"
+                onClick={toggleSidebar}
+                aria-label={isSidebarCollapsed ? t.menuExpand : t.menuCollapse}
+                aria-expanded={!isSidebarCollapsed}
+                title={isSidebarCollapsed ? t.menuExpand : t.menuCollapse}
+              >
+                <MenuToggleIcon />
+              </button>
               <h3>{t.menuTitle}</h3>
             </div>
 
             <nav className="menuItems">
-              <NavLink to="/home">
+              <NavLink to="/home" title={getNavTitle(t.menuHome)}>
                 <HomeIcon />
                 <span className="menuLabel">{t.menuHome}</span>
               </NavLink>
 
-              <NavLink to="/calendar">
+              <NavLink to="/calendar" title={getNavTitle(t.menuCalendar)}>
                 <CalendarIcon />
                 <span className="menuLabel">{t.menuCalendar}</span>
               </NavLink>
 
-              <NavLink to="/notes">
+              <NavLink to="/notes" title={getNavTitle(t.menuNotes)}>
                 <NotesIcon />
                 <span className="menuLabel">{t.menuNotes}</span>
               </NavLink>
 
-              <NavLink to="/objectives">
+              <NavLink to="/objectives" title={getNavTitle(t.menuObjectives)}>
                 <ObjectivesIcon />
                 <span className="menuLabel">{t.menuObjectives}</span>
               </NavLink>
 
               {isAdmin ? (
-                <NavLink to="/admin">
+                <NavLink to="/admin" title={getNavTitle(t.menuUsers)}>
                   <UsersIcon />
                   <span className="menuLabel">{t.menuUsers}</span>
                 </NavLink>
               ) : (
-                <NavLink to="/block">
+                <NavLink to="/block" title={getNavTitle(t.menuBlock)}>
                   <BlockIcon />
                   <span className="menuLabel">{t.menuBlock}</span>
                 </NavLink>
