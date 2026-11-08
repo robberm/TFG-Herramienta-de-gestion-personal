@@ -38,7 +38,21 @@ public final class TextConstants {
             Map.entry("errors.profile.update", "Unable to update profile image."),
             Map.entry("errors.profile.delete", "Unable to delete profile image."),
             Map.entry("errors.username.update", "Unable to update username."),
-            Map.entry("errors.password.update", "Unable to update password."));
+            Map.entry("errors.password.update", "Unable to update password."),
+            Map.entry("ai.invalidConfiguration", "Your AI provider rejected the API key or model. Check them in Settings."),
+            Map.entry("ai.unavailable", "Couldn't reach your AI provider. Try again in a moment."),
+            Map.entry("ai.badResponse", "The AI returned an unexpected response. Try again."),
+            Map.entry("ai.notConfigured", "Set up an AI provider in Settings first."),
+            Map.entry("ai.messageEmpty", "The message can't be empty."),
+            Map.entry("ai.messageTooLong", "The message is too long."),
+            Map.entry("ai.memoryNotFound", "Memory not found."),
+            Map.entry("ai.questionNotFound", "Question not found."),
+            Map.entry("ai.questionAnswered", "This question has already been answered."),
+            Map.entry("ai.answerEmpty", "The answer can't be empty."),
+            Map.entry("ai.answerTooLong", "The answer is too long."),
+            Map.entry("ai.topicTooLong", "A topic is too long (max 60 characters)."),
+            Map.entry("ai.topicsEmpty", "Choose at least one topic."),
+            Map.entry("ai.topicsTooMany", "Too many topics (max 12).")));
 
     public static final Map<String, String> ES = Map.ofEntries(
             Map.entry("auth.login.invalidCredentials", "Usuario o contraseña inválida."),
@@ -71,5 +85,19 @@ public final class TextConstants {
             Map.entry("errors.profile.update", "No se pudo actualizar la foto de perfil."),
             Map.entry("errors.profile.delete", "No se pudo eliminar la foto."),
             Map.entry("errors.username.update", "No se pudo actualizar el username."),
-            Map.entry("errors.password.update", "No se pudo actualizar la contraseña."));
+            Map.entry("errors.password.update", "No se pudo actualizar la contraseña."),
+            Map.entry("ai.invalidConfiguration", "Tu proveedor de IA rechazó la clave o el modelo. Revísalos en Ajustes."),
+            Map.entry("ai.unavailable", "No se pudo contactar con tu proveedor de IA. Inténtalo en un momento."),
+            Map.entry("ai.badResponse", "La IA devolvió una respuesta inesperada. Inténtalo de nuevo."),
+            Map.entry("ai.notConfigured", "Primero configura un proveedor de IA en Ajustes."),
+            Map.entry("ai.messageEmpty", "El mensaje no puede estar vacío."),
+            Map.entry("ai.messageTooLong", "El mensaje es demasiado largo."),
+            Map.entry("ai.memoryNotFound", "Recuerdo no encontrado."),
+            Map.entry("ai.questionNotFound", "Pregunta no encontrada."),
+            Map.entry("ai.questionAnswered", "Esta pregunta ya está contestada."),
+            Map.entry("ai.answerEmpty", "La respuesta no puede estar vacía."),
+            Map.entry("ai.answerTooLong", "La respuesta es demasiado larga."),
+            Map.entry("ai.topicTooLong", "Un tema es demasiado largo (máximo 60 caracteres)."),
+            Map.entry("ai.topicsEmpty", "Elige al menos un tema."),
+            Map.entry("ai.topicsTooMany", "Demasiados temas (máximo 12).")));
 }

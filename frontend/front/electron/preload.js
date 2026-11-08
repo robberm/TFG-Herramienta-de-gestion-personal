@@ -51,6 +51,14 @@ contextBridge.exposeInMainWorld("electronAPI", {
     relaunch: () => ipcRenderer.send("graphics:relaunch"),
   },
 
+  /** Proveedor de IA guardado en %APPDATA%/GMO/ai.json (clave cifrada con safeStorage). */
+  ai: {
+    getSettings: () => ipcRenderer.invoke("ai:get-settings"),
+    saveSettings: (settings) => ipcRenderer.invoke("ai:save-settings", settings),
+    clearSettings: () => ipcRenderer.invoke("ai:clear-settings"),
+    getCredentials: () => ipcRenderer.invoke("ai:get-credentials"),
+  },
+
   isWindowMaximized: () => ipcRenderer.invoke("window:is-maximized"),
 
   showReminderWindow: (reminder) =>
