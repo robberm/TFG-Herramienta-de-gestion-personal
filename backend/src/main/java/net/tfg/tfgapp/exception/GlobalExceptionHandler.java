@@ -2,6 +2,7 @@ package net.tfg.tfgapp.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import net.tfg.tfgapp.DTOs.errors.ApiErrorResponse;
+import net.tfg.tfgapp.components.ai.AiProviderException;
 import net.tfg.tfgapp.xi18n.LanguageResolver;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -72,6 +73,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleSecurity(SecurityException ex,
                                                            HttpServletRequest request) {
         return buildResponse(HttpStatus.FORBIDDEN, ex.getMessage(), request, null);
+    }
+
+    /**
+     * Fallos del proveedor de IA del usuario. El detalle del proveedor (p. ej. "model not
+     * found") va en details para que el usuario pueda corregir su configuración.
+     */
+    @ExceptionHandler(AiProviderException.class)
+    public ResponseEntity<ApiErrorResponse> handleAiProvider(AiProviderException ex, HttpServletRequest request) {
+        return switch (ex.getKind()) {
+            case INVALID_CONFIGURATION -> buildResponse(HttpStatus.UNPROCESSABLE_ENTITY, "ai.invalidConfiguration",
+                    request, Map.of("provider", ex.getMessage()));
+            case UNAVAILABLE -> buildResponse(HttpStatus.SERVICE_UNAVAILABLE, "ai.unavailable", request, null);
+            case BAD_RESPONSE -> buildResponse(HttpStatus.BAD_GATEWAY, "ai.badResponse", request, null);
+        };
     }
 
     @ExceptionHandler(DateTimeException.class)

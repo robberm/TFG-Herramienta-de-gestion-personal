@@ -1,0 +1,141 @@
+/* ============================================
+   HOME - ASISTENTE DE IA
+   ============================================ */
+
+.assistantPanel {
+  margin-top: 24px;
+  padding: 20px 22px;
+  border-radius: 16px;
+  border: 1px solid var(--border-color, #e9e5e0);
+  background-color: var(--bg-page);
+  box-sizing: border-box;
+}
+
+.assistantHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.assistantHeader h2 {
+  margin: 0;
+  font-size: 20px;
+  color: var(--text-main);
+}
+
+.assistantSubtitle {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.assistantMessages {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 380px;
+  overflow-y: auto;
+  padding: 4px 2px;
+}
+
+.assistantEmpty {
+  margin: 8px 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.assistantMessage {
+  max-width: 82%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-main);
+}
+
+.assistantMessage p {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.assistantMessage.user {
+  align-self: flex-end;
+  background: var(--link-active-bg);
+  color: var(--link-active-text);
+}
+
+.assistantMessage.assistant {
+  align-self: flex-start;
+  background: var(--ui-control);
+}
+
+.assistantMessage.thinking {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.assistantRemembered {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.assistantComposer {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.assistantComposer input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--panel-border);
+  background: var(--ui-control);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 14px;
+}
+
+.assistantSend {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  background: var(--link-active-bg);
+  color: var(--link-active-text);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.assistantSend:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.assistantNotice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.assistantNotice p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.assistantError {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--event-mandatory-color);
+}

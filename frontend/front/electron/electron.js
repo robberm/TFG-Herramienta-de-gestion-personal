@@ -7,6 +7,7 @@ const {
   dialog,
   nativeTheme,
   desktopCapturer,
+  shell,
 } = require("electron");
 const path = require("path");
 const os = require("os");
@@ -24,6 +25,12 @@ const {
   buildChildEnv,
 } = require("./runtimeConfig");
 const { loadGraphicsSettings, saveGraphicsSettings } = require("./graphicsSettings");
+const {
+  getAiSettings,
+  saveAiSettings,
+  clearAiSettings,
+  getAiCredentials,
+} = require("./aiSettings");
 
 // La aceleración por hardware solo se puede desactivar antes de app.ready, así que se lee
 // aquí. `hardwareAccelerationActive` es la de ESTA ejecución; si el usuario la cambia, se
@@ -1152,6 +1159,12 @@ ipcMain.on("graphics:relaunch", () => {
   app.relaunch();
   app.quit();
 });
+
+// Proveedor de IA: la clave vive cifrada en este PC (ver aiSettings.js).
+ipcMain.handle("ai:get-settings", () => getAiSettings(app));
+ipcMain.handle("ai:save-settings", (_event, settings) => saveAiSettings(app, settings));
+ipcMain.handle("ai:clear-settings", () => clearAiSettings(app));
+ipcMain.handle("ai:get-credentials", () => getAiCredentials(app));
 
 ipcMain.on("show-reminder-window", (_event, reminder) => {
   createReminderWindow(reminder);
