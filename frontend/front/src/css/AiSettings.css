@@ -84,3 +84,68 @@
 .aiMemoryList button:hover {
   color: var(--event-mandatory-color);
 }
+
+/* Estado del CLI local (Claude Code / Codex) */
+.aiCliPanel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 4px 0 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+}
+
+.aiCliPanel .settingsHint {
+  margin: 0;
+}
+
+.aiCliState {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-main);
+}
+
+.aiCliDot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--text-secondary);
+}
+
+.aiCliState.ok .aiCliDot {
+  background: #3fb950;
+}
+
+.aiCliState.warning .aiCliDot {
+  background: #d29922;
+}
+
+.aiCliState.error .aiCliDot {
+  background: #f85149;
+}
+
+.aiCliState.pending .aiCliDot {
+  animation: aiCliPulse 1.2s ease-in-out infinite;
+}
+
+.aiCliPanel code {
+  overflow-wrap: anywhere;
+}
+
+@keyframes aiCliPulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aiCliState.pending .aiCliDot {
+    animation: none;
+  }
+}

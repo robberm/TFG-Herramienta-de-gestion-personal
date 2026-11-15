@@ -30,6 +30,7 @@ const {
   saveAiSettings,
   clearAiSettings,
   getAiCredentials,
+  openCliLogin,
 } = require("./aiSettings");
 
 // La aceleración por hardware solo se puede desactivar antes de app.ready, así que se lee
@@ -1231,6 +1232,7 @@ ipcMain.handle("ai:get-settings", () => getAiSettings(app));
 ipcMain.handle("ai:save-settings", (_event, settings) => saveAiSettings(app, settings));
 ipcMain.handle("ai:clear-settings", () => clearAiSettings(app));
 ipcMain.handle("ai:get-credentials", () => getAiCredentials(app));
+ipcMain.handle("ai:open-cli-login", (_event, provider) => openCliLogin(provider));
 
 ipcMain.on("show-reminder-window", (_event, reminder) => {
   createReminderWindow(reminder);

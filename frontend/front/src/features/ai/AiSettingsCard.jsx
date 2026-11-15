@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import "../../css/AiSettings.css";
 import CustomSelectDropdown from "../../components/shared/CustomSelectDropdown";
 import { useLanguage } from "../../context/languageContext";
@@ -9,9 +9,11 @@ import {
   clearAiSettings,
   deleteAiMemory,
   fetchAiMemories,
+  fetchCliStatus,
   fetchLearningTopics,
   getAiSettings,
   isAiSupported,
+  openCliLogin,
   saveAiSettings,
   saveLearningTopics,
   testAiConnection,
@@ -31,6 +33,97 @@ const StatusMessage = ({ status }) =>
   status ? (
     <p className={`accountMessage ${status.error ? "error" : "success"}`}>{status.text}</p>
   ) : null;
+
+/**
+ * Estado del CLI (Claude Code / Codex) en este PC: instalado, sesión iniciada y botón
+ * para abrir el login en una terminal. Tras iniciar sesión el usuario pulsa "Comprobar".
+ */
+const CliStatusPanel = ({ provider, t }) => {
+  const [status, setStatus] = useState(null);
+  const [isChecking, setIsChecking] = useState(true);
+  const [error, setError] = useState("");
+  const [loginOpened, setLoginOpened] = useState(false);
+
+  const check = useCallback(async () => {
+    setIsChecking(true);
+    setError("");
+    try {
+      setStatus(await fetchCliStatus(provider.id));
+    } catch (checkError) {
+      setStatus(null);
+      setError(getApiErrorMessage(checkError));
+    } finally {
+      setIsChecking(false);
+    }
+  }, [provider.id]);
+
+  useEffect(() => {
+    check();
+  }, [check]);
+
+  const handleLogin = async () => {
+    setError("");
+    try {
+      await openCliLogin(provider.id);
+      setLoginOpened(true);
+    } catch (loginError) {
+      setError(loginError?.message || String(loginError));
+    }
+  };
+
+  let stateClass = "pending";
+  let stateText = t.aiCliChecking;
+  if (!isChecking && status) {
+    if (!status.installed) {
+      stateClass = "error";
+      stateText = t.aiCliNotInstalled;
+    } else if (!status.loggedIn) {
+      stateClass = "warning";
+      stateText = t.aiCliLoggedOut;
+    } else {
+      stateClass = "ok";
+      stateText = t.aiCliReady;
+    }
+  } else if (!isChecking && error) {
+    stateClass = "error";
+    stateText = t.aiCliCheckFailed;
+  }
+
+  return (
+    <div className="aiCliPanel" aria-live="polite">
+      <p className={`aiCliState ${stateClass}`}>
+        <span className="aiCliDot" aria-hidden="true" />
+        {stateText}
+      </p>
+
+      {status && !status.installed && (
+        <p className="settingsHint">
+          {t.aiCliInstallHint} <code>{provider.installCommand}</code>
+        </p>
+      )}
+      {status?.installed && !status.loggedIn && (
+        <p className="settingsHint">
+          {t.aiCliLoginHint} <code>{status.loginCommand}</code>
+        </p>
+      )}
+      {loginOpened && !status?.loggedIn && <p className="settingsHint">{t.aiCliLoginOpened}</p>}
+      {status?.loggedIn && status.detail && <p className="settingsHint">{status.detail}</p>}
+      {error && <p className="accountMessage error">{error}</p>}
+
+      <div className="aiSettingsActions">
+        {status?.installed && !status.loggedIn && (
+          <button type="button" className="settingsButton primary" onClick={handleLogin}>
+            {t.aiCliLogin}
+          </button>
+        )}
+        <button type="button" className="settingsButton secondary" onClick={check} disabled={isChecking}>
+          {t.aiCliRecheck}
+        </button>
+      </div>
+      <p className="settingsHint">{t.aiCliUsageNote}</p>
+    </div>
+  );
+};
 
 /**
  * Ajustes del asistente: proveedor y clave (solo en este PC), temas de la pregunta
@@ -80,7 +173,10 @@ const AiSettingsCard = () => {
   }
 
   const providerInfo = AI_PROVIDERS.find((item) => item.id === provider) || AI_PROVIDERS[0];
+  const isCli = Boolean(providerInfo.cli);
   const keyIsSavedForProvider = settings?.hasKey && settings?.provider === provider;
+  // Los proveedores de CLI no llevan clave: basta con elegirlos y guardar.
+  const canSave = isCli || Boolean(apiKey.trim()) || keyIsSavedForProvider;
 
   const runProviderAction = async (action) => {
     setIsBusy(true);
@@ -109,6 +205,7 @@ const AiSettingsCard = () => {
         setSettings(await saveAiSettings({ provider, model, apiKey }));
         setApiKey("");
       }
+      if (isCli) setProviderStatus({ error: false, text: t.aiCliTesting });
       await testAiConnection();
       setProviderStatus({ error: false, text: t.aiTestOk });
     });
@@ -187,13 +284,22 @@ const AiSettingsCard = () => {
           className="settingsInput"
           value={model}
           onChange={(event) => setModel(event.target.value)}
-          placeholder={providerInfo.defaultModel}
+          placeholder={providerInfo.defaultModel || t.aiCliDefaultModel}
         />
         <p className="settingsHint">
-          {t.aiModelHint} <code>{providerInfo.defaultModel}</code>
+          {isCli ? (
+            t.aiCliModelHint
+          ) : (
+            <>
+              {t.aiModelHint} <code>{providerInfo.defaultModel}</code>
+            </>
+          )}
         </p>
       </div>
 
+      {isCli && <CliStatusPanel key={provider} provider={providerInfo} t={t} />}
+
+      {!isCli && (
       <div className="settingsFieldGroup">
         <label className="settingsFieldLabel" htmlFor="aiApiKey">
           {t.aiApiKey}
@@ -212,13 +318,14 @@ const AiSettingsCard = () => {
           <p className="settingsHint">{t.aiEncryptionUnavailable}</p>
         )}
       </div>
+      )}
 
       <div className="aiSettingsActions">
         <button
           type="button"
           className="settingsButton primary"
           onClick={handleSave}
-          disabled={isBusy || (!apiKey.trim() && !keyIsSavedForProvider)}
+          disabled={isBusy || !canSave}
         >
           {t.aiSave}
         </button>
@@ -226,13 +333,13 @@ const AiSettingsCard = () => {
           type="button"
           className="settingsButton secondary"
           onClick={handleTest}
-          disabled={isBusy || (!apiKey.trim() && !keyIsSavedForProvider)}
+          disabled={isBusy || !canSave}
         >
           {t.aiTest}
         </button>
-        {settings?.hasKey && (
+        {(settings?.configured ?? settings?.hasKey) && (
           <button type="button" className="settingsButton danger" onClick={handleRemove} disabled={isBusy}>
-            {t.aiRemove}
+            {settings?.hasKey ? t.aiRemove : t.aiDisconnect}
           </button>
         )}
       </div>

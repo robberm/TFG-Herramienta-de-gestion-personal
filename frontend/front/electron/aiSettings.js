@@ -6,9 +6,13 @@ const { safeStorage } = require("electron");
  * Proveedor de IA del usuario. La clave de API se cifra con safeStorage (DPAPI en Windows,
  * ligada a la cuenta de Windows) y se guarda en %APPDATA%/GMO/ai.json: nunca se manda a la
  * BD compartida. El backend local la recibe por cabecera solo cuando la necesita.
+ * Claude Code y Codex no tienen clave: el backend ejecuta su CLI con la sesión del usuario.
  */
 const FILE_NAME = "ai.json";
-const PROVIDERS = ["OPENAI", "ANTHROPIC", "GEMINI"];
+const PROVIDERS = ["OPENAI", "ANTHROPIC", "GEMINI", "CLAUDE_CODE", "CODEX"];
+/** Usan la suscripción con la que se haya iniciado sesión en su CLI: no hay clave. */
+const CLI_PROVIDERS = ["CLAUDE_CODE", "CODEX"];
+const usesLocalCli = (provider) => CLI_PROVIDERS.includes(provider);
 
 const getSettingsPath = (app) => path.join(app.getPath("userData"), FILE_NAME);
 
@@ -39,6 +43,8 @@ function getAiSettings(app) {
     provider: stored.provider,
     model: stored.model,
     hasKey: Boolean(stored.encryptedKey),
+    // Listo para usarse: con clave o, en los proveedores de CLI, solo con elegirlo.
+    configured: Boolean(stored.provider) && (usesLocalCli(stored.provider) || Boolean(stored.encryptedKey)),
     encryptionAvailable: safeStorage.isEncryptionAvailable(),
   };
 }
@@ -52,7 +58,9 @@ function saveAiSettings(app, { provider, model, apiKey } = {}) {
   let encryptedKey = provider === stored.provider ? stored.encryptedKey : null;
 
   const trimmedKey = typeof apiKey === "string" ? apiKey.trim() : "";
-  if (trimmedKey) {
+  if (usesLocalCli(provider)) {
+    encryptedKey = null;
+  } else if (trimmedKey) {
     if (!safeStorage.isEncryptionAvailable()) {
       // Sin cifrado del sistema no se guarda la clave en claro.
       throw new Error("El cifrado del sistema no está disponible en este equipo.");
@@ -80,6 +88,9 @@ function clearAiSettings(app) {
 /** Credenciales descifradas para las cabeceras X-AI-*; null si no hay clave utilizable. */
 function getAiCredentials(app) {
   const stored = readStored(app);
+  if (usesLocalCli(stored.provider)) {
+    return { provider: stored.provider, model: stored.model, apiKey: "" };
+  }
   if (!stored.provider || !stored.encryptedKey || !safeStorage.isEncryptionAvailable()) {
     return null;
   }
@@ -92,4 +103,30 @@ function getAiCredentials(app) {
   }
 }
 
-module.exports = { getAiSettings, saveAiSettings, clearAiSettings, getAiCredentials };
+/**
+ * Abre una terminal con el login del CLI (Claude Code o Codex). El login es interactivo
+ * (abre el navegador y a veces pide pegar un código), así que el usuario lo hace en una
+ * terminal visible y luego vuelve a comprobar el estado desde Ajustes.
+ */
+function openCliLogin(provider) {
+  if (!usesLocalCli(provider)) {
+    throw new Error("Proveedor de IA no válido.");
+  }
+  const command = provider === "CLAUDE_CODE" ? ["claude", "auth", "login"] : ["codex", "login"];
+  const { spawn } = require("child_process");
+  const detachedOptions = { detached: true, stdio: "ignore" };
+
+  if (process.platform === "win32") {
+    // "start" abre una consola nueva; cmd /k la deja abierta para leer el resultado.
+    // Argumentos sueltos (sin espacios) para que no se interpreten como título de ventana.
+    spawn("cmd.exe", ["/c", "start", "cmd", "/k", ...command], detachedOptions).unref();
+  } else if (process.platform === "darwin") {
+    const script = `tell application "Terminal" to do script "${command.join(" ")}"`;
+    spawn("osascript", ["-e", script, "-e", 'tell application "Terminal" to activate'], detachedOptions).unref();
+  } else {
+    spawn("x-terminal-emulator", ["-e", ...command], detachedOptions).unref();
+  }
+  return { command: command.join(" ") };
+}
+
+module.exports = { getAiSettings, saveAiSettings, clearAiSettings, getAiCredentials, openCliLogin };

@@ -18,7 +18,8 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Cliente mínimo para los tres proveedores que puede elegir el usuario. Se habla con sus
+ * Cliente mínimo para los proveedores con API que puede elegir el usuario (los de CLI local
+ * se delegan en {@link LocalCliClient}). Se habla con sus
  * APIs REST directamente (sin SDKs) porque solo se necesita "prompt de sistema + mensajes
  * → texto", y así añadir un proveedor es añadir un método.
  *
@@ -32,10 +33,12 @@ public class AiProviderClient {
     private static final String ANTHROPIC_FALLBACK_BETA = "server-side-fallback-2026-07-01";
 
     private final ObjectMapper objectMapper;
+    private final LocalCliClient localCliClient;
     private final HttpClient httpClient = HttpClient.newBuilder().connectTimeout(CONNECT_TIMEOUT).build();
 
-    public AiProviderClient(ObjectMapper objectMapper) {
+    public AiProviderClient(ObjectMapper objectMapper, LocalCliClient localCliClient) {
         this.objectMapper = objectMapper;
+        this.localCliClient = localCliClient;
     }
 
     public record Message(String role, String content) {
@@ -57,6 +60,8 @@ public class AiProviderClient {
             case OPENAI -> callOpenAi(credentials, system, messages, maxTokens);
             case ANTHROPIC -> callAnthropic(credentials, system, messages, maxTokens);
             case GEMINI -> callGemini(credentials, system, messages, maxTokens);
+            // Los CLI no admiten un límite de tokens de salida; el prompt ya pide respuestas cortas.
+            case CLAUDE_CODE, CODEX -> localCliClient.complete(credentials, system, messages);
         };
         return parseJsonObject(text);
     }

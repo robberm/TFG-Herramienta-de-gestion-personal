@@ -57,6 +57,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     saveSettings: (settings) => ipcRenderer.invoke("ai:save-settings", settings),
     clearSettings: () => ipcRenderer.invoke("ai:clear-settings"),
     getCredentials: () => ipcRenderer.invoke("ai:get-credentials"),
+    /** Abre una terminal con "claude auth login" o "codex login". */
+    openCliLogin: (provider) => ipcRenderer.invoke("ai:open-cli-login", provider),
   },
 
   isWindowMaximized: () => ipcRenderer.invoke("window:is-maximized"),

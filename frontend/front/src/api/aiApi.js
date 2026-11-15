@@ -2,10 +2,28 @@ import { apiRequest } from "./apiClient";
 
 const AI_URL = "/ai";
 
+/**
+ * cli: usa la suscripción del usuario a través de su CLI oficial instalado en el PC
+ * (sin clave de API). installCommand se muestra si el CLI no está instalado.
+ */
 export const AI_PROVIDERS = [
-  { id: "OPENAI", label: "OpenAI (ChatGPT)", defaultModel: "gpt-4.1-mini" },
-  { id: "ANTHROPIC", label: "Anthropic (Claude)", defaultModel: "claude-opus-5-5" },
-  { id: "GEMINI", label: "Google (Gemini)", defaultModel: "gemini-2.5-flash" },
+  { id: "OPENAI", label: "OpenAI (ChatGPT) · API key", defaultModel: "gpt-4.1-mini" },
+  { id: "ANTHROPIC", label: "Anthropic (Claude) · API key", defaultModel: "claude-opus-5-5" },
+  { id: "GEMINI", label: "Google (Gemini) · API key", defaultModel: "gemini-2.5-flash" },
+  {
+    id: "CLAUDE_CODE",
+    label: "Claude Code · Claude Pro/Max",
+    defaultModel: "",
+    cli: true,
+    installCommand: "npm install -g @anthropic-ai/claude-code",
+  },
+  {
+    id: "CODEX",
+    label: "Codex CLI · ChatGPT",
+    defaultModel: "",
+    cli: true,
+    installCommand: "npm install -g @openai/codex",
+  },
 ];
 
 const aiBridge = () =>
@@ -48,6 +66,16 @@ const withAi = async (path, options = {}) =>
     ...options,
     headers: { ...(options.headers || {}), ...(await aiHeaders()) },
   });
+
+/** { installed, loggedIn, loginCommand, detail } del CLI en este PC. */
+export const fetchCliStatus = (provider) =>
+  apiRequest(`${AI_URL}/cli/status?provider=${encodeURIComponent(provider)}`, {
+    method: "GET",
+    includeJson: false,
+  });
+
+/** Abre una terminal con el login del CLI; el usuario vuelve y comprueba el estado. */
+export const openCliLogin = (provider) => aiBridge().openCliLogin(provider);
 
 export const testAiConnection = () =>
   withAi(`${AI_URL}/test`, { method: "POST", includeJson: false });

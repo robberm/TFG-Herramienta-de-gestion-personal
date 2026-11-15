@@ -32,7 +32,7 @@ const AssistantPanel = () => {
     if (!isAiSupported()) return undefined;
 
     const loadSettings = () =>
-      getAiSettings().then((settings) => setIsConfigured(Boolean(settings?.hasKey)));
+      getAiSettings().then((settings) => setIsConfigured(Boolean(settings?.configured ?? settings?.hasKey)));
     loadSettings();
     fetchChatHistory()
       .then((history) => setMessages(Array.isArray(history) ? history : []))

@@ -3,6 +3,7 @@ package net.tfg.tfgapp.controller;
 import net.tfg.tfgapp.DTOs.ai.*;
 import net.tfg.tfgapp.components.ai.AiCredentials;
 import net.tfg.tfgapp.components.ai.AiProviderClient;
+import net.tfg.tfgapp.components.ai.LocalCliClient;
 import net.tfg.tfgapp.domains.AiChatMessage;
 import net.tfg.tfgapp.domains.AiMemory;
 import net.tfg.tfgapp.domains.User;
@@ -32,16 +33,18 @@ public class AiController {
     private final AiAssistantService assistantService;
     private final DailyQuestionService dailyQuestionService;
     private final AiProviderClient aiProviderClient;
+    private final LocalCliClient localCliClient;
     private final LanguageResolver languageResolver;
     private final JwtUtil jwtUtil;
     private final UserService userService;
 
     public AiController(AiAssistantService assistantService, DailyQuestionService dailyQuestionService,
-                        AiProviderClient aiProviderClient, LanguageResolver languageResolver, JwtUtil jwtUtil,
-                        UserService userService) {
+                        AiProviderClient aiProviderClient, LocalCliClient localCliClient,
+                        LanguageResolver languageResolver, JwtUtil jwtUtil, UserService userService) {
         this.assistantService = assistantService;
         this.dailyQuestionService = dailyQuestionService;
         this.aiProviderClient = aiProviderClient;
+        this.localCliClient = localCliClient;
         this.languageResolver = languageResolver;
         this.jwtUtil = jwtUtil;
         this.userService = userService;
@@ -58,6 +61,26 @@ public class AiController {
         aiProviderClient.completeJson(credentials, "Respond with the JSON object {\"ok\": true} and nothing else.",
                 List.of(AiProviderClient.Message.user("ping")), 1000);
         return Map.of("ok", true, "provider", credentials.provider(), "model", credentials.model());
+    }
+
+    /**
+     * Si el CLI del proveedor (Claude Code o Codex) está instalado en este PC y tiene una
+     * sesión iniciada. El backend corre en el PC del usuario, así que mira su instalación.
+     */
+    @GetMapping("/cli/status")
+    public Map<String, Object> cliStatus(@RequestHeader("Authorization") String authorization,
+                                         @RequestParam("provider") String provider) {
+        currentUser(authorization);
+        AiCredentials.AiProvider parsed = AiCredentials.parseProvider(provider)
+                .filter(AiCredentials.AiProvider::usesLocalCli)
+                .orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, "ai.notConfigured"));
+        LocalCliClient.CliStatus status = localCliClient.status(parsed);
+        return Map.of(
+                "provider", parsed,
+                "installed", status.installed(),
+                "loggedIn", status.loggedIn(),
+                "loginCommand", LocalCliClient.loginCommand(parsed),
+                "detail", status.detail() == null ? "" : status.detail());
     }
 
     // ---------- Pregunta diaria ----------
