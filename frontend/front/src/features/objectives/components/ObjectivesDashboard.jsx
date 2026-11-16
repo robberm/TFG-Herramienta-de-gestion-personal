@@ -8,6 +8,7 @@ import {
 import { useLanguage } from "../../../context/languageContext";
 import HabitBarChart from "./HabitBarChart";
 import HabitLineChart from "./HabitLineChart";
+import HabitMonthView from "./HabitMonthView";
 
 const ObjectivesDashboard = ({
   goals,
@@ -120,13 +121,13 @@ const ObjectivesDashboard = ({
   /**
    * Renderiza el anillo de progreso reutilizable para las cards superiores.
    */
-  const renderRing = (percent, color1, color2) => {
+  const renderRing = (percent) => {
     const radius = 25;
     const circumference = 2 * Math.PI * radius;
     const offset = circumference - (percent / 100) * circumference;
 
     return (
-      <div className="summaryRing">
+      <div className="summaryRing" aria-hidden="true">
         <svg viewBox="0 0 60 60">
           <circle className="ringBg" cx="30" cy="30" r={radius} />
           <circle
@@ -134,24 +135,10 @@ const ObjectivesDashboard = ({
             cx="30"
             cy="30"
             r={radius}
-            stroke={`url(#gradient-${color1})`}
             strokeDasharray={circumference}
             strokeDashoffset={offset}
           />
-          <defs>
-            <linearGradient
-              id={`gradient-${color1}`}
-              x1="0%"
-              y1="0%"
-              x2="100%"
-              y2="100%"
-            >
-              <stop offset="0%" stopColor={color1} />
-              <stop offset="100%" stopColor={color2} />
-            </linearGradient>
-          </defs>
         </svg>
-        <span className="ringPercent">{percent}%</span>
       </div>
     );
   };
@@ -179,7 +166,7 @@ const ObjectivesDashboard = ({
                 {metrics.completedToday}/{habits.length}
               </strong>
             </div>
-            {renderRing(metrics.todayPercent, "#4facfe", "#00f2fe")}
+            {renderRing(metrics.todayPercent)}
           </div>
         </article>
 
@@ -189,7 +176,7 @@ const ObjectivesDashboard = ({
               <span className="summaryLabel">{t.dashboardWeeklyRate}</span>
               <strong className="summaryValue">{metrics.weeklyRate}%</strong>
             </div>
-            {renderRing(metrics.weeklyRate, "#43e97b", "#38f9d7")}
+            {renderRing(metrics.weeklyRate)}
           </div>
         </article>
 
@@ -272,7 +259,8 @@ const ObjectivesDashboard = ({
               type="button"
               className="weeklyNavButton"
               onClick={onPreviousHabitWeek}
-              aria-label="Previous week"
+              aria-label={t.dashboardPreviousWeek}
+              title={t.dashboardPreviousWeek}
             >
               ‹
             </button>
@@ -282,7 +270,8 @@ const ObjectivesDashboard = ({
               className="weeklyNavButton"
               onClick={onNextHabitWeek}
               disabled={isCurrentHabitWeek}
-              aria-label="Next week"
+              aria-label={t.dashboardNextWeek}
+              title={t.dashboardNextWeek}
             >
               ›
             </button>
@@ -325,6 +314,8 @@ const ObjectivesDashboard = ({
           )}
         </article>
       </div>
+
+      <HabitMonthView habits={habits} logs={logs} />
     </section>
   );
 };

@@ -21,8 +21,10 @@ const HabitsSection = ({ habits, habitCompletionMap, selectedHabitDate, onCreate
     <section className="objectivesSection habitsWorkspace">
       <div className="sectionHeader modernSectionHeader">
         <div>
-          <span className="sectionKicker">{selectedDateLabel}</span>
-          <h2>{t.habitsTitle}</h2>
+          <div className="sectionTitleRow">
+            <h2>{t.habitsTitle}</h2>
+            <span className="sectionKicker">{selectedDateLabel}</span>
+          </div>
           <p>{t.habitsSubtitle}</p>
         </div>
         <button className="addButton" onClick={onCreate}><i className="fa fa-plus" /> {t.habitsNew}</button>

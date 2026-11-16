@@ -57,7 +57,7 @@ const GoalsSection = ({ goals, onCreate, onEdit, onDelete, isAdmin = false, show
               </div>
               <div className="goalProgressFooter">
                 <span className={`goalStatusPill status-${goal.status}`}>{statusLabel(goal.status)}</span>
-                <span>{goal.isNumeric ? `${Number(goal.valorProgreso || 0)} / ${Number(goal.valorObjetivo || 0)}` : statusLabel(goal.status)}</span>
+                {goal.isNumeric && <span>{`${Number(goal.valorProgreso || 0)} / ${Number(goal.valorObjetivo || 0)}`}</span>}
               </div>
             </div>
 
@@ -88,8 +88,10 @@ const GoalsSection = ({ goals, onCreate, onEdit, onDelete, isAdmin = false, show
     <section className="objectivesSection goalsWorkspace">
       <div className="sectionHeader modernSectionHeader">
         <div>
-          <span className="sectionKicker">{activeGoals.length} {t.goalsTitle}</span>
-          <h2>{t.goalsTitle}</h2>
+          <div className="sectionTitleRow">
+            <h2>{t.goalsTitle}</h2>
+            <span className="sectionKicker">{activeGoals.length} {t.goalsTitle}</span>
+          </div>
           <p>{t.goalsSubtitle}</p>
         </div>
         <button className="addButton" onClick={onCreate}><i className="fa fa-plus" /> {t.goalsNew}</button>

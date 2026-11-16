@@ -11,15 +11,16 @@ import {
 } from "recharts";
 import { buildHabitCompletionMap } from "../utils/objectiveHelpers";
 
+// Paleta categórica contenida: tonos medios que se leen sobre fondo claro y oscuro.
 const LINE_COLORS = [
-  "#f5576c",
-  "#4facfe",
-  "#43e97b",
-  "#fa709a",
-  "#667eea",
-  "#fee140",
-  "#38f9d7",
-  "#764ba2",
+  "#2a9d8f",
+  "#d08a1c",
+  "#4a86c5",
+  "#8f8f8a",
+  "#c0533a",
+  "#6f9a4a",
+  "#5f7d95",
+  "#b07a52",
 ];
 
 /**
@@ -95,13 +96,13 @@ const HabitLineChart = ({ data, habits, logs, selectedDate, todayIso, onSelectDa
           {habits.map((habit, index) => (
             <Line
               key={habit.id}
-              type="monotone"
+              type="linear"
               dataKey={`habit-${habit.id}`}
               name={habit.titulo}
               stroke={LINE_COLORS[index % LINE_COLORS.length]}
-              strokeWidth={2.5}
-              dot={{ r: 3 }}
-              activeDot={{ r: 5 }}
+              strokeWidth={2}
+              dot={{ r: 2.5, strokeWidth: 0, fill: LINE_COLORS[index % LINE_COLORS.length] }}
+              activeDot={{ r: 4.5 }}
               connectNulls={false}
               isAnimationActive
               animationDuration={400}
