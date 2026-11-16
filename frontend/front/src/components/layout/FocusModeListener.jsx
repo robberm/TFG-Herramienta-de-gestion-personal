@@ -2,10 +2,49 @@ import { useEffect, useRef } from "react";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import { useLocation } from "react-router-dom";
+import breakSoundUrl from "../../assets/sounds/universfield-positive-notification.mp3";
+import { useLanguage } from "../../context/languageContext";
+import { formatBreakDuration } from "../../utils/breakDuration";
+
+const breakSound = typeof Audio !== "undefined" ? new Audio(breakSoundUrl) : null;
+if (breakSound) {
+  breakSound.preload = "auto";
+  breakSound.volume = 0.8;
+}
+
+// La ventana de aviso es una URL data: que no puede cargar el mp3, así que suena aquí.
+const playBreakSound = () => {
+  if (!breakSound) return;
+  breakSound.currentTime = 0;
+  breakSound.play().catch(() => {});
+};
+
+const buildBreakNotification = (event, t) => {
+  if (event.phase === "BREAK_END") {
+    return {
+      eyebrow: t.focusBreakEndEyebrow,
+      title: t.focusBreakEndTitle,
+      description: t.focusBreakEndMessage,
+    };
+  }
+
+  return {
+    eyebrow: t.focusBreakEyebrow,
+    title: t.focusBreakTitle,
+    description: t.focusBreakMessage.replace(
+      "{duration}",
+      formatBreakDuration(event.breakDurationSeconds),
+    ),
+  };
+};
 
 const FocusModeListener = () => {
   const clientRef = useRef(null);
   const location = useLocation();
+  const { t } = useLanguage();
+  // El socket vive más que un render: así usa siempre el idioma actual.
+  const textsRef = useRef(t);
+  textsRef.current = t;
 
   useEffect(() => {
     const isPublicRoute = location.pathname === "/";
@@ -44,22 +83,26 @@ const FocusModeListener = () => {
               return;
             }
 
+            playBreakSound();
+
+            const texts = textsRef.current;
+            const notification = buildBreakNotification(event, texts);
+
             if (
               typeof window !== "undefined" &&
               window.electronAPI &&
               typeof window.electronAPI.showReminderWindow === "function"
             ) {
               window.electronAPI.showReminderWindow({
-                title: event.title,
-                description: event.message,
-                startTime: new Date().toISOString(),
-                allDay: false,
+                ...notification,
+                kind: "break",
+                closeLabel: texts.focusBreakClose,
               });
               return;
             }
 
             if (window.Notification && Notification.permission === "granted") {
-              new Notification(event.title, { body: event.message });
+              new Notification(notification.title, { body: notification.description });
             }
           } catch (error) {
             console.error("Failed to parse focus notification:", error);

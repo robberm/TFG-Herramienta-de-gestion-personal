@@ -65,18 +65,50 @@ body {
   padding: 20px 0;
   box-sizing: border-box;
   flex-shrink: 0;
+  overflow: hidden;
+  transition: width 0.22s ease, min-width 0.22s ease;
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
 }
 
 .menuHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 0 20px 16px 20px;
   border-bottom: 1px solid var(--panel-border);
   margin-bottom: 16px;
 }
 
+.sidebarToggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  padding: 0;
+  margin-left: 2px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.sidebarToggle:hover {
+  background-color: var(--bg-hover);
+}
+
+.sidebarToggle:focus-visible {
+  outline: 2px solid var(--text-main);
+  outline-offset: 2px;
+}
+
 .menuHeader h3 {
   margin: 0;
+  white-space: nowrap;
   color: var(--text-main);
   font-size: 14px;
   font-weight: 600;
@@ -128,6 +160,36 @@ body {
   display: inline-flex;
   align-items: center;
   min-height: 18px;
+  white-space: nowrap;
+}
+
+/* Barra plegada: solo se ven el botón de menú y los iconos. */
+.sideBar.collapsed {
+  width: 68px;
+  min-width: 68px;
+}
+
+.sideBar.collapsed .menuHeader {
+  justify-content: center;
+  padding: 0 0 16px 0;
+}
+
+.sideBar.collapsed .sidebarToggle {
+  margin-left: 0;
+}
+
+.sideBar.collapsed .menuHeader h3,
+.sideBar.collapsed .menuLabel {
+  display: none;
+}
+
+.sideBar.collapsed .menuItems {
+  padding: 0 12px;
+}
+
+.sideBar.collapsed a {
+  justify-content: center;
+  padding: 10px 0;
 }
 
 .mainContent {
@@ -164,10 +226,22 @@ body {
     flex-direction: column;
   }
 
-  .sideBar {
+  .sideBar,
+  .sideBar.collapsed {
     width: 100%;
     min-width: 100%;
     height: auto;
+  }
+
+  .sideBar.collapsed .menuHeader {
+    justify-content: flex-start;
+    padding: 0 20px;
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+
+  .sideBar.collapsed .menuItems {
+    display: none;
   }
 
   .pageContent {

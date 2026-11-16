@@ -15,6 +15,7 @@ import {
 import { getApiErrorMessage } from "../api/apiClient";
 import { useLanguage } from "../context/languageContext";
 import CustomSelectDropdown from "../components/shared/CustomSelectDropdown";
+import AiSettingsCard from "../features/ai/AiSettingsCard";
 
 const Settings = () => {
   const {
@@ -386,6 +387,7 @@ const Settings = () => {
             </div>
           </div>
         </section>
+        <AiSettingsCard />
         <section className="settingsCard appearanceCard">
           <div className="settingsCardHeader">
             <h2>{t.appearance}</h2>

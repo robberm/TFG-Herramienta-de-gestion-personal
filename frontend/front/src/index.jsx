@@ -5,6 +5,7 @@ import { BrowserRouter, HashRouter } from "react-router-dom";
 import { ErrorMessageGenerator } from "./components/ErrorContext";
 import MainLayout from "./components/layout/MainLayout";
 import FocusModeListener from "./components/layout/FocusModeListener";
+import DailyQuestionGate from "./components/layout/DailyQuestionGate";
 
 import "./css/index.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
@@ -23,6 +24,7 @@ root.render(
       <ErrorMessageGenerator>
         <Router>
           <FocusModeListener />
+          <DailyQuestionGate />
           <MainLayout>
             <AppRouter />
           </MainLayout>

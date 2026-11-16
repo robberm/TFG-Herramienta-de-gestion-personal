@@ -199,6 +199,7 @@ const EventModal = ({
     location: "",
     category: "",
     isAllDay: false,
+    showInMonthView: true,
     targetUserId: "",
     targetUserIds: [],
     assignmentMode: "single",
@@ -250,6 +251,7 @@ const EventModal = ({
         location: event.location || "",
         category: event.category || "",
         isAllDay: event.isAllDay || false,
+        showInMonthView: event.showInMonthView !== false,
         targetUserId: defaultSingleUserId,
         targetUserIds: assignedUserIds,
         assignmentMode: inferredAssignmentMode,
@@ -290,6 +292,7 @@ const EventModal = ({
         location: "",
         category: "",
         isAllDay: false,
+        showInMonthView: true,
         targetUserId: defaultManagedUserId ?? "",
         targetUserIds: defaultManagedUserId != null ? [String(defaultManagedUserId)] : [],
         assignmentMode: "single",
@@ -405,6 +408,7 @@ const EventModal = ({
       location: formData.location,
       category: formData.category,
       isAllDay: formData.isAllDay,
+      showInMonthView: canChangeMonthVisibility ? formData.showInMonthView : null,
       reminderMinutesBeforeList,
       targetUserId:
         isAdmin && formData.assignmentMode === "single" && formData.targetUserId
@@ -468,6 +472,8 @@ const EventModal = ({
     event?.assignedByAdminUsername !== event?.assignedToUsername;
   const canDeleteEvent = !isEventAssignedByAdmin || isAdmin;
   const isAssignedEventReadOnly = isEventAssignedByAdmin && !isAdmin;
+  // La visibilidad de una ocurrencia la decide su serie: gimnasio se oculta entero, no día a día.
+  const canChangeMonthVisibility = isSeries || event?.seriesId == null;
 
   const formatDisplayDate = () => {
     if (!formData.date) return "";
@@ -746,6 +752,20 @@ const EventModal = ({
                     </div>
                   )}
                 </div>
+              )}
+
+              {canChangeMonthVisibility && (
+                <label className="gcal-allday-toggle gcal-month-visibility">
+                  <input
+                    type="checkbox"
+                    name="showInMonthView"
+                    checked={formData.showInMonthView}
+                    disabled={isAssignedEventReadOnly}
+                    onChange={handleChange}
+                  />
+                  <span className="gcal-toggle-slider"></span>
+                  <span className="gcal-toggle-label">{t.calendarShowInMonth}</span>
+                </label>
               )}
 
               <div className="formGroup">

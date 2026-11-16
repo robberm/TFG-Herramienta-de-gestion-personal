@@ -92,7 +92,8 @@ public class AppController {
     @GetMapping("/browser-blocking-policy")
     public java.util.Map<String, Object> getBrowserBlockingPolicy() {
         return java.util.Map.of(
-                "focusModeEnabled", blockingService.isEffectiveFocusModeEnabled(),
+                // Durante el descanso la extensión retira sus reglas.
+                "focusModeEnabled", blockingService.areRestrictionsEnforced(),
                 "blockedDomains", restrictionService.getBlockedWebsites()
         );
     }

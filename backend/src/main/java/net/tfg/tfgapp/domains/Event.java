@@ -35,6 +35,8 @@ public class Event {
     private EventCategory category;
     @Column(unique = false)
     private Boolean isAllDay;
+    @Column(nullable = false)
+    private boolean showInMonthView = true;
     // Solo en ocurrencias de una serie que se han editado o movido por separado.
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
