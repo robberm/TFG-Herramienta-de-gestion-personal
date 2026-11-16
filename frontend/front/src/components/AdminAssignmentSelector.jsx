@@ -61,7 +61,7 @@ const AdminAssignmentSelector = ({
         />
       )}
 
-      {mode === "all" && <div className="admin-assignment-all-confirm">✓ {t.commonAllOrganization}</div>}
+      {mode === "all" && <div className="admin-assignment-all-confirm"><i className="fa fa-check" aria-hidden="true" /> {t.commonAllOrganization}</div>}
 
       {mode === "multiple" && (
         <div className="admin-assignment-multi">
@@ -81,7 +81,7 @@ const AdminAssignmentSelector = ({
               return (
                 <button type="button" key={user.id} className={`admin-assignment-result ${checked ? "selected" : ""}`} onClick={() => onToggleUser(user.id)}>
                   <span>{user.username}</span>
-                  {checked && <span>✓</span>}
+                  {checked && <i className="fa fa-check" aria-hidden="true" />}
                 </button>
               );
             })}

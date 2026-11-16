@@ -8,12 +8,12 @@ const COLLAPSED_KEY = "calendar.tag-colors.collapsed";
 
 // Object.freeze hace el array inmutable (no añadir ni quitar elementos)
 const TAG_COLOR_CONFIG = Object.freeze([
-  { key: "FOCUS", cssVar: "--event-focus-color", defaultColor: "#7c3aed" },
-  { key: "MANDATORY", cssVar: "--event-mandatory-color", defaultColor: "#e74c3c" },
-  { key: "WORK", cssVar: "--event-work-color", defaultColor: "#0ea5a4" },
-  { key: "STUDY", cssVar: "--event-study-color", defaultColor: "#f39c12" },
-  { key: "PERSONAL", cssVar: "--event-personal-color", defaultColor: "#2ecc71" },
-  { key: "HEALTH", cssVar: "--event-health-color", defaultColor: "#9b59b6" },
+  { key: "FOCUS", cssVar: "--event-focus-color", defaultColor: "#3d4a5c" },
+  { key: "MANDATORY", cssVar: "--event-mandatory-color", defaultColor: "#c4382f" },
+  { key: "WORK", cssVar: "--event-work-color", defaultColor: "#1b6e66" },
+  { key: "STUDY", cssVar: "--event-study-color", defaultColor: "#c27c0e" },
+  { key: "PERSONAL", cssVar: "--event-personal-color", defaultColor: "#3f8f4f" },
+  { key: "HEALTH", cssVar: "--event-health-color", defaultColor: "#2f6fb3" },
 ]);
 
 /**

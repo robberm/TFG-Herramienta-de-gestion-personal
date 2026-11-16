@@ -254,7 +254,6 @@ const Notes = () => {
     <main className="notesPage">
       <header className="notesHero">
         <div>
-          <span className="notesEyebrow">{t.notesEyebrow}</span>
           <h1>{t.notesTitle}</h1>
           <p>{t.notesSubtitle}</p>
         </div>

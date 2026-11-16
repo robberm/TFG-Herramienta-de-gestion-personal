@@ -1,104 +1,684 @@
+/* ============================================================
+   Notes — a grid of coloured notes and a full editor sheet.
+   The note colour is the user's choice: flat pastel fills on light themes,
+   tinted surfaces on dark ones. EDITOR_EXIT_MS in Notes.jsx is 180ms: the
+   exit animations below must not run longer.
+   ============================================================ */
+
 .notesPage {
-  --ink: #25231f;
-  --muted: #736f67;
-  min-height: calc(100vh - 160px);
-  color: var(--ink);
+  --note-sand: #f5eedd;
+  --note-coral: #fae5de;
+  --note-sky: #e2edf8;
+  --note-mint: #e0f1e6;
+  --note-lilac: #ebe6f3;
+  --note-sand-edge: #b8902f;
+  --note-coral-edge: #c4664f;
+  --note-sky-edge: #3f7fbf;
+  --note-mint-edge: #3f8f5e;
+  --note-lilac-edge: #7d6ba8;
+  --note-ink: #26241f;
+  --note-muted: #5c574d;
+
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+body.dark .notesPage,
+body.truedark .notesPage,
+body.custom .notesPage,
+body.translucent .notesPage {
+  --note-sand: color-mix(in srgb, var(--note-sand-edge) 20%, var(--surface));
+  --note-coral: color-mix(in srgb, var(--note-coral-edge) 20%, var(--surface));
+  --note-sky: color-mix(in srgb, var(--note-sky-edge) 20%, var(--surface));
+  --note-mint: color-mix(in srgb, var(--note-mint-edge) 20%, var(--surface));
+  --note-lilac: color-mix(in srgb, var(--note-lilac-edge) 22%, var(--surface));
+  --note-sand-edge: #d9b25a;
+  --note-coral-edge: #e48a73;
+  --note-sky-edge: #6ea6dd;
+  --note-mint-edge: #6cbf8b;
+  --note-lilac-edge: #a593cf;
+  --note-ink: var(--text);
+  --note-muted: var(--muted);
+}
+
+.note-sand { --note-fill: var(--note-sand); --note-edge: var(--note-sand-edge); }
+.note-coral { --note-fill: var(--note-coral); --note-edge: var(--note-coral-edge); }
+.note-sky { --note-fill: var(--note-sky); --note-edge: var(--note-sky-edge); }
+.note-mint { --note-fill: var(--note-mint); --note-edge: var(--note-mint-edge); }
+.note-lilac { --note-fill: var(--note-lilac); --note-edge: var(--note-lilac-edge); }
+
+/* ---------- Header and search ---------- */
+
+.notesHero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.notesHero h1 {
+  margin: 0;
+  font-size: var(--fs-32);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--text);
+}
+
+.notesHero p {
+  margin: 6px 0 0;
+  font-size: var(--fs-16);
+  color: var(--muted);
+}
+
+.notesNewButton {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  height: var(--control-h);
+  padding: 0 18px 0 14px;
+  border: none;
+  border-radius: var(--r-chip);
+  background: var(--primary);
+  color: var(--primary-ink);
+  font-size: var(--fs-14);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) ease,
+    transform var(--dur-press) var(--ease-out);
+}
+
+.notesNewButton span {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.notesNewButton:hover {
+  background: var(--primary-hover);
+}
+
+.notesNewButton:active {
+  transform: scale(0.97);
+}
+
+.notesSearch {
   position: relative;
+  display: flex;
+  align-items: center;
+  max-width: 520px;
 }
 
-.notesPage::before {
-  content: "";
-  position: fixed;
-  inset: 0 0 0 260px;
+.notesSearch svg {
+  position: absolute;
+  left: 14px;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: var(--faint);
+  stroke-width: 2;
+  stroke-linecap: round;
   pointer-events: none;
-  background: radial-gradient(circle at 82% 12%, rgba(242, 188, 72, .13), transparent 30%), repeating-linear-gradient(0deg, transparent 0 31px, rgba(44, 42, 37, .025) 32px);
 }
 
-.notesHero, .notesSearch, .notesGrid, .notesEmpty { position: relative; z-index: 1; }
-.notesHero { display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; margin-bottom: 30px; }
-.notesEyebrow { color: #a56819; font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
-.notesHero h1 { margin: 5px 0 4px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(38px, 5vw, 64px); line-height: .98; letter-spacing: -.045em; }
-.notesHero p { margin: 10px 0 0; color: var(--muted); font-size: 15px; }
-.notesNewButton { border: 0; border-radius: 16px; padding: 13px 18px; background: #25231f; color: #fff; font: inherit; font-weight: 700; box-shadow: 0 10px 26px rgba(37, 35, 31, .2); cursor: pointer; transition: transform .2s, box-shadow .2s; }
-.notesNewButton span { font-size: 22px; line-height: 0; margin-right: 8px; vertical-align: -1px; }
-.notesNewButton:hover { transform: translateY(-2px) rotate(-1deg); box-shadow: 0 14px 30px rgba(37, 35, 31, .25); }
-.notesSearch { max-width: 680px; height: 48px; border: 1px solid rgba(37, 35, 31, .1); border-radius: 15px; background: rgba(255, 255, 255, .78); display: flex; align-items: center; gap: 12px; padding: 0 15px; margin-bottom: 28px; box-shadow: 0 7px 24px rgba(38, 32, 20, .06); }
-.notesSearch svg { width: 19px; fill: none; stroke: #777168; stroke-width: 1.8; }
-.notesSearch input { flex: 1; border: 0; outline: 0; background: transparent; color: var(--ink); font: inherit; }
-.notesSearch span { min-width: 27px; padding: 3px 7px; border-radius: 9px; background: #eee9df; color: #68635b; text-align: center; font-size: 12px; font-weight: 700; }
-.notesGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(225px, 1fr)); gap: 18px; padding-bottom: 30px; }
-.noteCard { min-height: 225px; padding: 20px; border: 1px solid rgba(45, 39, 29, .08); border-radius: 22px; color: #2a2823; text-align: left; display: flex; flex-direction: column; cursor: pointer; box-shadow: 0 10px 24px rgba(51, 40, 20, .09); animation: noteRise .5s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--note-index) * 55ms); transition: transform .24s, box-shadow .24s; }
-.noteCard:hover { transform: translateY(-6px) rotate(.45deg); box-shadow: 0 18px 34px rgba(51, 40, 20, .14); }
-.note-sand { background: linear-gradient(145deg, #fff2b6, #f9d977); }
-.note-coral { background: linear-gradient(145deg, #ffd8cc, #f4a68e); }
-.note-sky { background: linear-gradient(145deg, #d9efff, #9bcce9); }
-.note-mint { background: linear-gradient(145deg, #dff3d8, #a9d8a0); }
-.note-lilac { background: linear-gradient(145deg, #eadff2, #cbb3db); }
-.noteCardTop { display: flex; justify-content: space-between; align-items: center; min-height: 28px; }
-.noteCardIcon { width: 27px; height: 27px; opacity: .72; }
-.noteCardIcon svg, .notePinButton svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; }
-.notePinned { padding: 4px 8px; border-radius: 99px; background: rgba(255,255,255,.4); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
-.noteCard h2 { margin: 22px 0 9px; font-family: Georgia, "Times New Roman", serif; font-size: 23px; line-height: 1.1; overflow-wrap: anywhere; }
-.noteCard p { margin: 0; color: rgba(39, 36, 30, .7); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5; white-space: pre-wrap; }
-.noteCard time { margin-top: auto; padding-top: 20px; color: rgba(39, 36, 30, .55); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
-.notesEmpty { min-height: 330px; display: grid; place-content: center; text-align: center; color: var(--muted); }
-.notesEmpty h2 { color: var(--ink); font-family: Georgia, serif; margin: 18px 0 4px; }
-.notesEmpty p { margin: 0 0 18px; }
-.notesEmpty button { justify-self: center; border: 0; background: #f1c85d; padding: 11px 16px; border-radius: 12px; cursor: pointer; font-weight: 700; }
-.notesEmptyStack { width: 80px; height: 65px; position: relative; margin: auto; }
-.notesEmptyStack i { position: absolute; inset: 0; border-radius: 14px; background: #f5d879; border: 1px solid rgba(0,0,0,.08); transform: rotate(-7deg); }
-.notesEmptyStack i:nth-child(2) { transform: translate(8px, -4px) rotate(4deg); background: #c7e1ed; }
-.notesEmptyStack i:nth-child(3) { transform: translate(2px, -9px) rotate(-1deg); background: #f7e9b5; }
-.notesLoading { display: flex; gap: 18px; }
-.notesLoading i { width: min(240px, 28vw); height: 220px; border-radius: 22px; background: linear-gradient(100deg, #eee 20%, #fafafa 40%, #eee 60%); background-size: 300% 100%; animation: shimmer 1.5s infinite; }
-.noteEditorOverlay { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 56px 28px 28px; background: rgba(32, 29, 24, .42); backdrop-filter: blur(10px); animation: fadeIn .2s ease; }
-.noteEditor { box-sizing: border-box; width: min(720px, 100%); height: min(680px, calc(100vh - 84px)); border-radius: 28px; padding: 22px 25px; display: flex; flex-direction: column; color: #28251f; box-shadow: 0 30px 90px rgba(24, 20, 12, .35); animation: editorIn .38s cubic-bezier(.2,.9,.2,1); }
-.noteEditor header, .noteEditor footer { display: flex; align-items: center; gap: 12px; }
-.noteEditor header { min-height: 38px; }
-.noteEditorClose { width: 34px; height: 34px; border: 0; border-radius: 50%; background: rgba(255,255,255,.42); font-size: 22px; cursor: pointer; }
-.noteColorPicker { display: flex; gap: 7px; margin-left: auto; }
-.noteColor { width: 22px; height: 22px; border: 2px solid rgba(255,255,255,.75); border-radius: 50%; cursor: pointer; box-shadow: 0 1px 5px rgba(0,0,0,.15); }
-.noteColor.active { outline: 2px solid #2c2923; outline-offset: 2px; }
-.notePinButton { height: 34px; border: 0; border-radius: 10px; padding: 7px 10px; background: rgba(255,255,255,.42); display: flex; align-items: center; gap: 6px; cursor: pointer; font-weight: 700; }
-.notePinButton svg { width: 17px; height: 17px; }
-.notePinButton.active { background: #2b2822; color: #fff; }
-.noteEditorTitle { margin-top: 28px; border: 0; outline: 0; background: transparent; color: inherit; font: 700 38px/1.1 Georgia, "Times New Roman", serif; }
-.noteEditorTitle::placeholder, .noteEditor textarea::placeholder { color: rgba(42,37,31,.4); }
-.noteEditor textarea { flex: 1; min-height: 180px; margin: 18px 0; border: 0; outline: 0; resize: none; background: transparent; color: inherit; font: 17px/1.7 "Segoe UI", sans-serif; }
-.noteEditor footer { border-top: 1px solid rgba(42,37,31,.12); padding-top: 16px; }
-.noteEditorMeta { margin-left: auto; display: flex; align-items: center; gap: 10px; color: rgba(42,37,31,.55); font-size: 12px; }
-.noteSaveStatus:empty { display: none; }
-.noteSaveStatus.is-error { color: #a03a2a; font-weight: 700; }
-.noteDeleteButton, .noteSaveButton { border: 0; border-radius: 12px; padding: 10px 15px; cursor: pointer; font-weight: 750; }
-.noteDeleteButton { background: rgba(255,255,255,.35); color: #a03a2a; }
-.noteSaveButton { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: #292621; color: #fff; min-width: 112px; transition: background-color .15s ease, transform .1s ease; }
-.noteSaveButton:active:not(:disabled) { transform: scale(.97); }
-.noteSaveButton:disabled { opacity: .45; cursor: default; }
-.noteSaveButton.is-saved, .noteSaveButton.is-saved:disabled { background: #2f7d4f; opacity: 1; }
-.noteSaveButton svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 22; animation: noteCheckDraw .26s ease-out both; }
-.noteDiscardButton { border: 0; background: transparent; color: #a03a2a; font-size: 12px; font-weight: 700; text-decoration: underline; cursor: pointer; }
-.noteEditorOverlay.is-closing { animation: noteOverlayOut .18s ease-in both; pointer-events: none; }
-.noteEditorOverlay.is-closing .noteEditor { animation: editorOut .18s ease-in both; }
-@keyframes noteRise { from { opacity: 0; transform: translateY(18px) scale(.97); } }
-@keyframes editorIn { from { opacity: 0; transform: translateY(28px) scale(.96); } }
-@keyframes editorOut { to { opacity: 0; transform: translateY(14px) scale(.98); } }
-@keyframes noteOverlayOut { to { opacity: 0; } }
-@keyframes noteCheckDraw { from { stroke-dashoffset: 22; } to { stroke-dashoffset: 0; } }
-@keyframes fadeIn { from { opacity: 0; } }
-@keyframes shimmer { to { background-position: -300% 0; } }
-@media (max-width: 768px) {
-  .notesPage::before { inset-left: 0; }
-  .notesHero { align-items: flex-start; }
-  .notesHero p { display: none; }
-  .notesGrid { grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); }
-  .noteCard { min-height: 190px; }
-  .noteEditorOverlay { padding: 52px 10px 10px; align-items: end; }
-  .noteEditor { height: calc(100vh - 62px); border-radius: 24px; padding: 18px; }
-  .noteColorPicker { gap: 4px; }
-  .noteColor { width: 18px; height: 18px; }
-  .notePinButton { font-size: 0; }
+.notesSearch input {
+  width: 100%;
+  height: 42px;
+  padding: 0 52px 0 40px;
+  border: 1px solid var(--control-border);
+  border-radius: var(--r-chip);
+  background: var(--raised);
+  color: var(--text);
+  font-size: var(--fs-14);
+  outline: none;
+  transition:
+    border-color var(--dur-fast) ease,
+    box-shadow var(--dur-fast) ease;
 }
-@media (prefers-reduced-motion: reduce) { .noteCard, .noteEditor, .noteEditorOverlay, .noteEditorOverlay.is-closing, .noteEditorOverlay.is-closing .noteEditor, .noteSaveButton svg, .notesLoading i { animation: none; } }
-body.dark .notesPage { --ink: #f2eee6; --muted: #aaa49a; }
-body.dark .notesSearch { background: rgba(43,41,37,.8); border-color: rgba(255,255,255,.1); }
-body.dark .notesSearch input { color: #f2eee6; }
+
+.notesSearch input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.notesSearch > span {
+  position: absolute;
+  right: 8px;
+  min-width: 26px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: var(--r-chip);
+  background: var(--pill-neutral-bg);
+  color: var(--pill-neutral-ink);
+  font-size: var(--fs-12);
+  font-weight: 500;
+  line-height: 24px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Grid ---------- */
+
+.notesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.noteCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 220px;
+  padding: 18px 18px 16px;
+  border: none;
+  border-radius: var(--r-card);
+  background: var(--note-fill);
+  color: var(--note-ink);
+  text-align: left;
+  cursor: pointer;
+  animation: noteRise 320ms var(--ease-out) both;
+  animation-delay: calc(min(var(--note-index, 0), 8) * 40ms);
+  transition:
+    transform 200ms var(--ease-out),
+    box-shadow 200ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .noteCard:hover {
+    transform: translateY(-2px);
+    box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--note-edge) 55%, transparent);
+  }
+}
+
+.noteCard:active {
+  transform: scale(0.98);
+}
+
+.noteCardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 24px;
+  margin-bottom: 12px;
+}
+
+.noteCardIcon {
+  display: inline-flex;
+  color: var(--note-edge);
+}
+
+.noteCardIcon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.notePinned {
+  padding: 2px 9px;
+  border-radius: var(--r-chip);
+  background: color-mix(in srgb, var(--note-edge) 18%, transparent);
+  color: var(--note-ink);
+  font-size: var(--fs-11);
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.noteCard h2 {
+  display: -webkit-box;
+  margin: 0 0 8px;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  font-size: var(--fs-16);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.005em;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.noteCard p {
+  display: -webkit-box;
+  flex: 1;
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--fs-14);
+  line-height: 1.5;
+  color: var(--note-muted);
+  white-space: pre-line;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+}
+
+.noteCard time {
+  margin-top: 14px;
+  font-size: var(--fs-12);
+  color: var(--note-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Loading and empty ---------- */
+
+.notesLoading {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.notesLoading i {
+  height: 220px;
+  border-radius: var(--r-card);
+  background: var(--surface);
+}
+
+.notesEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 48px 20px;
+  border: 1px dashed var(--control-border);
+  border-radius: var(--r-card);
+  text-align: center;
+}
+
+.notesEmptyStack {
+  display: flex;
+  margin-bottom: 8px;
+}
+
+.notesEmptyStack i {
+  width: 40px;
+  height: 48px;
+  margin: 0 -6px;
+  border-radius: 10px;
+}
+
+.notesEmptyStack i:nth-child(1) {
+  background: var(--note-sand);
+  transform: rotate(-8deg);
+}
+
+.notesEmptyStack i:nth-child(2) {
+  position: relative;
+  z-index: 1;
+  background: var(--note-sky);
+}
+
+.notesEmptyStack i:nth-child(3) {
+  background: var(--note-mint);
+  transform: rotate(8deg);
+}
+
+.notesEmpty h2 {
+  margin: 0;
+  font-size: var(--fs-16);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.notesEmpty p {
+  margin: 0;
+  font-size: var(--fs-14);
+  color: var(--muted);
+}
+
+.notesEmpty button {
+  height: var(--control-h);
+  margin-top: 8px;
+  padding: 0 18px;
+  border: none;
+  border-radius: var(--r-chip);
+  background: var(--primary);
+  color: var(--primary-ink);
+  font-size: var(--fs-14);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* ---------- Editor sheet ---------- */
+
+.noteEditorOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 48px 24px 24px;
+  background: var(--scrim);
+  animation: noteFadeIn 200ms ease-out;
+}
+
+.noteEditor {
+  display: flex;
+  flex-direction: column;
+  width: min(720px, 100%);
+  height: min(680px, calc(100vh - 80px));
+  padding: 16px 24px 20px;
+  border-radius: 24px;
+  background: var(--note-fill);
+  color: var(--note-ink);
+  box-shadow: var(--shadow-modal);
+  animation: editorIn 260ms var(--ease-out);
+}
+
+body.dark .noteEditor,
+body.truedark .noteEditor,
+body.custom .noteEditor {
+  background: color-mix(in srgb, var(--note-edge) 16%, #1c1c1c);
+}
+
+body.translucent .noteEditor {
+  background: color-mix(in srgb, var(--note-edge) 22%, rgba(22, 25, 31, 0.9));
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.noteEditor > header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.noteEditorClose {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--note-muted);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.noteEditorClose:hover {
+  background: color-mix(in srgb, var(--note-edge) 14%, transparent);
+  color: var(--note-ink);
+}
+
+.noteColorPicker {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.noteColor {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  background: var(--note-edge);
+  cursor: pointer;
+  transition:
+    transform var(--dur-press) var(--ease-out),
+    box-shadow var(--dur-fast) ease;
+}
+
+.noteColor:hover {
+  transform: scale(1.1);
+}
+
+.noteColor.active {
+  box-shadow: 0 0 0 2px var(--note-fill), 0 0 0 4px var(--note-ink);
+}
+
+.notePinButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid color-mix(in srgb, var(--note-ink) 18%, transparent);
+  border-radius: var(--r-chip);
+  background: transparent;
+  color: var(--note-ink);
+  font-size: var(--fs-13);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.notePinButton svg {
+  width: 14px;
+  height: 14px;
+}
+
+.notePinButton.active {
+  border-color: transparent;
+  background: color-mix(in srgb, var(--note-edge) 22%, transparent);
+}
+
+.noteEditorTitle {
+  margin-top: 24px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+  font-family: var(--font-sans);
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.noteEditor textarea {
+  flex: 1;
+  margin-top: 14px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+  font-size: var(--fs-16);
+  line-height: 1.65;
+  resize: none;
+}
+
+.noteEditorTitle::placeholder,
+.noteEditor textarea::placeholder {
+  color: color-mix(in srgb, var(--note-ink) 42%, transparent);
+}
+
+.noteEditor footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid color-mix(in srgb, var(--note-ink) 12%, transparent);
+}
+
+.noteDeleteButton,
+.noteDiscardButton {
+  height: 36px;
+  padding: 0 14px;
+  border: none;
+  border-radius: var(--r-chip);
+  background: transparent;
+  color: var(--negative);
+  font-size: var(--fs-14);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.noteDiscardButton {
+  color: var(--note-ink);
+}
+
+.noteDeleteButton:hover,
+.noteDiscardButton:hover {
+  background: color-mix(in srgb, var(--note-ink) 8%, transparent);
+}
+
+.noteEditorMeta {
+  display: flex;
+  flex: 1;
+  justify-content: flex-end;
+  gap: 12px;
+  font-size: var(--fs-12);
+  color: var(--note-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.noteSaveStatus.is-error {
+  color: var(--negative);
+  font-weight: 500;
+}
+
+.noteSaveButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 104px;
+  height: var(--control-h);
+  padding: 0 18px;
+  border: none;
+  border-radius: var(--r-chip);
+  background: var(--note-ink);
+  color: var(--note-fill);
+  font-size: var(--fs-14);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    opacity var(--dur-fast) ease,
+    transform var(--dur-press) var(--ease-out);
+}
+
+body.dark .noteSaveButton,
+body.truedark .noteSaveButton,
+body.custom .noteSaveButton,
+body.translucent .noteSaveButton {
+  background: var(--primary);
+  color: var(--primary-ink);
+}
+
+.noteSaveButton:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.noteSaveButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.noteSaveButton svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 22;
+  animation: noteCheckDraw 0.3s var(--ease-out) both;
+}
+
+.noteEditorOverlay.is-closing {
+  pointer-events: none;
+  animation: noteOverlayOut 0.18s ease-out both;
+}
+
+.noteEditorOverlay.is-closing .noteEditor {
+  animation: editorOut 0.18s ease-out both;
+}
+
+@keyframes noteRise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@keyframes editorIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+}
+
+@keyframes editorOut {
+  to {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+}
+
+@keyframes noteOverlayOut {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes noteCheckDraw {
+  from {
+    stroke-dashoffset: 22;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes noteFadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .notesHero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .notesGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .noteCard {
+    min-height: 180px;
+    padding: 14px;
+  }
+
+  .noteEditorOverlay {
+    align-items: end;
+    padding: 0;
+  }
+
+  .noteEditor {
+    height: 92vh;
+    border-radius: 24px 24px 0 0;
+  }
+
+  .noteEditorMeta span:first-child {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .noteCard,
+  .noteEditor,
+  .noteEditorOverlay,
+  .noteEditorOverlay.is-closing,
+  .noteEditorOverlay.is-closing .noteEditor,
+  .noteSaveButton svg {
+    animation: none;
+  }
+}
+
+.noteEditorTitle:focus-visible,
+.noteEditor textarea:focus-visible {
+  outline: none;
+}
+
+.noteCardIcon svg,
+.notePinButton svg {
+  fill: currentColor;
+}

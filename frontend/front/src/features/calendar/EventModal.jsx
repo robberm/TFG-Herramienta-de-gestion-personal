@@ -823,7 +823,7 @@ const EventModal = ({
                         disabled={isAssignedEventReadOnly}
                         onClick={() => removeReminderMinutes(minutes)}
                       >
-                        {minutes >= 60 ? `${minutes / 60}h` : `${minutes} min`} ✕
+                        {minutes >= 60 ? `${minutes / 60}h` : `${minutes} min`} <i className="fa fa-times" aria-hidden="true" />
                       </button>
                     ))
                   )}

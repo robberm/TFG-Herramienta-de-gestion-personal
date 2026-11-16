@@ -1,83 +1,170 @@
+/* ============================================================
+   Settings — one row per section: the title and description on the
+   left (300px), the controls on the right. Sections are split by a
+   full-width rule, not boxed. Danger lives last, in its own section.
+   ============================================================ */
+
 .settingsPage {
-  min-height: 100vh;
-  background: transparent;
-  color: var(--text-main);
-  padding: 32px 20px;
+  width: 100%;
 }
 
 .settingsContainer {
-  max-width: 820px;
-  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  max-width: 1040px;
 }
 
 .settingsTitle {
-  margin: 0 0 8px 0;
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--text-main);
+  margin: 0 0 12px;
+  font-size: var(--fs-32);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--text);
 }
 
 .settingsCard {
-  background-color: var(--sidebar-bg);
-  border-radius: 18px;
-  padding: 22px;
-  box-shadow: var(--panel-shadow);
-  border: 1px solid var(--panel-border);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  column-gap: 48px;
+  row-gap: 0;
+  align-items: start;
+  padding: 32px 0;
+  border-top: 1px solid var(--border);
 }
 
-.settingsCardHeader {
-  margin-bottom: 18px;
+.settingsCard > * {
+  grid-column: 2;
+  min-width: 0;
+}
+
+/* The header spans the rows on the left; the controls stack 16px apart on the right. */
+.settingsCard > :not(.settingsCardHeader) + :not(.settingsCardHeader) {
+  margin-top: 16px;
+}
+
+.settingsCard > .settingsCardHeader {
+  grid-column: 1;
+  grid-row: 1 / span 12;
 }
 
 .settingsCardHeader h2 {
-  margin: 0 0 6px 0;
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text-main);
+  margin: 0;
+  font-size: var(--fs-16);
+  font-weight: 600;
+  color: var(--text);
 }
 
 .settingsCardHeader p {
-  margin: 0;
-  font-size: 14px;
+  margin: 6px 0 0;
+  font-size: var(--fs-14);
   line-height: 1.5;
-  color: var(--text-main);
-  opacity: 0.75;
+  color: var(--muted);
 }
 
-.appearanceCard {
-  overflow: hidden;
+/* ---------- Rows with a control on the right ---------- */
+
+.settingsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 40px;
 }
+
+.settingsRow > div:first-child {
+  min-width: 0;
+}
+
+.settingsLabel {
+  display: block;
+  font-size: var(--fs-14);
+  font-weight: 500;
+  color: var(--text);
+}
+
+.settingsHint {
+  margin: 4px 0 0;
+  font-size: var(--fs-13);
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.settingsSelectWrap {
+  flex: none;
+  width: 240px;
+}
+
+.appearanceUtilityRow {
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+}
+
+/* Switch: 34x20, the accent when on. */
+.settingsSwitch {
+  position: relative;
+  flex: none;
+  width: 34px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: var(--r-chip);
+  background: var(--surface-2);
+  box-shadow: inset 0 0 0 1px var(--control-border);
+  cursor: pointer;
+  transition: background-color var(--dur) ease;
+}
+
+.settingsSwitchThumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: transform var(--dur) var(--ease-out);
+}
+
+.settingsSwitch.active {
+  background: var(--accent);
+  box-shadow: none;
+}
+
+.settingsSwitch.active .settingsSwitchThumb {
+  transform: translateX(14px);
+}
+
+.settingsSwitch:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ---------- Theme picker ---------- */
 
 .themeSectionHeading {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 12px;
+  gap: 4px 12px;
 }
 
-.themeSectionHeading > span {
-  font-size: 13px;
-  font-weight: 750;
-  letter-spacing: 0.035em;
-  text-transform: uppercase;
+.themeSectionHeading span {
+  font-size: var(--fs-14);
+  font-weight: 500;
+  color: var(--text);
 }
 
 .themeSectionHeading small {
-  color: var(--text-main);
-  font-size: 12px;
-  opacity: 0.55;
+  font-size: var(--fs-13);
+  color: var(--muted);
 }
 
 .themePaletteGrid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
 }
 
 .themePalette,
@@ -85,489 +172,396 @@
   position: relative;
   display: flex;
   align-items: center;
-  min-width: 0;
-  gap: 13px;
-  padding: 12px;
-  border: 1px solid var(--panel-border);
-  border-radius: 14px;
-  background: color-mix(in srgb, var(--bg-hover) 45%, transparent);
-  color: var(--text-main);
-  font: inherit;
+  gap: 12px;
+  width: 100%;
+  min-height: 64px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-inner);
+  background: var(--raised);
+  color: var(--text);
   text-align: left;
   cursor: pointer;
-  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+  transition:
+    border-color var(--dur-fast) ease,
+    box-shadow var(--dur-fast) ease,
+    transform var(--dur-press) var(--ease-out);
 }
 
-.themePalette:hover,
+.themePalette:hover:not(:disabled),
 .customThemeTrigger:hover {
-  transform: translateY(-1px);
-  border-color: color-mix(in srgb, var(--text-main) 24%, transparent);
-  background: color-mix(in srgb, var(--bg-hover) 72%, transparent);
+  border-color: var(--control-border);
+}
+
+.themePalette:active:not(:disabled),
+.customThemeTrigger:active {
+  transform: scale(0.98);
 }
 
 .themePalette.active,
 .customThemeTrigger.active {
-  border-color: var(--link-active-bg);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--link-active-bg) 22%, transparent);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.themePalette.unavailable {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .themePalettePreview {
   display: grid;
-  grid-template-columns: 1.1fr 0.8fr;
-  grid-template-rows: 1fr 0.34fr;
-  width: 62px;
-  height: 48px;
+  flex: none;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 6px;
+  width: 44px;
+  height: 36px;
   overflow: hidden;
-  flex: 0 0 auto;
-  border: 1px solid color-mix(in srgb, var(--text-main) 22%, transparent);
-  border-radius: 10px;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05), 0 5px 13px rgba(0, 0, 0, 0.14);
+  border-radius: 9px;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text) 12%, transparent);
 }
 
-.themePalettePreview > span:first-child {
-  grid-row: 1 / 3;
-}
-
-.themePalettePreview > span:last-child {
-  grid-column: 2;
-  grid-row: 2;
+.themePalettePreview span:nth-child(3) {
+  grid-column: 1 / -1;
 }
 
 .themePaletteCopy {
   display: flex;
-  min-width: 0;
   flex: 1;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
+  min-width: 0;
 }
 
 .themePaletteCopy strong {
-  overflow: hidden;
-  font-size: 14px;
-  font-weight: 700;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-size: var(--fs-14);
+  font-weight: 500;
 }
 
 .themePaletteCopy small {
   overflow: hidden;
-  color: var(--text-main);
-  font-size: 11px;
-  line-height: 1.25;
-  opacity: 0.6;
-  text-overflow: ellipsis;
+  font-size: var(--fs-12);
+  color: var(--muted);
   white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .themeSelectedMark {
-  position: absolute;
-  top: -7px;
-  right: -7px;
-  display: grid;
-  width: 22px;
-  height: 22px;
-  place-items: center;
-  border: 3px solid var(--sidebar-bg);
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  background: var(--link-active-bg);
-  color: var(--link-active-text);
-  font-size: 9px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 10px;
 }
 
 .customThemePanel {
-  margin-top: 14px;
-  overflow: hidden;
-  border: 1px solid var(--panel-border);
-  border-radius: 16px;
-  background: color-mix(in srgb, var(--bg-main) 46%, transparent);
-}
-
-.customThemeTrigger {
-  width: 100%;
-  border: 0;
-  border-radius: 15px;
-  background: transparent;
-}
-
-.customThemeTrigger.active {
-  box-shadow: inset 0 0 0 1px var(--link-active-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .customThemeSwatch {
-  width: 62px;
-  height: 48px;
-  flex: 0 0 auto;
-  border-radius: 10px;
-  background:
-    radial-gradient(circle at 28% 25%, rgba(255, 255, 255, 0.7), transparent 22%),
-    linear-gradient(135deg, color-mix(in srgb, var(--theme-swatch) 48%, white), var(--theme-swatch) 52%, color-mix(in srgb, var(--theme-swatch) 65%, black));
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18), 0 5px 13px color-mix(in srgb, var(--theme-swatch) 25%, transparent);
+  flex: none;
+  width: 44px;
+  height: 36px;
+  border-radius: 9px;
+  background: var(--theme-swatch);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text) 12%, transparent);
 }
 
 .customThemeHex {
-  padding: 5px 8px;
-  border-radius: 7px;
-  background: var(--bg-hover);
-  font: 600 11px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
-  opacity: 0.76;
+  padding: 2px 8px;
+  border-radius: var(--r-chip);
+  background: var(--pill-neutral-bg);
+  color: var(--pill-neutral-ink);
+  font-size: var(--fs-12);
+  font-variant-numeric: tabular-nums;
 }
 
-.customThemeTrigger > .fa-chevron-down {
+.customThemeTrigger .fa-chevron-down {
   font-size: 11px;
-  opacity: 0.58;
-  transition: transform 180ms ease;
+  color: var(--faint);
+  transition: transform var(--dur) var(--ease-out);
 }
 
-.customThemeTrigger > .fa-chevron-down.open {
+.customThemeTrigger .fa-chevron-down.open {
   transform: rotate(180deg);
 }
 
 .customThemeEditor {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 18px;
-  border-top: 1px solid var(--panel-border);
-}
-
-.customThemeEditor .react-colorful {
-  width: 210px;
-  height: 142px;
-  flex: 0 0 auto;
-}
-
-.customThemeEditor .react-colorful__saturation {
-  border-radius: 10px 10px 0 0;
-}
-
-.customThemeEditor .react-colorful__hue {
-  height: 18px;
-  border-radius: 0 0 10px 10px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 20px;
+  padding: 16px;
+  border-radius: var(--r-inner);
+  background: var(--surface);
+  animation: settingsReveal 220ms var(--ease-out);
 }
 
 .customThemeEditorCopy {
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .customThemeHexInput {
   display: flex;
   align-items: center;
-  width: 132px;
-  margin-top: 13px;
-  overflow: hidden;
-  border: 1px solid var(--panel-border);
-  border-radius: 9px;
-  background: var(--bg-main);
-  color: var(--text-main);
-}
-
-.customThemeHexInput > span {
-  padding-left: 10px;
-  opacity: 0.48;
+  gap: 8px;
+  max-width: 200px;
 }
 
 .customThemeHexInput input {
   width: 100%;
-  padding: 9px 9px 9px 3px;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: inherit;
-  font: 600 12px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
-  text-transform: uppercase;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--control-border);
+  border-radius: 10px;
+  background: var(--ground);
+  color: var(--text);
+  font-size: var(--fs-14);
+  font-variant-numeric: tabular-nums;
 }
 
-.appearanceUtilityRow {
-  margin-top: 20px;
-  padding-top: 18px;
-  border-top: 1px solid var(--panel-border);
+.customThemeEditor .react-colorful {
+  width: 200px;
+  height: 160px;
 }
 
-.settingsRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+.customThemeEditor .react-colorful__saturation {
+  border-radius: 12px 12px 0 0;
 }
 
-.settingsCard .settingsRow + .settingsRow {
-  margin-top: 18px;
+.customThemeEditor .react-colorful__last-control {
+  border-radius: 0 0 12px 12px;
 }
 
-.settingsLabel {
-  display: block;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-main);
-  margin-bottom: 4px;
-}
-
-.settingsHint {
-  margin: 0;
-  font-size: 13px;
-  color: var(--text-main);
-  opacity: 0.7;
-  line-height: 1.4;
-}
-
-.settingsSwitch {
-  position: relative;
-  width: 58px;
-  height: 32px;
-  border: 1px solid var(--panel-border);
-  border-radius: 999px;
-  background-color: var(--bg-hover);
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: background-color 0.2s ease, transform 0.2s ease;
-  padding: 0;
-}
-
-.settingsSwitch:hover {
-  transform: scale(1.03);
-}
-
-.settingsSwitch.active {
-  background-color: var(--link-active-bg);
-}
-
-.settingsSwitchThumb {
-  position: absolute;
-  top: 4px;
-  left: 4px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background-color: var(--link-active-text);
-  transition: transform 0.2s ease;
-}
-
-.settingsSwitch.active .settingsSwitchThumb {
-  transform: translateX(26px);
-}
-
-.settingsSwitch:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* Temas que necesitan aceleración por hardware cuando está desactivada. */
-.themePalette.unavailable {
-  opacity: 0.5;
-  cursor: not-allowed;
-  filter: grayscale(0.6);
+@keyframes settingsReveal {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
 }
 
 .graphicsRestartHint {
-  margin-top: 6px;
-  opacity: 1;
-  font-weight: 500;
+  color: var(--warning);
 }
 
 .graphicsInlineButton {
-  border: none;
-  background: none;
   padding: 0;
-  color: var(--link-active-bg);
+  border: none;
+  background: transparent;
+  color: var(--text);
   font: inherit;
   font-weight: 600;
   text-decoration: underline;
   cursor: pointer;
 }
 
+/* ---------- Profile ---------- */
+
 .profileSection {
   display: flex;
   align-items: center;
-  gap: 22px;
-  flex-wrap: wrap;
+  gap: 20px;
 }
 
 .profileAvatarPreview {
-  width: 92px;
-  height: 92px;
-  border-radius: 50%;
-  background-color: var(--link-active-bg);
-  color: var(--link-active-text);
   display: flex;
+  flex: none;
   align-items: center;
   justify-content: center;
+  width: 72px;
+  height: 72px;
   overflow: hidden;
-  flex-shrink: 0;
-  font-size: 32px;
-  font-weight: 700;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
 .profileAvatarImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
 }
 
 .profileAvatarFallback {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
+  font-size: var(--fs-24);
+  font-weight: 600;
 }
 
 .profileActions {
   display: flex;
-  gap: 12px;
   flex-wrap: wrap;
-}
-
-.settingsFieldGroup {
-  display: flex;
-  flex-direction: column;
   gap: 8px;
-  margin-bottom: 16px;
-}
-
-.settingsFieldGroup:last-of-type {
-  margin-bottom: 18px;
-}
-
-.settingsFieldLabel {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-main);
-}
-
-.settingsInput {
-  width: 100%;
-  min-height: 46px;
-  padding: 12px 14px;
-  border: 1px solid var(--panel-border);
-  border-radius: 12px;
-  background-color: var(--bg-main);
-  color: var(--text-main);
-  font-size: 14px;
-  outline: none;
-  transition:
-    border-color 0.2s ease,
-    background-color 0.2s ease,
-    box-shadow 0.2s ease;
-  box-sizing: border-box;
-}
-
-.settingsInput::placeholder {
-  color: var(--text-main);
-  opacity: 0.45;
-}
-
-.settingsInput:focus {
-  border-color: var(--link-active-bg);
-  box-shadow: 0 0 0 3px rgba(35, 131, 226, 0.15);
-}
-
-.settingsButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 44px;
-  padding: 0 16px;
-  border-radius: 12px;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: none;
-  transition:
-    transform 0.15s ease,
-    background-color 0.2s ease,
-    opacity 0.2s ease,
-    border-color 0.2s ease;
-}
-
-.settingsButton:hover {
-  transform: translateY(-1px);
-}
-
-.settingsButton:active {
-  transform: scale(0.98);
-}
-
-.settingsButton.primary {
-  background-color: var(--link-active-bg);
-  color: var(--link-active-text);
-}
-
-.settingsButton.secondary {
-  background-color: var(--bg-hover);
-  color: var(--text-main);
-  border: 1px solid var(--panel-border);
 }
 
 .hiddenFileInput {
   display: none;
 }
 
-@media (max-width: 768px) {
-  .settingsPage {
-    padding: 24px 14px;
-  }
+/* ---------- Fields and buttons ---------- */
 
-  .settingsTitle {
-    font-size: 28px;
-  }
-
-  .settingsCard {
-    padding: 18px;
-    border-radius: 16px;
-  }
-
-  .settingsRow {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .themePaletteGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .themeSectionHeading,
-  .customThemeEditor {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .customThemeHex {
-    display: none;
-  }
-
-  .profileSection {
-    align-items: flex-start;
-  }
-
-  .profileActions {
-    width: 100%;
-    flex-direction: column;
-  }
-
-  .profileActions .settingsButton {
-    width: 100%;
-  }
+.settingsFieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 420px;
 }
+
+.settingsFieldLabel {
+  font-size: var(--fs-13);
+  font-weight: 500;
+  color: var(--text);
+}
+
+.settingsInput {
+  width: 100%;
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--control-border);
+  border-radius: var(--r-control);
+  background: var(--raised);
+  color: var(--text);
+  font-size: var(--fs-14);
+  outline: none;
+  transition:
+    border-color var(--dur-fast) ease,
+    box-shadow var(--dur-fast) ease;
+}
+
+.settingsInput:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.settingsButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: start;
+  gap: 8px;
+  width: fit-content;
+  height: var(--control-h);
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: var(--r-chip);
+  font-size: var(--fs-14);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) ease,
+    border-color var(--dur-fast) ease,
+    transform var(--dur-press) var(--ease-out);
+}
+
+.settingsButton:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.settingsButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.settingsButton.primary {
+  background: var(--primary);
+  color: var(--primary-ink);
+}
+
+.settingsButton.primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.settingsButton.secondary {
+  border-color: var(--control-border);
+  background: transparent;
+  color: var(--text);
+}
+
+.settingsButton.secondary:hover:not(:disabled) {
+  background: var(--hover);
+}
+
 .settingsButton.danger {
-  background-color: #dc2626;
-  color: #ffffff;
+  border-color: color-mix(in srgb, var(--negative) 45%, transparent);
+  background: transparent;
+  color: var(--negative);
 }
 
-.settingsButton.danger:hover {
-  background-color: #b91c1c;
+.settingsButton.danger:hover:not(:disabled) {
+  background: var(--pill-negative-bg);
 }
 
-.deleteAccountCard {
-  border-color: rgba(220, 38, 38, 0.35);
+.accountMessage {
+  max-width: 420px;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: var(--fs-13);
+}
+
+.accountMessage.success {
+  background: var(--pill-positive-bg);
+  color: var(--pill-positive-ink);
+}
+
+.accountMessage.error {
+  background: var(--pill-negative-bg);
+  color: var(--pill-negative-ink);
+}
+
+.deleteAccountCard .settingsCardHeader h2 {
+  color: var(--negative);
 }
 
 .deleteAccountHint {
-  margin: 0 0 14px 0;
+  max-width: 420px;
 }
 
-.settingsSelectWrap {
-  width: min(100%, 260px);
+.confirmDialogCheckbox input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+
+/* ---------- Narrow windows: the label column stacks above its controls ---------- */
+
+@media (max-width: 860px) {
+  .settingsCard {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 24px 0;
+  }
+
+  .settingsCard > *,
+  .settingsCard > .settingsCardHeader {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .customThemeEditor {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .settingsRow {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .settingsRow:has(.settingsSwitch) {
+    align-items: center;
+    flex-direction: row;
+  }
+
+  .settingsSelectWrap {
+    width: 100%;
+  }
 }

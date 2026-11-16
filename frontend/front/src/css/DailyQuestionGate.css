@@ -1,5 +1,5 @@
 /* ============================================
-   PREGUNTA DIARIA (bloquea la app hasta contestar)
+   Daily question: blocks the app until it is answered.
    ============================================ */
 
 .dailyQuestionGate {
@@ -10,52 +10,66 @@
   align-items: center;
   justify-content: center;
   padding: 24px 16px;
-  box-sizing: border-box;
   overflow-y: auto;
-  background: color-mix(in srgb, var(--bg-main) 82%, transparent);
+  background: color-mix(in srgb, var(--ground) 86%, transparent);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
+  animation: dailyQuestionFade 240ms ease-out;
 }
 
-/* La barra de título (42px) queda libre para poder minimizar o cerrar. */
+body.translucent .dailyQuestionGate {
+  background: rgba(16, 18, 22, 0.55);
+}
+
+/* The title bar (36px) stays free so the window can still be minimised or closed. */
 .dailyQuestionGate.withTitleBar {
-  top: 42px;
+  top: 36px;
 }
 
 .dailyQuestionCard {
   width: min(560px, 100%);
   padding: 28px;
-  border-radius: 18px;
-  border: 1px solid var(--panel-border);
-  background: var(--ui-surface);
-  box-shadow: var(--panel-shadow);
-  color: var(--text-main);
-  box-sizing: border-box;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: var(--raised);
+  color: var(--text);
+  box-shadow: var(--shadow-modal);
+  animation: dailyQuestionIn 280ms var(--ease-out);
 }
 
-.dailyQuestionHeader h2 {
-  margin: 6px 0 4px;
-  font-size: 22px;
+body.translucent .dailyQuestionCard {
+  background: var(--popover-bg);
 }
 
 .dailyQuestionEyebrow {
-  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: var(--r-chip);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: var(--fs-12);
+  font-weight: 500;
+}
+
+.dailyQuestionHeader h2 {
+  margin: 12px 0 4px;
+  font-size: var(--fs-20);
   font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--link-active-bg);
 }
 
 .dailyQuestionSubtitle {
   margin: 0;
-  font-size: 13px;
-  color: var(--text-secondary);
+  font-size: var(--fs-13);
+  color: var(--muted);
 }
 
 .dailyQuestionText {
   margin: 20px 0;
-  font-size: 18px;
-  line-height: 1.5;
+  font-family: var(--font-serif);
+  font-size: 24px;
+  line-height: 1.35;
 }
 
 .dailyQuestionForm {
@@ -66,43 +80,59 @@
 
 .dailyQuestionForm textarea {
   width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid var(--panel-border);
-  background: var(--ui-control);
-  color: var(--text-main);
-  font: inherit;
-  font-size: 14px;
+  min-height: 110px;
+  padding: 12px 14px;
+  border: 1px solid var(--control-border);
+  border-radius: var(--r-control);
+  background: var(--ground);
+  color: var(--text);
+  font-size: var(--fs-14);
+  line-height: 1.5;
   resize: vertical;
-  box-sizing: border-box;
+  outline: none;
 }
 
 .dailyQuestionForm textarea:focus {
-  outline: 2px solid var(--link-active-bg);
-  outline-offset: 1px;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .dailyQuestionButton {
   align-self: flex-end;
-  padding: 10px 18px;
+  height: var(--control-h);
+  padding: 0 20px;
   border: none;
-  border-radius: 10px;
-  background: var(--link-active-bg);
-  color: var(--link-active-text);
-  font-size: 14px;
-  font-weight: 600;
+  border-radius: var(--r-chip);
+  background: var(--primary);
+  color: var(--primary-ink);
+  font-size: var(--fs-14);
+  font-weight: 500;
   cursor: pointer;
+  transition:
+    background-color var(--dur-fast) ease,
+    transform var(--dur-press) var(--ease-out);
+}
+
+.dailyQuestionButton:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.dailyQuestionButton:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 .dailyQuestionButton:disabled {
-  opacity: 0.55;
   cursor: default;
+  opacity: 0.55;
 }
 
 .dailyQuestionError {
   margin: 0;
-  font-size: 13px;
-  color: var(--event-mandatory-color);
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--pill-negative-bg);
+  color: var(--pill-negative-ink);
+  font-size: var(--fs-13);
 }
 
 .dailyQuestionResult {
@@ -118,57 +148,61 @@
 }
 
 .dailyQuestionScore span {
-  font-size: 13px;
-  color: var(--text-secondary);
+  font-size: var(--fs-13);
+  color: var(--muted);
 }
 
 .dailyQuestionScore strong {
-  font-size: 26px;
+  font-size: var(--fs-32);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
 }
 
 .dailyQuestionScore.score0 strong,
 .dailyQuestionScore.score1 strong,
 .dailyQuestionScore.score2 strong {
-  color: var(--event-mandatory-color);
+  color: var(--negative);
 }
 
 .dailyQuestionScore.score3 strong {
-  color: var(--event-study-color);
+  color: var(--warning);
 }
 
 .dailyQuestionScore.score4 strong,
 .dailyQuestionScore.score5 strong {
-  color: var(--event-personal-color);
+  color: var(--positive);
 }
 
 .dailyQuestionFeedback,
-.dailyQuestionNotice {
+.dailyQuestionNotice,
+.dailyQuestionReference,
+.dailyQuestionSchedule {
   margin: 0;
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: var(--fs-14);
+  line-height: 1.55;
 }
 
 .dailyQuestionReference {
   padding: 12px 14px;
-  border-radius: 10px;
-  background: var(--ui-surface-raised);
-  border: 1px solid var(--panel-border);
-}
-
-.dailyQuestionReference span {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-
-.dailyQuestionReference p {
-  margin: 4px 0 0;
-  font-size: 14px;
-  line-height: 1.5;
+  border-radius: var(--r-control);
+  background: var(--surface);
+  color: var(--muted);
 }
 
 .dailyQuestionSchedule {
-  margin: 0;
-  font-size: 12px;
-  color: var(--text-secondary);
+  font-size: var(--fs-13);
+  color: var(--muted);
+}
+
+@keyframes dailyQuestionFade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes dailyQuestionIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
 }

@@ -73,31 +73,31 @@ const Settings = () => {
       id: "truedark",
       label: t.trueDarkTheme,
       hint: t.trueDarkThemeHint,
-      colors: ["#000000", "#090909", "#191919"],
+      colors: ["#000000", "#0d0d0d", "#5cbcaf"],
     },
     {
       id: "dark",
       label: t.darkTheme,
       hint: t.darkThemeHint,
-      colors: ["#1c1c1c", "#2a2a2a", "#4a90e2"],
+      colors: ["#141414", "#262626", "#5cbcaf"],
     },
     {
       id: "light",
       label: t.lightTheme,
       hint: t.lightThemeHint,
-      colors: ["#ffffff", "#e9e5e0", "#2383e2"],
+      colors: ["#ffffff", "#ececea", "#1b6e66"],
     },
     {
       id: "translucent",
       label: t.translucentTheme,
       hint: t.translucentThemeHint,
-      colors: ["rgba(26, 28, 34, .42)", "rgba(255, 255, 255, .16)", "#4a90e2"],
+      colors: ["rgba(26, 28, 34, .42)", "rgba(255, 255, 255, .16)", "#7fd6ca"],
     },
     {
       id: "acrylic",
       label: t.acrylicTheme,
       hint: t.acrylicThemeHint,
-      colors: ["rgba(44, 44, 48, .55)", "rgba(255, 255, 255, .10)", "#60a5fa"],
+      colors: ["rgba(44, 44, 48, .55)", "rgba(255, 255, 255, .10)", "#78d0c4"],
     },
   ];
 

@@ -13,14 +13,15 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 10px;
-  margin-top: 22px;
-  padding-top: 18px;
-  border-top: 1px solid var(--panel-border);
+  margin-top: 8px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
 }
 
 .aiSettingsSubsection h3 {
   margin: 0;
-  font-size: 15px;
+  font-size: var(--fs-14);
+  font-weight: 600;
   color: var(--text-main);
 }
 
@@ -38,9 +39,10 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 6px 4px 10px;
+  height: 28px;
+  padding: 0 6px 0 12px;
   border-radius: 999px;
-  background: var(--ui-control);
+  background: var(--pill-neutral-bg);
   color: var(--text-main);
   font-size: 13px;
 }
@@ -67,8 +69,8 @@
   align-items: center;
   gap: 12px;
   padding: 8px 0;
-  border-bottom: 1px solid var(--panel-border);
-  font-size: 13px;
+  border-bottom: 1px solid var(--rule);
+  font-size: var(--fs-13);
   color: var(--text-main);
 }
 
@@ -82,7 +84,7 @@
 }
 
 .aiMemoryList button:hover {
-  color: var(--event-mandatory-color);
+  color: var(--negative);
 }
 
 /* Estado del CLI local (Claude Code / Codex) */
@@ -93,8 +95,8 @@
   gap: 8px;
   margin: 4px 0 16px;
   padding: 14px 16px;
-  border: 1px solid var(--panel-border);
-  border-radius: 12px;
+  border-radius: var(--r-inner);
+  background: var(--surface);
 }
 
 .aiCliPanel .settingsHint {
@@ -119,15 +121,15 @@
 }
 
 .aiCliState.ok .aiCliDot {
-  background: #3fb950;
+  background: var(--positive);
 }
 
 .aiCliState.warning .aiCliDot {
-  background: #d29922;
+  background: var(--warning);
 }
 
 .aiCliState.error .aiCliDot {
-  background: #f85149;
+  background: var(--negative);
 }
 
 .aiCliState.pending .aiCliDot {

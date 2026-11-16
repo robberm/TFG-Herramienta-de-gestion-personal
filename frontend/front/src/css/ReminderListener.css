@@ -1,72 +1,108 @@
+/* Event reminders: raised cards stacked at the bottom right. */
 .reminderToastStack {
   position: fixed;
-  right: 24px;
-  bottom: 24px;
+  right: 20px;
+  bottom: 20px;
+  z-index: 900;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  z-index: 900;
+  gap: 10px;
   pointer-events: none;
 }
 
 .reminderToast {
-  width: 320px;
-  padding: 16px 18px;
-  border-radius: 16px;
-  border: 1px solid var(--panel-border);
-  background: var(--bg-main);
-  box-shadow: var(--panel-shadow);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  pointer-events: auto;
   position: relative;
+  width: 320px;
+  padding: 14px 16px 16px 18px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 16px;
+  background: var(--popover-bg, var(--raised));
+  color: var(--text);
+  box-shadow: var(--shadow-float);
+  backdrop-filter: var(--panel-blur);
+  -webkit-backdrop-filter: var(--panel-blur);
+  pointer-events: auto;
+  animation: reminderToastIn 320ms var(--ease-drawer);
 }
 
 .reminderToastClose {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 8px;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
   border: none;
+  border-radius: 8px;
   background: transparent;
-  color: var(--text-main);
-  cursor: pointer;
+  color: var(--muted);
   font-size: 18px;
   line-height: 1;
+  cursor: pointer;
+}
+
+.reminderToastClose:hover {
+  background: var(--hover);
+  color: var(--text);
 }
 
 .reminderToastEyebrow {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.65;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
+  font-size: var(--fs-12);
+  font-weight: 500;
+  color: var(--accent);
 }
 
 .reminderToastTitle {
-  font-size: 18px;
+  margin-bottom: 6px;
+  padding-right: 24px;
+  font-size: var(--fs-16);
   font-weight: 600;
-  color: var(--text-main);
-  margin-bottom: 8px;
+  color: var(--text);
 }
 
 .reminderToastTime,
 .reminderToastLocation,
 .reminderToastDescription {
-  font-size: 13px;
-  color: var(--text-main);
-  opacity: 0.88;
-  margin-top: 6px;
+  margin-top: 4px;
+  font-size: var(--fs-13);
+  color: var(--muted);
+}
+
+.reminderToastTime {
+  font-variant-numeric: tabular-nums;
 }
 
 .reminderToastLocation {
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
 }
 
 .reminderToastLocation .event-location-icon {
+  flex: 0 0 auto;
   width: 12px;
   height: 12px;
-  flex: 0 0 auto;
+}
+
+@keyframes reminderToastIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@media (max-width: 480px) {
+  .reminderToastStack {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+  }
+
+  .reminderToast {
+    width: auto;
+  }
 }

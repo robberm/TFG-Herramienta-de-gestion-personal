@@ -631,12 +631,12 @@ function Block() {
     <div className="block-container">
       <div className="block-main">
         <header className="block-header">
-          <h1 className="block-title with-bubble">
-            {t.blockTimeTracker}
-            <span className="burbuja-content">{t.blockBubbleContent}</span>
-          </h1>
+          <h1 className="block-title">{t.blockTimeTracker}</h1>
+          <p className="block-subtitle">{t.blockBubbleContent}</p>
         </header>
 
+        <div className="block-columns">
+        <section className="block-focus-column">
         <div className="timer-card">
           <div className="timer-progress-ring">
             <svg
@@ -754,9 +754,14 @@ function Block() {
           </div>
         </div>
 
-        <div className="block-tabs">
+        </section>
+
+        <section className="block-apps-column">
+        <div className="block-tabs" role="tablist">
           <button
             className={`tab-btn ${activeTab === "add" ? "active" : ""}`}
+            role="tab"
+            aria-selected={activeTab === "add"}
             onClick={() => setActiveTab("add")}
           >
             <PlusIcon />
@@ -764,6 +769,8 @@ function Block() {
           </button>
           <button
             className={`tab-btn ${activeTab === "manage" ? "active" : ""}`}
+            role="tab"
+            aria-selected={activeTab === "manage"}
             onClick={() => setActiveTab("manage")}
           >
             <TrashIcon />
@@ -771,6 +778,8 @@ function Block() {
           </button>
           <button
             className={`tab-btn ${activeTab === "websites" ? "active" : ""}`}
+            role="tab"
+            aria-selected={activeTab === "websites"}
             onClick={() => setActiveTab("websites")}
           >
             <SearchIcon />
@@ -1006,6 +1015,8 @@ function Block() {
               )}
             </div>
           )}
+        </div>
+        </section>
         </div>
       </div>
     </div>

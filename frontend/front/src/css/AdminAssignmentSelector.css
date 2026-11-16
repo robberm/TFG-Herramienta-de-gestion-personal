@@ -1,54 +1,157 @@
-.admin-assignment-panel { display:flex; flex-direction:column; gap:.65rem; margin-bottom:1rem; }
-.admin-assignment-panel label { color: var(--text-secondary); font-size: .75rem; font-weight:600; text-transform: uppercase; letter-spacing:.5px; }
+/* Admin: choose which managed users an event, habit or goal is assigned to. */
+.admin-assignment-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
 
-.admin-assignment-dropdown { display:flex; flex-direction:column; gap:.35rem; }
-.admin-assignment-results-inline {
-  width:100%;
-  animation: gcal-slide-up 0.15s ease-out;
+.admin-assignment-panel label {
+  font-size: var(--fs-13);
+  font-weight: 500;
+  color: var(--text);
+}
+
+.admin-assignment-dropdown {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-assignment-results-inline,
+.admin-assignment-multi,
+.admin-assignment-all-confirm {
   transform-origin: top;
+  animation: adminAssignIn 160ms var(--ease-out);
+}
+
+.admin-assignment-results-inline {
+  width: 100%;
 }
 
 .admin-assignment-input {
-  width:100%;
-  background: var(--ui-control);
-  border:1px solid var(--border-color);
-  border-radius:12px;
-  color:var(--text-main);
-  padding:12px 14px;
-  transition: all .2s ease;
-}
-
-select.admin-assignment-input { cursor: pointer; appearance: none; padding-right: 38px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2399a2b3' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; }
-.admin-assignment-input:focus { border-color: #667eea; background-color: rgba(102,126,234,.05); box-shadow: 0 0 0 3px rgba(102,126,234,.1); outline: none; }
-
-.admin-assignment-single { position: relative; }
-.admin-assignment-trigger { display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
-.admin-assignment-trigger.active { border-color:#667eea; background-color: rgba(102,126,234,.05); box-shadow: 0 0 0 3px rgba(102,126,234,.1); }
-.admin-assignment-results-single { position:absolute; top: calc(100% + .35rem); left:0; right:0; z-index:30; }
-
-.admin-assignment-input option { background: #1c2233; color: #fff; }
-.admin-assignment-all-confirm { border:1px dashed rgba(102,126,234,.45); background:rgba(102,126,234,.08); border-radius:12px; padding:.7rem .85rem; color:var(--text-main); font-size:.9rem; }
-.admin-assignment-multi {
-  display:flex;
-  flex-direction:column;
   width: 100%;
-  gap:.6rem;
-  animation: gcal-slide-up 0.15s ease-out;
-  transform-origin: top;
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--control-border);
+  border-radius: var(--r-control);
+  background: var(--ground);
+  color: var(--text);
+  font-size: var(--fs-14);
+  transition:
+    border-color var(--dur-fast) ease,
+    box-shadow var(--dur-fast) ease;
 }
-.admin-assignment-tags { display:flex; flex-wrap:wrap; gap:.4rem; }
-.admin-assignment-tag { border:1px solid rgba(102,126,234,.4); background:rgba(102,126,234,.12); color:var(--text-main); border-radius:999px; padding:.25rem .6rem; cursor:pointer; }
-.admin-assignment-results { max-height:180px; overflow:auto; border:1px solid var(--border-color); border-radius:12px; padding:.35rem; display:flex; flex-direction:column; gap:.25rem; background: var(--ui-popover); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); }
-.admin-assignment-result { width:100%; display:flex; justify-content:space-between; background:transparent; border:none; color:var(--text-main); padding:.45rem .55rem; border-radius:8px; cursor:pointer; }
-.admin-assignment-result:hover { background:rgba(102,126,234,.1); }
-.admin-assignment-result.selected { background:rgba(102,126,234,.18); }
 
-.admin-assignment-results::-webkit-scrollbar { width: 8px; }
-.admin-assignment-results::-webkit-scrollbar-track { background: rgba(255,255,255,.04); border-radius: 10px; }
-.admin-assignment-results::-webkit-scrollbar-thumb { background: rgba(120,130,160,.55); border-radius: 10px; }
-.admin-assignment-results::-webkit-scrollbar-thumb:hover { background: rgba(120,130,160,.75); }
+select.admin-assignment-input {
+  padding-right: 38px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-position: right 14px center;
+  background-repeat: no-repeat;
+  appearance: none;
+  cursor: pointer;
+}
+
+.admin-assignment-input:focus,
+.admin-assignment-trigger.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  outline: none;
+}
+
+.admin-assignment-input option {
+  background: var(--raised);
+  color: var(--text);
+}
+
+.admin-assignment-single {
+  position: relative;
+}
+
+.admin-assignment-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.admin-assignment-results-single {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+}
 
 .admin-assignment-all-confirm {
-  animation: gcal-slide-up 0.15s ease-out;
-  transform-origin: top;
+  padding: 10px 12px;
+  border-radius: var(--r-control);
+  background: var(--pill-warning-bg);
+  color: var(--pill-warning-ink);
+  font-size: var(--fs-13);
+}
+
+.admin-assignment-multi {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.admin-assignment-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.admin-assignment-tag {
+  height: 28px;
+  padding: 0 12px;
+  border: none;
+  border-radius: var(--r-chip);
+  background: var(--accent-soft);
+  color: var(--text);
+  font-size: var(--fs-13);
+  cursor: pointer;
+}
+
+.admin-assignment-results {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 180px;
+  padding: 6px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--r-inner);
+  background: var(--popover-bg, var(--raised));
+  box-shadow: var(--shadow-float);
+}
+
+.admin-assignment-result {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text);
+  font-size: var(--fs-14);
+  cursor: pointer;
+}
+
+.admin-assignment-result:hover {
+  background: var(--hover);
+}
+
+.admin-assignment-result.selected {
+  background: var(--accent-soft);
+}
+
+@keyframes adminAssignIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
 }
