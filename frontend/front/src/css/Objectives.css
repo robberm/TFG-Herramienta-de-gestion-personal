@@ -1423,6 +1423,18 @@ body.translucent .modalOverlay .formGroup textarea {
     grid-template-columns: 1fr;
   }
 
+  .summaryCardsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .summaryCard:nth-child(3) {
+    box-shadow: none;
+  }
+
+  .summaryCard:nth-child(n + 3) {
+    border-top: 1px solid var(--border);
+  }
+
   .habitPanelGrid,
   .habitPanelGrid:has(> :nth-child(3n):last-child) {
     grid-template-columns: repeat(2, minmax(0, 1fr));

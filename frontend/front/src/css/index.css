@@ -25,19 +25,6 @@
   font-display: swap;
 }
 
-/* Legacy display faces, still referenced by name in a few places. */
-@font-face {
-  font-family: "Caoli";
-  src: url("./../../public/rrs/fonts/CAOOLI.otf") format("opentype");
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Neue_bold";
-  src: url("./../../public/rrs/fonts/NeueHaasDisplayBold.ttf") format("truetype");
-  font-display: swap;
-}
-
 *,
 *::before,
 *::after {

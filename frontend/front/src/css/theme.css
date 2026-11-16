@@ -90,11 +90,10 @@
   --pill-warning-ink: #7a3a0c;
   --pill-neutral-bg: #efefed;
   --pill-neutral-ink: #3d3d3a;
-  --focus-ring: 0 0 0 2px var(--ground), 0 0 0 4px color-mix(in srgb, var(--accent) 70%, transparent);
   --shadow-float: 0 16px 40px rgba(20, 20, 18, 0.12), 0 2px 8px rgba(20, 20, 18, 0.06);
   --shadow-modal: 0 24px 64px rgba(20, 20, 18, 0.18), 0 4px 16px rgba(20, 20, 18, 0.08);
   --scrim: rgba(24, 24, 22, 0.36);
-  --frame-bg: var(--ground);
+  /* --frame-bg is only set by the see-through themes; elsewhere the frame falls back to --ground. */
   --frame-border: transparent;
   --glass-blur: none;
   --panel-blur: none;

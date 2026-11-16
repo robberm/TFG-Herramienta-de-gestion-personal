@@ -17,7 +17,7 @@
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
-  background: var(--frame-bg);
+  background: var(--frame-bg, var(--ground));
   border: 1px solid var(--frame-border);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
