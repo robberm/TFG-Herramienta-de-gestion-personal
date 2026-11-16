@@ -246,6 +246,15 @@ const WeekView = ({
     };
   }, []);
 
+  // Al abrir, la rejilla arranca una hora antes de ahora en vez de a las 00:00.
+  useEffect(() => {
+    const viewport = gridViewportRef.current;
+    if (!viewport) return;
+    const top = Math.max(0, (new Date().getHours() - 1) * HOUR_HEIGHT_PX - 16);
+    viewport.scrollTop = top;
+    if (timelineRef.current) timelineRef.current.scrollTop = top;
+  }, []);
+
   const handleGridScroll = (e) => {
     const { scrollLeft, scrollTop } = e.currentTarget;
 

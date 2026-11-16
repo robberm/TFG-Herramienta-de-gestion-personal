@@ -4,33 +4,22 @@ import "./css/App.css";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import WindowTitleBar from "./components/layout/WindowTitleBar";
+import AuthOrbit from "./components/shared/AuthOrbit";
+import GmoMark from "./components/shared/GmoMark";
 import { useLanguage } from "./context/languageContext";
 import { app_name } from "./constants/textConstants";
 import { registerActiveSessionUser } from "./api/authApi";
 
-const CONFIG_ANIMACION = {
-  retrasoInicial: 500,
-  duracionAparecer: 1500,
-  duracionEscalar: 1000,
-  duracionDesaparecer: 2000,
-  nombreApp: app_name,
-  colorTexto: "#ffffff",
-  colorNombreApp: "#000000",
-  colorFondo: "#111111",
-  escala: 1.05,
-};
-
 const isElectronEnvironment =
   typeof window !== "undefined" && typeof window.electronAPI !== "undefined";
 
+const AUTH_MODES = ["login", "register"];
+
 function App() {
-  const [showForm, setShowForm] = useState(null);
-  const [config] = useState(CONFIG_ANIMACION);
-  const [etapaAnimacion, setEtapaAnimacion] = useState(0);
-  const [showButtons, setShowButtons] = useState(true);
+  // El formulario visible: inicio de sesión por defecto, registro desde el selector.
+  const [showForm, setShowForm] = useState("login");
   const { t } = useLanguage();
   const navigate = useNavigate();
-
 
   useEffect(() => {
     if (!isElectronEnvironment) {
@@ -55,104 +44,59 @@ function App() {
     registerActiveSessionUser().catch(() => {});
     navigate(nextPath, { replace: true });
   }, [navigate]);
-  useEffect(() => {
-    if (etapaAnimacion === 0) {
-      const temporizador1 = setTimeout(() => {
-        setEtapaAnimacion(1);
-      }, config.retrasoInicial);
-      return () => clearTimeout(temporizador1);
-    } else if (etapaAnimacion === 1) {
-      const temporizador2 = setTimeout(() => {
-        setEtapaAnimacion(2);
-      }, config.duracionAparecer);
-      return () => clearTimeout(temporizador2);
-    } else if (etapaAnimacion === 2) {
-      const temporizador3 = setTimeout(() => {
-        setEtapaAnimacion(3);
-      }, config.duracionEscalar);
-      return () => clearTimeout(temporizador3);
-    } else if (etapaAnimacion === 3) {
-      const temporizador4 = setTimeout(() => {
-        setEtapaAnimacion(0);
-      }, config.duracionDesaparecer);
-      return () => clearTimeout(temporizador4);
-    }
-  }, [etapaAnimacion, config]);
 
-  const obtenerClasesAnimacion = () => {
-    switch (etapaAnimacion) {
-      case 0:
-        return "texto-bienvenida oculto";
-      case 1:
-        return "texto-bienvenida aparecer elevar";
-      case 2:
-        return "texto-bienvenida aparecer elevar escalar";
-      case 3:
-        return "texto-bienvenida desvanecer elevar escalar";
-      default:
-        return "texto-bienvenida oculto";
-    }
-  };
-
-  const estiloTexto = {
-    color: config.colorTexto,
-    "--factor-escala": config.escala,
-  };
-
-  const estiloNombreApp = {
-    color: "transparent",
-    WebkitTextStroke: "1px #000000",
-    textStroke: "2px #000000",
-  };
-
-  const handleFormSelection = (form) => {
-    setShowForm(form);
-    setShowButtons(false);
-  };
-
-  const goBack = () => {
-    setShowForm(null);
-    setShowButtons(true);
+  const handleModeKeyDown = (event) => {
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+    event.preventDefault();
+    const next = showForm === "login" ? "register" : "login";
+    setShowForm(next);
+    document.getElementById(`auth-tab-${next}`)?.focus();
   };
 
   const content = (
-    <div className="contenedor-app">
-      <video className="video-bg" autoPlay loop muted playsInline>
-        <source src="rrs/white-waves-background.mp4" type="video/mp4" />
-      </video>
-
-      <div className={obtenerClasesAnimacion()} style={estiloTexto}>
-          {t.appWelcomeTo}{" "}
-        <span className="nombre-app" style={estiloNombreApp}>
-          {config.nombreApp}
-        </span>
-      </div>
-
-      {showButtons && (
-        <div className="form-selection">
-          <button
-            className="app-button"
-            onClick={() => handleFormSelection("login")}
-          >
-            {t.loginTitle}
-          </button>
-          <button
-            className="app-button"
-            onClick={() => handleFormSelection("register")}
-          >
-            {t.registerTitle}
-          </button>
+    <div className="contenedor-app authScreen">
+      <main className="authColumn">
+        <AuthOrbit />
+        <div className="authHero">
+          <GmoMark size={48} className="authMark" />
         </div>
-      )}
 
-      {showForm === "login" && <Login />}
-      {showForm === "register" && <Register />}
+        <h1 className="authTitle">
+          {t.appWelcomeTo} {app_name}
+        </h1>
+        <p className="authLead">{t.appTagline}</p>
 
-      {showForm && (
-        <button className="app-button" onClick={goBack}>
-          {t.commonBack}
-        </button>
-      )}
+        <section className="authCard" aria-label={t.authModeLabel}>
+          <div className="authSwitch" role="tablist" aria-label={t.authModeLabel}>
+            <span
+              className="authSwitchThumb"
+              data-mode={showForm}
+              aria-hidden="true"
+            />
+            {AUTH_MODES.map((mode) => (
+              <button
+                key={mode}
+                id={`auth-tab-${mode}`}
+                type="button"
+                role="tab"
+                aria-selected={showForm === mode}
+                aria-controls="auth-panel"
+                tabIndex={showForm === mode ? 0 : -1}
+                className="authSwitchOption"
+                onClick={() => setShowForm(mode)}
+                onKeyDown={handleModeKeyDown}
+              >
+                {mode === "login" ? t.loginTitle : t.registerTitle}
+              </button>
+            ))}
+          </div>
+
+          <div id="auth-panel" role="tabpanel" aria-labelledby={`auth-tab-${showForm}`}>
+            {showForm === "login" && <Login />}
+            {showForm === "register" && <Register />}
+          </div>
+        </section>
+      </main>
     </div>
   );
 

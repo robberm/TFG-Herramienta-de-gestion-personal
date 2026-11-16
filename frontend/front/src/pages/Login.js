@@ -68,35 +68,44 @@ const Login = () => {
   };
 
   return (
-    <div className="login-form">
-      <h2 style={{ color: "#FFFFFF" }}>{t.loginTitle}</h2>
-      <form onSubmit={handleLogin}>
-        <input
-          className="app-input"
-          name="username"
-          type="text"
-          placeholder={t.username}
-          value={loginUsername}
-          onChange={(e) => setLoginUsername(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
-        <input
-          className="app-input"
-          id="password"
-          ref={passwordInputRef}
-          name="password"
-          type="password"
-          placeholder={t.loginPassword}
-          value={loginPw}
-          onChange={(e) => setLoginPw(e.target.value)}
-          onKeyDown={handleKeyDown}
-          autoComplete="current-password"
-        />
-        <button className="app-button" type="submit">
+    <div className="login-form authForm">
+      <h2 className="srOnly">{t.loginTitle}</h2>
+      <form className="authFormFields" onSubmit={handleLogin} noValidate>
+        <label className="authField">
+          <span className="authFieldLabel">{t.username}</span>
+          <input
+            className="app-input"
+            name="username"
+            type="text"
+            autoComplete="username"
+            value={loginUsername}
+            onChange={(e) => setLoginUsername(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+        </label>
+        <label className="authField">
+          <span className="authFieldLabel">{t.loginPassword}</span>
+          <input
+            className="app-input"
+            id="password"
+            ref={passwordInputRef}
+            name="password"
+            type="password"
+            value={loginPw}
+            onChange={(e) => setLoginPw(e.target.value)}
+            onKeyDown={handleKeyDown}
+            autoComplete="current-password"
+          />
+        </label>
+        {error && (
+          <div className="error" role="alert">
+            {error}
+          </div>
+        )}
+        <button className="app-button authSubmit" type="submit">
           {t.loginTitle}
         </button>
       </form>
-      {error && <div className="error">{error}</div>}
     </div>
   );
 };

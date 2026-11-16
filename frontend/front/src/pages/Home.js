@@ -278,9 +278,11 @@ if (isAdmin) {
 
   return (
     <>
-      <HomeHeader />
+      <HomeHeader events={isLoadingTodayEvents && todayEvents.length === 0 ? null : todayEvents} />
 
       <div className="homeHeroSection">
+        {/* Al pasar el ratón por la rejilla, el calendario anclado a la derecha se expande
+            y la columna izquierda se contrae. */}
         <div className="homeHeroGrid">
           <div className="homeLeftColumn">
             <RemindersPanel
@@ -295,9 +297,11 @@ if (isAdmin) {
           />
         </div>
 
-        <TodoList />
+        <div className="homeLowerGrid">
+          <TodoList />
 
-        <AssistantPanel />
+          <AssistantPanel />
+        </div>
       </div>
     </>
   );

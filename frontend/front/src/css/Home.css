@@ -1,74 +1,101 @@
-.personalHeader {
-  padding: 0 0 20px 0;
-  background-color: transparent;
+/* ============================================================
+   Home — personal dashboard
+   Grid: the canvas is fluid (max 1200px). One gap value (16px) horizontally and vertically.
+   Hero row: reminders (1fr) + calendar tile (320px). On hover the tile takes 1.28fr and
+   the reminders contract to 0.72fr — the anchored, expanding calendar is kept as designed.
+   ============================================================ */
+
+.homeHeader {
+  margin: 4px 0 32px;
 }
 
-.personalHeader h1 {
-  margin: 0 0 30px 0;
-  font-size: 42px;
-  color: var(--text-main);
-  letter-spacing: 1px;
-  font-family: Caoli;
+.homeGreeting {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--fs-48);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  color: var(--text);
+  overflow-wrap: anywhere;
 }
 
-/* Slide-in-bottom effect for username (smooth, window-like expand) */
-.slide-in-bottom {
-  position: relative;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: flex-start;
-  overflow: hidden;
-  vertical-align: middle;
-  height: 1em;
-  line-height: 1;
-  transform: translateY(-0.08em); /*número mágico que se alinea con el texto de bienvenida para el usuario*/
+.homeHeaderLine {
+  margin: 12px 0 0;
+  font-size: var(--fs-16);
+  line-height: 1.5;
+  color: var(--muted);
 }
 
-.slide-in-bottom .slide-inner {
+.homeHeaderLine strong {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.homeHeaderLine time {
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+/* Panels share one recipe: a tonal step off the ground, no border, no shadow. */
+.remindersSection,
+.todoListSection,
+.assistantPanel,
+.adminGoalsStats {
+  border-radius: var(--r-card);
+  background: var(--surface);
+}
+
+body.translucent .remindersSection,
+body.translucent .todoListSection,
+body.translucent .assistantPanel {
+  border: 1px solid var(--border);
+}
+
+.homePanelHeader {
   display: flex;
-  flex-direction: column;
-  will-change: transform;
-  animation: slideUpDown 5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  align-items: center;
+  gap: 8px;
+  min-height: 24px;
+  margin-bottom: 14px;
 }
 
-.slide-in-bottom .slide-original,
-.slide-in-bottom .slide-duplicate {
-  display: block;
-  line-height: 1;
+.homePanelHeader h2 {
   margin: 0;
-  padding: 0;
+  font-size: var(--fs-14);
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--text);
 }
 
-.slide-in-bottom .slide-duplicate {
-  font-weight: 700;
-}
-
-@keyframes slideUpDown {
-  0%, 74% { transform: translateY(0); }
-  80%, 88% { transform: translateY(-50%); }
-  100% { transform: translateY(0); }
-}
-.dashboardHeader {
-  margin-bottom: 28px;
-}
-
-.dashboardHeader h1 {
-  margin: 0;
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--text-main);
+.homePanelCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: var(--r-chip);
+  background: var(--pill-neutral-bg);
+  color: var(--pill-neutral-ink);
+  font-size: var(--fs-12);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }
 
 .homeHeroSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   width: 100%;
 }
 
 .homeHeroGrid {
   display: grid;
-  grid-template-columns: minmax(420px, 1fr) 300px;
-  gap: 24px;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 16px;
   align-items: start;
-  transition: grid-template-columns 0.4s ease;
+  transition: grid-template-columns 450ms var(--ease-drawer);
 }
 
 .homeHeroGrid:hover {
@@ -79,147 +106,119 @@
   min-width: 0;
 }
 
-.remindersSection {
-  width: 100%;
-  margin-top: 18px;
-  padding-top: 18px;
-  border-top: 1px solid var(--border-color, #e9e5e0);
-  background-color: transparent;
-}
+/* ---------- Reminders ---------- */
 
-.remindersSection h2 {
-  margin: 0 0 10px 0;
-  font-size: 20px;
-  color: var(--text-main);
+.remindersSection {
+  min-height: 320px;
+  padding: 20px;
 }
 
 .remindersList {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .reminderCard {
-  padding: 12px 14px;
-  border: 1px solid var(--border-color, #e5e7eb);
-  border-radius: 12px;
-  background: var(--bg-page);
+  position: relative;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  min-height: 64px;
+  padding: 12px 14px 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-inner);
+  background: var(--raised);
+}
+
+.reminderCard::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  left: 0;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--reminder-color, var(--accent));
 }
 
 .reminderCardTime {
-  font-size: 12px;
-  font-weight: 700;
-  margin-bottom: 4px;
-  color: var(--text-main);
-  opacity: 0.75;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--fs-14);
+  font-weight: 500;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.reminderCardEnd {
+  font-size: var(--fs-12);
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.reminderCardBody {
+  min-width: 0;
 }
 
 .reminderCardTitle {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-main);
+  overflow: hidden;
+  font-size: var(--fs-14);
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--text);
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .reminderCardLocation {
   margin-top: 4px;
-  font-size: 12px;
-  color: var(--text-main);
-  opacity: 0.7;
+  font-size: var(--fs-12);
+  color: var(--muted);
 }
 
 .remindersEmptyState {
-  padding: 12px 0;
-  font-size: 14px;
-  color: var(--text-main);
-  opacity: 0.7;
+  padding: 14px 16px;
+  border: 1px dashed var(--control-border);
+  border-radius: var(--r-inner);
+  font-size: var(--fs-14);
+  color: var(--muted);
 }
 
-.reminderItem {
-  padding: 8px 0;
-  color: #555;
-  font-size: 14px;
-}
-
-.pieChart {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  position: relative;
-  overflow: hidden;
-  background: conic-gradient(
-    #2383e2 0deg 72deg,
-    #e91e63 72deg 144deg,
-    #4caf50 144deg 216deg,
-    #ff9800 216deg 288deg,
-    #9c27b0 288deg 360deg
-  );
-}
-
-.pieChart::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 60px;
-  height: 60px;
-  background-color: white;
-  border-radius: 50%;
-}
-
-.chartLabel {
-  margin: 0;
-  font-size: 14px;
-  color: #666;
-  font-style: italic;
-}
+/* ---------- Calendar tile (collapsed ring, expands to the daily timeline) ---------- */
 
 .homeDailyWidget {
   position: relative;
-  width: 300px;
-  height: 300px;
   justify-self: end;
-  border-radius: 20px;
-  border: 1px solid var(--border-color, #e5e7eb);
-  background: var(--bg-main);
+  width: 320px;
+  height: 320px;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  background: var(--raised);
   transition:
-    width 0.4s ease,
-    height 0.4s ease,
-    border-radius 0.3s ease,
-    box-shadow 0.25s ease,
-    transform 0.25s ease;
+    width 450ms var(--ease-drawer),
+    height 450ms var(--ease-drawer),
+    border-color var(--dur) ease;
 }
 
 .homeHeroGrid:hover .homeDailyWidget {
   width: 100%;
   height: 560px;
-  border-radius: 22px;
-}
-
-.homeDailyWidget:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.12);
 }
 
 body.translucent .homeDailyWidget {
+  background: var(--surface);
   backface-visibility: hidden;
   contain: layout paint;
   transform: translate3d(0, 0, 0);
-  transition:
-    width 0.4s ease,
-    height 0.4s ease,
-    border-radius 0.3s ease,
-    box-shadow 0.25s ease,
-    transform 0.25s ease,
-    background-color 0.3s ease,
-    background 0.3s ease;
-  will-change: width, height, transform;
-}
-
-body.translucent .homeDailyWidget:hover {
-  transform: translate3d(0, -2px, 0);
+  will-change: width, height;
 }
 
 body.translucent .homeDailyWidgetInner {
@@ -238,12 +237,14 @@ body.translucent .homeDailyWidgetInner {
   inset: 0;
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
-  padding: 22px;
+  gap: 14px;
+  padding: 20px;
   opacity: 1;
   transition:
-    opacity 0.2s ease,
-    transform 0.24s ease;
+    opacity 180ms ease,
+    transform 240ms var(--ease-out);
 }
 
 .homeHeroGrid:hover .homeDailyWidgetCollapsedContent {
@@ -255,97 +256,156 @@ body.translucent .homeDailyWidgetInner {
 .homeDailyPreviewShell {
   display: flex;
   justify-content: center;
-  margin-bottom: 18px;
 }
 
-.homeDailyPreviewCircle {
-  width: 112px;
-  height: 112px;
-  border-radius: 999px;
-  border: 3px solid var(--border-color, #d8d8d8);
-  background: radial-gradient(
-    circle at center,
-    transparent 58%,
-    rgba(0, 0, 0, 0.04) 59%,
-    transparent 60%
-  );
+.dayRing {
+  display: block;
+  overflow: visible;
+}
+
+.dayRingTrack {
+  stroke: var(--surface-2);
+}
+
+.dayRingTick {
+  stroke: var(--faint);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.dayRingArc {
+  stroke-linecap: butt;
+}
+
+.dayRingNow {
+  stroke: var(--text);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.dayRingTime {
+  fill: var(--text);
+  font-family: var(--font-sans);
+  font-size: 24px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.dayRingNowLabel {
+  fill: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 12px;
 }
 
 .homeDailyPreviewMeta {
+  width: 100%;
   text-align: center;
 }
 
 .homeDailyPreviewTitle {
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--text-main);
-  margin-bottom: 4px;
+  font-size: var(--fs-16);
+  font-weight: 600;
+  color: var(--text);
 }
 
 .homeDailyPreviewSubtitle {
-  font-size: 13px;
-  color: var(--text-main);
-  opacity: 0.7;
+  margin-top: 2px;
+  font-size: var(--fs-13);
+  color: var(--muted);
+}
+
+.homeDailyPreviewNext {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: 100%;
+  margin-top: 10px;
+  font-size: var(--fs-13);
+  color: var(--text);
+}
+
+.homeDailyPreviewNext.isEmpty {
+  color: var(--muted);
+}
+
+.homeDailyPreviewSwatch {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.homeDailyPreviewNextTime {
+  flex: none;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.homeDailyPreviewNextTitle {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .homeDailyWidgetExpandedContent {
   position: absolute;
   inset: 0;
-  padding: 16px;
+  padding: 18px 18px 18px 14px;
+  overflow: auto;
   opacity: 0;
   pointer-events: none;
   transform: translateY(8px);
   transition:
-    opacity 0.26s ease,
-    transform 0.26s ease;
-  overflow: auto;
+    opacity 260ms ease,
+    transform 300ms var(--ease-out);
 }
 
 .homeHeroGrid:hover .homeDailyWidgetExpandedContent {
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);
+  transition-delay: 80ms;
 }
 
 .homeDailyExpandedHeader {
+  position: sticky;
+  top: -18px;
+  z-index: 6;
   display: flex;
+  align-items: baseline;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 10px;
+  gap: 12px;
+  margin: -18px -18px 10px -14px;
+  padding: 18px 18px 10px 18px;
+  background: var(--raised);
 }
 
-.homeDailyWidgetEyebrow {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-main);
-  opacity: 0.65;
-  margin-bottom: 4px;
+body.translucent .homeDailyExpandedHeader {
+  background: var(--popover-bg);
 }
 
 .homeDailyWidgetDate {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text-main);
+  font-size: var(--fs-16);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.homeDailyWidgetEyebrow {
+  font-size: var(--fs-13);
+  color: var(--muted);
+  white-space: nowrap;
 }
 
 .homeDailyAllDayBlock {
-  margin-bottom: 10px;
-  padding: 10px;
-  border: 1px solid var(--border-color, #e5e7eb);
-  border-radius: 12px;
-  background: var(--bg-page);
+  margin: 0 0 10px 60px;
 }
 
 .homeDailyAllDayLabel {
-  margin-bottom: 8px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--text-main);
-  opacity: 0.7;
+  margin-bottom: 6px;
+  font-size: var(--fs-12);
+  color: var(--muted);
 }
 
 .homeDailyAllDayList {
@@ -358,16 +418,14 @@ body.translucent .homeDailyWidgetInner {
   position: relative !important;
   inset: auto !important;
   height: auto !important;
-  left: auto !important;
-  right: auto !important;
-  cursor: pointer;
   min-height: unset !important;
+  cursor: pointer;
 }
 
 .homeDailyTimeline {
   display: grid;
-  grid-template-columns: 52px 1fr;
-  gap: 8px;
+  grid-template-columns: 48px 1fr;
+  gap: 10px;
   min-height: 672px;
 }
 
@@ -377,38 +435,29 @@ body.translucent .homeDailyWidgetInner {
 
 .homeDailyTimelineLabel {
   height: 28px;
-  font-size: 11px;
-  color: var(--text-main);
-  opacity: 0.72;
+  padding-right: 2px;
+  font-size: var(--fs-11);
+  line-height: 0;
   text-align: right;
-  padding-right: 4px;
-  box-sizing: border-box;
-  line-height: 28px;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
 }
 
 .homeDailyTimelineGrid {
   position: relative;
   min-height: 672px;
-  border: 1px solid var(--border-color, #e5e7eb);
-  border-radius: 14px;
-  overflow: hidden;
-  background-color: var(--bg-main);
+  border-top: 1px solid var(--grid-line);
 }
 
 .homeDailyTimelineRow {
   height: 28px;
+  border-bottom: 1px solid var(--grid-line);
   cursor: pointer;
-  transition: background-color 0.18s ease;
-  border-bottom: 1px solid var(--border-color, #e5e7eb);
-  box-sizing: border-box;
-}
-
-.homeDailyTimelineRow:last-child {
-  border-bottom: none;
+  transition: background-color 120ms ease;
 }
 
 .homeDailyTimelineRow:hover {
-  background-color: rgba(98, 100, 167, 0.05);
+  background-color: var(--hover);
 }
 
 .homeDailyEventsLayer {
@@ -424,97 +473,56 @@ body.translucent .homeDailyWidgetInner {
   position: absolute;
   left: 0;
   right: 0;
-  height: 0;
   z-index: 5;
+  height: 0;
   pointer-events: none;
 }
 
 .homeDailyNowDot {
-  width: 7px;
-  height: 7px;
-  background-color: #d13438;
-  border-radius: 50%;
-  border: 2px solid #fff;
   position: absolute;
-  left: -4px;
+  left: -5px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background-color: var(--now);
   transform: translateY(-50%);
 }
 
 .homeDailyNowLine {
-  border-top: 1px solid #d13438;
   width: 100%;
+  border-top: 1.5px solid var(--now);
   transform: translateY(-50%);
 }
 
-.todoSection {
-  max-width: 100%;
-}
-
-.todoHeader {
+.reminderCardLocation,
+.homeDailyEventCard .day-event-location,
+.homeAllDayEvent .day-event-location {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 2px solid #37352f;
+  gap: 4px;
+  min-width: 0;
 }
 
-.todoHeader h2 {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--text-main);
+.reminderCardLocation .event-location-icon,
+.homeDailyEventCard .event-location-icon,
+.homeAllDayEvent .event-location-icon {
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
 }
 
-.filterButton {
-  padding: 8px 16px;
-  background-color: transparent;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 14px;
-  color: #666;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
+/* ---------- Lower row: to-do beside the assistant (the to-do spans alone) ---------- */
 
-.filterButton:hover {
-  background-color: #f0f0f0;
-  border-color: #999;
-}
-
-.todoTable {
-  border: 2px solid #37352f;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.tableRow {
+.homeLowerGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  border-bottom: 1px solid #37352f;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 16px;
+  align-items: start;
 }
 
-.tableRow:last-child {
-  border-bottom: none;
-}
+/* ---------- Narrow windows ---------- */
 
-.tableHeader {
-  background-color: #f5f5f5;
-  font-weight: 600;
-}
-
-.tableCell {
-  padding: 16px 20px;
-  border-right: 1px solid #37352f;
-  font-size: 14px;
-  color: #37352f;
-}
-
-.tableCell:last-child {
-  border-right: none;
-}
-
-@media (max-width: 1180px) {
+@media (max-width: 1100px) {
   .homeHeroGrid,
   .homeHeroGrid:hover {
     grid-template-columns: 1fr;
@@ -522,35 +530,53 @@ body.translucent .homeDailyWidgetInner {
 
   .homeDailyWidget,
   .homeHeroGrid:hover .homeDailyWidget {
-    width: 100%;
-    height: 420px;
     justify-self: stretch;
+    width: 100%;
+    height: 440px;
+  }
+
+  /* No hover on a narrow window: the tile shows the timeline directly. */
+  .homeDailyWidgetCollapsedContent {
+    display: none;
+  }
+
+  .homeDailyWidgetExpandedContent {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+
+  .remindersSection {
+    min-height: 0;
   }
 }
 
 @media (max-width: 768px) {
-  .homeDailyPreviewCircle {
-    width: 96px;
-    height: 96px;
+  .homeGreeting {
+    font-size: 34px;
+  }
+
+  .homeHeaderLine {
+    font-size: var(--fs-14);
+  }
+
+  .homeLowerGrid {
+    grid-template-columns: 1fr;
   }
 
   .homeDailyTimeline {
-    grid-template-columns: 44px 1fr;
-  }
-
-  .homeDailyTimelineLabel {
-    font-size: 10px;
+    grid-template-columns: 40px 1fr;
   }
 }
 
-/* ============================================
-   ADMIN HOME - LIST EXPANSION IN FLOW
-   ============================================ */
+/* ============================================================
+   Admin home — managed users, each expands in place
+   ============================================================ */
 
 .adminHomeSection {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 16px;
 }
 
 .adminHomeActions {
@@ -559,133 +585,125 @@ body.translucent .homeDailyWidgetInner {
 }
 
 .adminHomeActions .refreshButton {
-  padding: 10px 16px;
-  border-radius: 12px;
-  border: 1px solid var(--panel-border);
-  background: var(--bg-main);
-  color: var(--text-main);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--control-h);
+  padding: 0 16px;
+  border: 1px solid var(--control-border);
+  border-radius: var(--r-chip);
+  background: var(--raised);
+  color: var(--text);
+  font-size: var(--fs-14);
+  font-weight: 500;
   cursor: pointer;
+  transition:
+    background-color var(--dur-fast) ease,
+    transform var(--dur-press) var(--ease-out);
+}
+
+.adminHomeActions .refreshButton:hover:not(:disabled) {
+  background: var(--surface-2);
+}
+
+.adminHomeActions .refreshButton:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 .adminUsersCardsGrid {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 8px;
 }
 
-/* Base card — collapsed state */
 .adminUserCard {
   display: flex;
   flex-direction: column;
-  border-radius: 14px;
-  border: 1px solid var(--panel-border);
-  background: var(--bg-main);
-  color: var(--text-main);
-  cursor: pointer;
-  overflow: hidden;
   max-height: 72px;
-  /*
-    CIERRE: ease-in acelera al principio para que el colapso
-    se perciba inmediato y no haya "hueco vacío" al principio.
-    Duración más corta que la apertura para sentirse ágil.
-  */
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--r-inner);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
   transition:
-    max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-    border-color 0.2s ease,
-    box-shadow 0.25s ease,
-    border-radius 0.25s ease;
+    max-height 350ms var(--ease-in-out),
+    border-color var(--dur) ease;
 }
 
 .adminUserCard:hover:not(.expanded) {
-  border-color: color-mix(in srgb, var(--link-active-bg) 50%, transparent);
+  border-color: var(--control-border);
 }
 
-/* Expanded state — grows in place, pushes siblings down */
 .adminUserCard.expanded {
   max-height: 600px;
-  border-color: var(--link-active-bg);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
-  border-radius: 18px;
+  border-color: var(--control-border);
   cursor: default;
-  /*
-    APERTURA: ease-out desacelera al final, da sensación
-    de expansión suave que "aterriza". Más lento que el cierre.
-  */
   transition:
-    max-height 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    border-color 0.2s ease,
-    box-shadow 0.3s ease,
-    border-radius 0.25s ease;
+    max-height 500ms var(--ease-drawer),
+    border-color var(--dur) ease;
 }
 
-/* Header — always visible */
 .adminUserCardHeader {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
   flex-shrink: 0;
+  align-items: center;
+  gap: 12px;
   min-height: 72px;
-  box-sizing: border-box;
+  padding: 12px 16px;
 }
 
 .adminUserCard.expanded .adminUserCardHeader {
-  padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid var(--panel-border);
-  min-height: auto;
+  border-bottom: 1px solid var(--rule);
 }
 
 .adminUserCard img,
 .adminUserAvatarFallback {
-  width: 44px;
-  height: 44px;
-  border-radius: 999px;
-  object-fit: cover;
-  border: 2px solid var(--panel-border);
   flex-shrink: 0;
-  transition: all 0.3s ease;
-}
-
-.adminUserCard.expanded img,
-.adminUserCard.expanded .adminUserAvatarFallback {
-  width: 52px;
-  height: 52px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .adminUserAvatarFallback {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 1.1rem;
-  background: var(--bg-hover);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: var(--fs-16);
+  font-weight: 600;
 }
 
 .adminUserCardInfo strong {
   display: block;
-  font-size: 0.95rem;
+  font-size: var(--fs-14);
+  font-weight: 600;
 }
 
 .adminUserCardInfo span {
-  font-size: 0.75rem;
-  opacity: 0.6;
+  font-size: var(--fs-12);
+  color: var(--muted);
 }
 
-/* Close button — hidden until expanded */
 .adminCloseBtn {
-  margin-left: auto;
+  flex-shrink: 0;
   width: 32px;
   height: 32px;
-  border-radius: 8px;
-  border: 1px solid var(--panel-border);
-  background: var(--bg-page);
-  color: var(--text-main);
-  font-size: 1.2rem;
+  margin-left: auto;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 20px;
+  line-height: 1;
   cursor: pointer;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.2s ease, background 0.15s ease;
-  flex-shrink: 0;
+  transition:
+    opacity var(--dur) ease,
+    background-color var(--dur-fast) ease;
 }
 
 .adminUserCard.expanded .adminCloseBtn {
@@ -694,116 +712,120 @@ body.translucent .homeDailyWidgetInner {
 }
 
 .adminCloseBtn:hover {
-  background: var(--bg-hover);
+  background: var(--hover);
+  color: var(--text);
 }
 
-/* Body — fades in when expanded, out immediately on close */
 .adminUserCardBody {
   flex: 1;
-  overflow-y: auto;
   padding: 0;
+  overflow-y: auto;
   opacity: 0;
-  transform: translateY(6px);
-  /* Al cerrar: sin delay, desaparece al instante */
-  transition:
-    opacity 0.15s ease 0s,
-    transform 0.15s ease 0s,
-    padding 0.2s ease;
   pointer-events: none;
+  transform: translateY(6px);
+  transition:
+    opacity 150ms ease,
+    transform 150ms ease,
+    padding 200ms ease;
 }
 
 .adminUserCard.expanded .adminUserCardBody {
-  padding: 1.25rem 1.5rem;
+  padding: 16px;
   opacity: 1;
-  transform: translateY(0);
   pointer-events: auto;
-  /* Al abrir: delay para que el contenido aparezca cuando la tarjeta ya está abierta */
+  transform: translateY(0);
   transition:
-    opacity 0.3s ease 0.25s,
-    transform 0.3s ease 0.25s,
-    padding 0.2s ease;
+    opacity 280ms ease 200ms,
+    transform 280ms var(--ease-out) 200ms,
+    padding 200ms ease;
 }
 
-/* Goals stats inside body */
+.adminGoalsStats {
+  padding: 16px;
+  background: var(--raised);
+}
+
 .adminGoalsStats h3 {
-  margin: 0 0 0.75rem;
-  font-size: 0.8rem;
+  margin: 0 0 12px;
+  font-size: var(--fs-14);
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  opacity: 0.6;
+  color: var(--text);
 }
 
 .adminGoalsStatsGrid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.6rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--r-inner);
 }
 
 .adminGoalsMetricCard {
-  border: 1px solid var(--panel-border);
-  border-radius: 12px;
-  background: var(--bg-page);
-  padding: 0.85rem 1rem;
+  padding: 12px 14px;
+  border-left: 1px solid var(--border);
+}
+
+.adminGoalsMetricCard:first-child {
+  border-left: none;
 }
 
 .adminGoalsMetricCard span {
-  font-size: 0.7rem;
-  opacity: 0.6;
+  font-size: var(--fs-12);
+  color: var(--muted);
 }
 
 .adminGoalsMetricCard strong {
   display: block;
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-top: 0.15rem;
+  margin-top: 4px;
+  font-size: var(--fs-24);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
 }
 
 .adminGoalsProgressBlock {
-  margin-top: 1rem;
+  margin-top: 14px;
 }
 
 .adminGoalsProgressBlock .goalsSummaryProgressBar {
   width: 100%;
-  height: 10px;
-  border-radius: 999px;
-  background: var(--bg-hover);
+  height: 8px;
   overflow: hidden;
+  border-radius: var(--r-chip);
+  background: var(--surface-2);
 }
 
 .adminGoalsProgressBlock .progressBarFill {
   height: 100%;
-  background: var(--link-active-bg);
-  border-radius: 999px;
+  border-radius: var(--r-chip);
+  background: var(--accent);
 }
 
 .adminGoalsProgressBlock .progressText {
   display: block;
-  margin-top: 0.5rem;
-  font-size: 0.75rem;
-  opacity: 0.55;
+  margin-top: 8px;
+  font-size: var(--fs-12);
+  color: var(--muted);
 }
 
 .adminHomeEmptyState,
 .adminLoadingState {
-  padding: 1.5rem;
+  padding: 20px;
+  border: 1px dashed var(--control-border);
+  border-radius: var(--r-inner);
+  color: var(--muted);
   text-align: center;
-  opacity: 0.6;
 }
 
-.reminderCardLocation,
-.homeDailyEventCard .day-event-location,
-.homeAllDayEvent .day-event-location {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  min-width: 0;
-}
+@media (max-width: 640px) {
+  .adminGoalsStatsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 
-.reminderCardLocation .event-location-icon,
-.homeDailyEventCard .event-location-icon,
-.homeAllDayEvent .event-location-icon {
-  width: 12px;
-  height: 12px;
-  flex: 0 0 auto;
+  .adminGoalsMetricCard:nth-child(3) {
+    border-left: none;
+  }
+
+  .adminGoalsMetricCard:nth-child(n + 3) {
+    border-top: 1px solid var(--border);
+  }
 }

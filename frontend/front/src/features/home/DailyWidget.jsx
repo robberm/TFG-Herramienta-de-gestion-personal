@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { format, isSameDay, parseISO } from "date-fns";
 import { enUS, es } from "date-fns/locale";
 import EventModal from "../calendar/EventModal.jsx";
@@ -7,6 +7,7 @@ import "../../css/Home.css";
 import "../../css/Calendar.css";
 import { capitalizeCalendarLabel } from "../../utils/dateLabels";
 import LocationIcon from "../../components/shared/LocationIcon.jsx";
+import DayRing from "./DayRing.jsx";
 import { useLanguage } from "../../context/languageContext";
 
 const HOUR_HEIGHT_PX = 28;
@@ -202,6 +203,14 @@ const DailyWidget = ({ events, onEventsChanged }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const expandedContentRef = useRef(null);
+
+  // La línea de tiempo arranca una hora antes de ahora, no a las 00:00.
+  useEffect(() => {
+    const element = expandedContentRef.current;
+    if (!element) return;
+    element.scrollTop = Math.max(0, (new Date().getHours() - 1) * HOUR_HEIGHT_PX);
+  }, []);
 
   const allDayEvents = useMemo(() => {
     return events.filter(
@@ -225,6 +234,14 @@ const DailyWidget = ({ events, onEventsChanged }) => {
 
   const hours = useMemo(() => Array.from({ length: 24 }, (_, i) => i), []);
 
+  // Primer evento con hora que aún no ha terminado: es lo que la tarjeta plegada anuncia.
+  const nextEvent = useMemo(() => {
+    const now = new Date();
+    return [...timedEvents]
+      .sort((a, b) => parseCalendarDate(a.startTime) - parseCalendarDate(b.startTime))
+      .find((event) => parseCalendarDate(event.endTime) > now);
+  }, [timedEvents]);
+
   const getCurrentTimePosition = () => {
     const now = new Date();
     const minutes = now.getHours() * 60 + now.getMinutes();
@@ -232,7 +249,7 @@ const DailyWidget = ({ events, onEventsChanged }) => {
   };
 
   const formatEventTime = (event) => {
-    if (event.isAllDay) return "Todo el día";
+    if (event.isAllDay) return t.calendarAllDay;
 
     return `${format(parseCalendarDate(event.startTime), "HH:mm")} - ${format(
       parseCalendarDate(event.endTime),
@@ -285,7 +302,12 @@ const DailyWidget = ({ events, onEventsChanged }) => {
         <div className="homeDailyWidgetInner">
           <div className="homeDailyWidgetCollapsedContent">
             <div className="homeDailyPreviewShell">
-              <div className="homeDailyPreviewCircle"></div>
+              <DayRing
+                events={events}
+                parseDate={parseCalendarDate}
+                label={`${events.length} ${events.length === 1 ? t.homeEventSingular : t.homeEventPlural} ${t.commonToday.toLowerCase()}`}
+                nowLabel={t.homeNowLabel}
+              />
             </div>
 
             <div className="homeDailyPreviewMeta">
@@ -293,22 +315,39 @@ const DailyWidget = ({ events, onEventsChanged }) => {
               <div className="homeDailyPreviewSubtitle">
                 {events.length} {events.length === 1 ? t.homeEventSingular : t.homeEventPlural} {t.commonToday.toLowerCase()}
               </div>
+              {nextEvent ? (
+                <div className="homeDailyPreviewNext">
+                  <span
+                    className="homeDailyPreviewSwatch"
+                    style={{ background: `var(--event-${String(nextEvent.category || "work").toLowerCase()}-color)` }}
+                    aria-hidden="true"
+                  />
+                  <span className="homeDailyPreviewNextTime">
+                    {format(parseCalendarDate(nextEvent.startTime), "HH:mm")}
+                  </span>
+                  <span className="homeDailyPreviewNextTitle">{nextEvent.title}</span>
+                </div>
+              ) : (
+                <div className="homeDailyPreviewNext isEmpty">
+                  {events.length === 0 ? t.homeNoEventsToday : t.homeNothingLeftToday}
+                </div>
+              )}
             </div>
           </div>
 
-          <div className="homeDailyWidgetExpandedContent">
+          <div className="homeDailyWidgetExpandedContent" ref={expandedContentRef}>
             <div className="homeDailyExpandedHeader">
-              <div>
-                <div className="homeDailyWidgetEyebrow">{t.homeDailyView}</div>
-                <div className="homeDailyWidgetDate">
-                  {capitalizeCalendarLabel(format(currentDate, "EEEE, d 'de' MMMM", { locale: calendarLocale }))}
-                </div>
+              <div className="homeDailyWidgetDate">
+                {capitalizeCalendarLabel(format(currentDate, "EEEE, d 'de' MMMM", { locale: calendarLocale }))}
+              </div>
+              <div className="homeDailyWidgetEyebrow">
+                {t.homeDailyView} · {events.length} {events.length === 1 ? t.homeEventSingular : t.homeEventPlural}
               </div>
             </div>
 
             {allDayEvents.length > 0 && (
               <div className="homeDailyAllDayBlock">
-                <div className="homeDailyAllDayLabel">Todo el día</div>
+                <div className="homeDailyAllDayLabel">{t.calendarAllDay}</div>
 
                 <div className="homeDailyAllDayList">
                   {allDayEvents.map((event) => (

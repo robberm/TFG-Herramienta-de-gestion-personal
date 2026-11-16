@@ -217,35 +217,12 @@ const DailyCalendarView = ({
   return (
     <div className="calendar-day">
       {allDayEvents.length > 0 && (
-        <div
-          style={{
-            marginBottom: "16px",
-            padding: "12px 16px",
-            border: "1px solid var(--table-border-color, #e5e7eb)",
-            borderRadius: "12px",
-            background: "var(--card-bg, rgba(255,255,255,0.7))",
-          }}
-        >
-          <div
-            style={{
-              fontSize: "12px",
-              fontWeight: 700,
-              marginBottom: "8px",
-              opacity: 0.8,
-              textTransform: "uppercase",
-              letterSpacing: "0.04em",
-            }}
-          >
+        <div className="day-all-day-block">
+          <div className="day-all-day-label">
             {t.calendarAllDay}
           </div>
 
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "8px",
-            }}
-          >
+          <div className="day-all-day-list">
             {allDayEvents.map((event) => (
               <div
                 key={event.id}

@@ -1,0 +1,8 @@
+Instrument Sans — Copyright 2022 The Instrument Sans Project Authors (https://github.com/Instrument/instrument-sans)
+Instrument Serif — Copyright 2022 The Instrument Serif Project Authors (https://github.com/Instrument/instrument-serif)
+
+Both families are licensed under the SIL Open Font License, Version 1.1.
+Full licence text: https://openfontlicense.org/open-font-license-official-text/
+
+The .woff2 files in this folder are the Latin subsets served by Google Fonts, bundled
+locally so the Electron build renders the right faces without a network connection.

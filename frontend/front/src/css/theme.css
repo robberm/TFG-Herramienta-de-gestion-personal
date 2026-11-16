@@ -1,131 +1,490 @@
-:root {
-  --bg-main: #ffffff;
-  --bg-page: #ffffff;
-  --sidebar-bg: #ffffff;
-  --bg-hover: #e9e5e0;
-  --text-main: #222;
-  --link-active-bg: #2383e2;
-  --link-active-text: white;
-  --panel-border: rgba(0, 0, 0, 0.08);
-  --panel-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  --glass-blur: none;
-  --card-background: var(--sidebar-bg);
-  --border-color: var(--panel-border);
-  --ui-surface: #ffffff;
-  --ui-surface-raised: #fbfaf8;
-  --ui-control: #f3f1ed;
-  --ui-popover: #ffffff;
-  --ui-muted: #706d68;
-  /* Los textos auxiliares comparten el mismo token en todas las vistas. */
-  --text-secondary: var(--ui-muted);
+/*
+ * GMO design tokens.
+ *
+ * One semantic set drives every screen:
+ *   --ground     the window canvas            --surface   tonal panel one step off the ground
+ *   --surface-2  a second step (controls, rows) --raised   inner cards, inputs, popovers
+ *   --border     panel edges                  --rule      row dividers (lighter than border)
+ *   --control-border  input / select edges (one step stronger than border)
+ *   --text / --muted / --faint   three text tiers, all >= 4.5:1 on --surface
+ *   --accent     the one hue: data, the selected state, at most one control
+ *   --primary    the filled primary action (near-black on light, near-white on dark)
+ *
+ * Every theme redefines the same names. Legacy names (--bg-main, --ui-surface, --text-main...)
+ * are aliases declared again on each element that overrides tokens (the reactive-contrast
+ * zones and the modals), because a var() inside a custom property resolves where it is declared.
+ */
 
-  --event-study-color: #f39c12;
-  --event-mandatory-color: #e74c3c;
-  --event-work-color: #0ea5a4;
-  --event-personal-color: #2ecc71;
-  --event-health-color: #9b59b6;
-  --event-reunion-color: #6264a7;
-  --event-perfil-color: #f48942;
-  --event-focus-color: #7c3aed;
+:root {
+  /* Type */
+  --font-sans: "Instrument Sans", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-serif: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --fs-11: 11px;
+  --fs-12: 12px;
+  --fs-13: 13px;
+  --fs-14: 14px;
+  --fs-16: 16px;
+  --fs-20: 20px;
+  --fs-24: 24px;
+  --fs-32: 32px;
+  --fs-48: 48px;
+
+  /* Shape and space */
+  --r-card: 20px;
+  --r-inner: 14px;
+  --r-control: 12px;
+  --r-chip: 999px;
+  --gap: 16px;
+  --pad: 20px;
+  --control-h: 38px;
+  --control-h-sm: 32px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --dur-press: 140ms;
+  --dur-fast: 160ms;
+  --dur: 220ms;
+
+  /* Event categories: data hues, editable from the calendar (TagColorCustomizer writes these on :root). */
+  --event-study-color: #c27c0e;
+  --event-mandatory-color: #c4382f;
+  --event-work-color: #1b6e66;
+  --event-personal-color: #3f8f4f;
+  --event-health-color: #2f6fb3;
+  --event-reunion-color: #5b6b7a;
+  --event-perfil-color: #c4622d;
+  --event-focus-color: #3d4a5c;
+
+  /* Light theme (default) */
+  --ground: #ffffff;
+  --sidebar: #f7f7f5;
+  --surface: #f5f5f3;
+  --surface-2: #ececea;
+  --raised: #ffffff;
+  --border: #e6e6e3;
+  --rule: #efefed;
+  --control-border: #d4d4d0;
+  --text: #1f201d;
+  --muted: #5d5d5a;
+  --faint: #6b6b68;
+  --accent: #1b6e66;
+  --accent-strong: #145a53;
+  --accent-soft: #e2efed;
+  --accent-ink: #ffffff;
+  --primary: #1f201d;
+  --primary-hover: #34352f;
+  --primary-ink: #ffffff;
+  --hover: rgba(31, 32, 29, 0.05);
+  --pressed: rgba(31, 32, 29, 0.09);
+  --active-pill: #e9e9e6;
+  --positive: #2e7d32;
+  --negative: #b42318;
+  --warning: #92400e;
+  --pill-positive-bg: #dcf3e2;
+  --pill-positive-ink: #12461a;
+  --pill-negative-bg: #fdecea;
+  --pill-negative-ink: #7a1d14;
+  --pill-warning-bg: #fff6df;
+  --pill-warning-ink: #7a3a0c;
+  --pill-neutral-bg: #efefed;
+  --pill-neutral-ink: #3d3d3a;
+  --focus-ring: 0 0 0 2px var(--ground), 0 0 0 4px color-mix(in srgb, var(--accent) 70%, transparent);
+  --shadow-float: 0 16px 40px rgba(20, 20, 18, 0.12), 0 2px 8px rgba(20, 20, 18, 0.06);
+  --shadow-modal: 0 24px 64px rgba(20, 20, 18, 0.18), 0 4px 16px rgba(20, 20, 18, 0.08);
+  --scrim: rgba(24, 24, 22, 0.36);
+  --frame-bg: var(--ground);
+  --frame-border: transparent;
+  --glass-blur: none;
+  --panel-blur: none;
+  --grid-line: #ededeb;
+  --now: #c4382f;
+  color-scheme: light;
 }
 
 body.dark {
-  --bg-main: #1c1c1c;
-  --bg-page: #1c1c1c;
-  --sidebar-bg: #2a2a2a;
-  --bg-hover: #333;
-  --text-main: #eee;
-  --link-active-bg: #4a90e2;
-  --link-active-text: white;
-  --panel-border: rgba(255, 255, 255, 0.08);
-  --panel-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  --glass-blur: none;
-  --ui-surface: #252525;
-  --ui-surface-raised: #2c2c2c;
-  --ui-control: #343434;
-  --ui-popover: #292929;
-  --ui-muted: #aaa7a2;
-  --text-secondary: var(--ui-muted);
+  --ground: #141414;
+  --sidebar: #141414;
+  --surface: #1c1c1c;
+  --surface-2: #262626;
+  --raised: #222222;
+  --border: #2a2a2a;
+  --rule: #232323;
+  --control-border: #3b3b3b;
+  --text: #f1f1ef;
+  --muted: #ababa7;
+  --faint: #969692;
+  --accent: #5cbcaf;
+  --accent-strong: #7fd0c5;
+  --accent-soft: rgba(92, 188, 175, 0.14);
+  --accent-ink: #0b1f1c;
+  --primary: #f1f1ef;
+  --primary-hover: #ffffff;
+  --primary-ink: #141414;
+  --hover: rgba(255, 255, 255, 0.05);
+  --pressed: rgba(255, 255, 255, 0.09);
+  --active-pill: #262626;
+  --positive: #5cc078;
+  --negative: #f07167;
+  --warning: #e7a54b;
+  --pill-positive-bg: #17291c;
+  --pill-positive-ink: #74d08e;
+  --pill-negative-bg: #2e1a19;
+  --pill-negative-ink: #f2948c;
+  --pill-warning-bg: #2c2214;
+  --pill-warning-ink: #edb969;
+  --pill-neutral-bg: #262626;
+  --pill-neutral-ink: #d4d4d0;
+  --shadow-float: 0 16px 40px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-modal: 0 28px 72px rgba(0, 0, 0, 0.55), 0 4px 16px rgba(0, 0, 0, 0.35);
+  --scrim: rgba(0, 0, 0, 0.55);
+  --grid-line: #232323;
+  --now: #f07167;
+  color-scheme: dark;
 }
+
 body.truedark {
-  --bg-main: #000000;
-  --bg-page: #000000;
-  --sidebar-bg: #080808;
-  --bg-hover: #171717;
-  --text-main: #f5f5f7;
-  --link-active-bg: #ffffff;
-  --link-active-text: #050505;
-  --panel-border: rgba(255, 255, 255, 0.10);
-  --panel-shadow: 0 12px 34px rgba(0, 0, 0, 0.72), inset 0 1px rgba(255, 255, 255, 0.035);
-  --glass-blur: none;
-  --ui-surface: #060606;
-  --ui-surface-raised: #0c0c0c;
-  --ui-control: #151515;
-  --ui-popover: #0b0b0b;
-  --ui-muted: #9d9d9d;
-  --text-secondary: var(--ui-muted);
+  --ground: #000000;
+  --sidebar: #000000;
+  --surface: #0d0d0d;
+  --surface-2: #171717;
+  --raised: #121212;
+  --border: #1c1c1c;
+  --rule: #151515;
+  --control-border: #333333;
+  --text: #f5f5f5;
+  --muted: #a6a6a6;
+  --faint: #8f8f8f;
+  --accent: #5cbcaf;
+  --accent-strong: #7fd0c5;
+  --accent-soft: rgba(92, 188, 175, 0.13);
+  --accent-ink: #001412;
+  --primary: #f5f5f5;
+  --primary-hover: #ffffff;
+  --primary-ink: #000000;
+  --hover: rgba(255, 255, 255, 0.05);
+  --pressed: rgba(255, 255, 255, 0.09);
+  --active-pill: #1a1a1a;
+  --positive: #5cc078;
+  --negative: #f07167;
+  --warning: #e7a54b;
+  --pill-positive-bg: #0f1f13;
+  --pill-positive-ink: #74d08e;
+  --pill-negative-bg: #241312;
+  --pill-negative-ink: #f2948c;
+  --pill-warning-bg: #22190c;
+  --pill-warning-ink: #edb969;
+  --pill-neutral-bg: #1a1a1a;
+  --pill-neutral-ink: #d4d4d4;
+  --shadow-float: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 0 1px #1f1f1f;
+  --shadow-modal: 0 28px 72px rgba(0, 0, 0, 0.8), 0 0 0 1px #222222;
+  --scrim: rgba(0, 0, 0, 0.66);
+  --grid-line: #151515;
+  --now: #f07167;
+  color-scheme: dark;
 }
 
+/* Custom: a dark theme tinted by the user's chosen colour, which also becomes the accent. */
 body.custom {
-  --bg-main: color-mix(in srgb, var(--custom-theme-color) 8%, #0d0e12);
-  --bg-page: color-mix(in srgb, var(--custom-theme-color) 6%, #0b0c10);
-  --sidebar-bg: color-mix(in srgb, var(--custom-theme-color) 14%, #17181e);
-  --bg-hover: color-mix(in srgb, var(--custom-theme-color) 24%, #25262e);
-  --text-main: #f7f7fb;
-  --link-active-bg: var(--custom-theme-color);
-  --link-active-text: #ffffff;
-  --panel-border: color-mix(in srgb, var(--custom-theme-color) 26%, rgba(255, 255, 255, 0.10));
-  --panel-shadow: 0 12px 32px color-mix(in srgb, var(--custom-theme-color) 15%, rgba(0, 0, 0, 0.48));
-  --glass-blur: none;
-  --ui-surface: color-mix(in srgb, var(--custom-theme-color) 11%, #111218);
-  --ui-surface-raised: color-mix(in srgb, var(--custom-theme-color) 15%, #181920);
-  --ui-control: color-mix(in srgb, var(--custom-theme-color) 20%, #22232b);
-  --ui-popover: color-mix(in srgb, var(--custom-theme-color) 12%, #15161c);
-  --ui-muted: color-mix(in srgb, var(--custom-theme-color) 20%, #b9b9c2);
-  --text-secondary: var(--ui-muted);
+  --ground: color-mix(in srgb, var(--custom-theme-color) 7%, #0e0f12);
+  --sidebar: color-mix(in srgb, var(--custom-theme-color) 7%, #0e0f12);
+  --surface: color-mix(in srgb, var(--custom-theme-color) 10%, #15161a);
+  --surface-2: color-mix(in srgb, var(--custom-theme-color) 15%, #1d1e23);
+  --raised: color-mix(in srgb, var(--custom-theme-color) 12%, #1a1b20);
+  --border: color-mix(in srgb, var(--custom-theme-color) 16%, #25262c);
+  --rule: color-mix(in srgb, var(--custom-theme-color) 12%, #1f2025);
+  --control-border: color-mix(in srgb, var(--custom-theme-color) 24%, #34353c);
+  --text: #f6f6f8;
+  --muted: color-mix(in srgb, var(--custom-theme-color) 14%, #b4b4bc);
+  --faint: color-mix(in srgb, var(--custom-theme-color) 14%, #9a9aa3);
+  --accent: color-mix(in srgb, var(--custom-theme-color) 82%, #ffffff);
+  --accent-strong: color-mix(in srgb, var(--custom-theme-color) 60%, #ffffff);
+  --accent-soft: color-mix(in srgb, var(--custom-theme-color) 20%, transparent);
+  --accent-ink: #ffffff;
+  --primary: #f6f6f8;
+  --primary-hover: #ffffff;
+  --primary-ink: #111216;
+  --hover: rgba(255, 255, 255, 0.05);
+  --pressed: rgba(255, 255, 255, 0.09);
+  --active-pill: color-mix(in srgb, var(--custom-theme-color) 20%, #22232a);
+  --positive: #5cc078;
+  --negative: #f07167;
+  --warning: #e7a54b;
+  --pill-positive-bg: #17291c;
+  --pill-positive-ink: #74d08e;
+  --pill-negative-bg: #2e1a19;
+  --pill-negative-ink: #f2948c;
+  --pill-warning-bg: #2c2214;
+  --pill-warning-ink: #edb969;
+  --pill-neutral-bg: color-mix(in srgb, var(--custom-theme-color) 14%, #24252b);
+  --pill-neutral-ink: #d8d8de;
+  --shadow-float: 0 16px 40px rgba(0, 0, 0, 0.5);
+  --shadow-modal: 0 28px 72px rgba(0, 0, 0, 0.6);
+  --scrim: rgba(0, 0, 0, 0.55);
+  --grid-line: color-mix(in srgb, var(--custom-theme-color) 10%, #1f2025);
+  --now: #f07167;
+  color-scheme: dark;
 }
 
+/*
+ * Translucent: the desktop shows through the window. Surfaces are thin washes and the frame
+ * keeps its backdrop blur (this theme's purpose). Reactive contrast refines it per zone below.
+ */
 body.translucent {
-  --bg-main: rgba(255, 255, 255, 0.10);
-  --bg-page: transparent;
-  --sidebar-bg: rgba(20, 20, 20, 0.22);
-  --bg-hover: rgba(255, 255, 255, 0.16);
-  --text-main: #f5f5f5;
-  --link-active-bg: rgba(74, 144, 226, 0.90);
-  --link-active-text: white;
-  --panel-border: rgba(255, 255, 255, 0.14);
-  --panel-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  --ground: transparent;
+  --sidebar: rgba(12, 14, 18, 0.22);
+  --surface: rgba(255, 255, 255, 0.07);
+  --surface-2: rgba(255, 255, 255, 0.11);
+  --raised: rgba(255, 255, 255, 0.09);
+  --border: rgba(255, 255, 255, 0.13);
+  --rule: rgba(255, 255, 255, 0.09);
+  --control-border: rgba(255, 255, 255, 0.22);
+  --text: #f7f7f7;
+  --muted: rgba(255, 255, 255, 0.74);
+  --faint: rgba(255, 255, 255, 0.66);
+  --accent: #7fd6ca;
+  --accent-strong: #a6e6dd;
+  --accent-soft: rgba(127, 214, 202, 0.18);
+  --accent-ink: #062320;
+  --primary: rgba(255, 255, 255, 0.94);
+  --primary-hover: #ffffff;
+  --primary-ink: #111316;
+  --hover: rgba(255, 255, 255, 0.08);
+  --pressed: rgba(255, 255, 255, 0.14);
+  --active-pill: rgba(255, 255, 255, 0.14);
+  --positive: #7fdc97;
+  --negative: #ff9a90;
+  --warning: #f5c26b;
+  --pill-positive-bg: rgba(127, 220, 151, 0.18);
+  --pill-positive-ink: #b5f0c5;
+  --pill-negative-bg: rgba(255, 154, 144, 0.18);
+  --pill-negative-ink: #ffc9c3;
+  --pill-warning-bg: rgba(245, 194, 107, 0.18);
+  --pill-warning-ink: #fde0ad;
+  --pill-neutral-bg: rgba(255, 255, 255, 0.12);
+  --pill-neutral-ink: #f0f0f0;
+  --shadow-float: 0 16px 40px rgba(0, 0, 0, 0.28);
+  --shadow-modal: 0 24px 64px rgba(0, 0, 0, 0.36);
+  --scrim: rgba(0, 0, 0, 0.32);
+  --frame-bg: rgba(16, 18, 22, 0.16);
+  --frame-border: rgba(255, 255, 255, 0.14);
   --glass-blur: blur(14px);
-  --ui-surface: rgba(17, 25, 40, 0.38);
-  --ui-surface-raised: rgba(17, 25, 40, 0.46);
-  --ui-control: rgba(255, 255, 255, 0.03);
-  --ui-popover: rgba(17, 25, 40, 0.90);
-  --ui-muted: rgba(255, 255, 255, 0.68);
-  --text-secondary: var(--ui-muted);
+  --panel-blur: blur(14px);
+  --popover-bg: rgba(22, 25, 31, 0.92);
+  --grid-line: rgba(255, 255, 255, 0.08);
+  --now: #ff8a80;
+  color-scheme: dark;
+}
+
+/* Acrylic: Windows paints the material, so panels only need a fine tint and no blur. */
+body.translucent.acrylic {
+  --sidebar: rgba(0, 0, 0, 0.14);
+  --surface: rgba(255, 255, 255, 0.05);
+  --surface-2: rgba(255, 255, 255, 0.085);
+  --raised: rgba(255, 255, 255, 0.07);
+  --border: rgba(255, 255, 255, 0.09);
+  --rule: rgba(255, 255, 255, 0.07);
+  --control-border: rgba(255, 255, 255, 0.18);
+  --text: #f4f4f4;
+  --muted: rgba(255, 255, 255, 0.72);
+  --faint: rgba(255, 255, 255, 0.64);
+  --accent: #78d0c4;
+  --active-pill: rgba(255, 255, 255, 0.11);
+  --hover: rgba(255, 255, 255, 0.07);
+  --frame-bg: rgba(255, 255, 255, 0.03);
+  --frame-border: rgba(255, 255, 255, 0.09);
+  --glass-blur: none;
+  --panel-blur: none;
+  --popover-bg: rgba(36, 36, 40, 0.95);
+  --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.3);
+}
+
+/*
+ * Reactive contrast of the translucent theme (src/theme/backdropContrast.js). Each zone gets
+ * data-backdrop from what lies behind the window. The colour wash (.backdropTint) carries the
+ * legibility; these only pick the text tier and very light neutral surfaces.
+ */
+body.translucent[data-backdrop="dark"],
+body.translucent [data-backdrop="dark"] {
+  --sidebar: rgba(0, 0, 0, 0.1);
+  --surface: rgba(0, 0, 0, 0.16);
+  --surface-2: rgba(255, 255, 255, 0.08);
+  --raised: rgba(0, 0, 0, 0.2);
+  --border: rgba(255, 255, 255, 0.15);
+  --rule: rgba(255, 255, 255, 0.1);
+  --text: #f8f8f8;
+  --muted: rgba(255, 255, 255, 0.76);
+  --faint: rgba(255, 255, 255, 0.68);
+  --hover: rgba(255, 255, 255, 0.1);
+  --active-pill: rgba(255, 255, 255, 0.18);
+  --primary: rgba(255, 255, 255, 0.94);
+  --primary-ink: #111316;
+  --accent: #7fd6ca;
+  color: var(--text);
+}
+
+body.translucent[data-backdrop="light"],
+body.translucent [data-backdrop="light"] {
+  --sidebar: rgba(255, 255, 255, 0.16);
+  --surface: rgba(255, 255, 255, 0.3);
+  --surface-2: rgba(0, 0, 0, 0.06);
+  --raised: rgba(255, 255, 255, 0.42);
+  --border: rgba(0, 0, 0, 0.12);
+  --rule: rgba(0, 0, 0, 0.08);
+  --control-border: rgba(0, 0, 0, 0.2);
+  --text: #121417;
+  --muted: rgba(0, 0, 0, 0.68);
+  --faint: rgba(0, 0, 0, 0.62);
+  --hover: rgba(0, 0, 0, 0.06);
+  --pressed: rgba(0, 0, 0, 0.1);
+  --active-pill: rgba(0, 0, 0, 0.09);
+  --primary: rgba(17, 19, 22, 0.9);
+  --primary-hover: #111316;
+  --primary-ink: #ffffff;
+  --accent: #145a53;
+  --accent-soft: rgba(20, 90, 83, 0.14);
+  --accent-ink: #ffffff;
+  --pill-neutral-bg: rgba(0, 0, 0, 0.07);
+  --pill-neutral-ink: #1f2124;
+  --popover-bg: rgba(250, 250, 252, 0.95);
+  --grid-line: rgba(0, 0, 0, 0.08);
+  color: var(--text);
+}
+
+/*
+ * Legacy aliases. Re-declared on every element that overrides the semantic tokens so the old
+ * names follow the zone they sit in.
+ */
+:root,
+body,
+.windowTitleBar,
+.sideBar,
+.mainContent,
+[data-backdrop-zone],
+.editModal,
+.gcal-modal,
+.confirmDialog,
+.themeSurfaceScope {
+  --bg-main: var(--ground);
+  --bg-page: var(--ground);
+  --sidebar-bg: var(--sidebar);
+  --bg-hover: var(--hover);
+  --text-main: var(--text);
+  --text-primary: var(--text);
+  --text-secondary: var(--muted);
+  --link-active-bg: var(--accent);
+  --link-active-text: var(--accent-ink);
+  --panel-border: var(--border);
+  --panel-shadow: none;
+  --card-background: var(--surface);
+  --card-bg: var(--surface);
+  --border-color: var(--border);
+  --border-color-soft: var(--rule);
+  --table-border-color: var(--border);
+  --ui-surface: var(--surface);
+  --ui-surface-raised: var(--raised);
+  --ui-control: var(--surface-2);
+  --ui-popover: var(--popover-bg, var(--raised));
+  --ui-muted: var(--muted);
+  --bg-primary: var(--ground);
+  --bg-secondary: var(--surface);
+  --bg-tertiary: var(--surface-2);
+  --background-color: var(--ground);
+  --primary-color: var(--accent);
+  --primary-light: var(--accent-soft);
+  --button-primary-bg: var(--primary);
+  --button-primary-text: var(--primary-ink);
+  --danger-color: var(--negative);
+  --warning-color: var(--warning);
+  --muted-legacy: var(--muted);
+  --ink: var(--text);
+  --radius-sm: 8px;
+  --radius-md: var(--r-control);
+  --radius-lg: var(--r-card);
+  --shadow-md: var(--shadow-float);
+  --shadow-lg: var(--shadow-modal);
+  --transition-fast: var(--dur-fast) var(--ease-out);
+}
+
+/* Modals and the confirm dialog sit on a raised sheet of their own. */
+.editModal,
+.gcal-modal,
+.confirmDialog {
+  --modal-ground: #ffffff;
+  --ground: var(--modal-ground);
+  background: var(--modal-ground);
+  color: var(--text);
+}
+
+body.light .editModal,
+body.light .gcal-modal,
+body.light .confirmDialog {
+  --modal-ground: #ffffff;
+  --surface: #f5f5f3;
+}
+
+body.dark .editModal,
+body.dark .gcal-modal,
+body.dark .confirmDialog {
+  --modal-ground: #1c1c1c;
+  --surface: #242424;
+  --raised: #262626;
+  --surface-2: #2c2c2c;
+}
+
+body.truedark .editModal,
+body.truedark .gcal-modal,
+body.truedark .confirmDialog {
+  --modal-ground: #0d0d0d;
+  --surface: #151515;
+  --raised: #171717;
+  --surface-2: #1e1e1e;
+}
+
+body.custom .editModal,
+body.custom .gcal-modal,
+body.custom .confirmDialog {
+  --modal-ground: color-mix(in srgb, var(--custom-theme-color) 10%, #17181d);
+  --surface: color-mix(in srgb, var(--custom-theme-color) 14%, #1e1f25);
+  --raised: color-mix(in srgb, var(--custom-theme-color) 16%, #22232a);
 }
 
 body.translucent .editModal,
 body.translucent .gcal-modal,
 body.translucent .confirmDialog {
-  --modal-surface: rgba(17, 25, 40, 0.72);
-  --modal-control: rgba(255, 255, 255, 0.06);
-  --modal-hover: rgba(255, 255, 255, 0.1);
-  --modal-border: rgba(255, 255, 255, 0.16);
-  --modal-text: rgba(255, 255, 255, 0.96);
-  --modal-muted: rgba(255, 255, 255, 0.68);
+  --modal-ground: rgba(22, 25, 31, 0.84);
+  --surface: rgba(255, 255, 255, 0.06);
+  --raised: rgba(255, 255, 255, 0.08);
+  --surface-2: rgba(255, 255, 255, 0.1);
+  --text: #f7f7f7;
+  --muted: rgba(255, 255, 255, 0.74);
+  --faint: rgba(255, 255, 255, 0.66);
+  --border: rgba(255, 255, 255, 0.14);
+  --control-border: rgba(255, 255, 255, 0.22);
+  --accent: #7fd6ca;
+  --accent-ink: #062320;
+  --primary: rgba(255, 255, 255, 0.94);
+  --primary-ink: #111316;
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+}
+
+body.translucent.acrylic .editModal,
+body.translucent.acrylic .gcal-modal,
+body.translucent.acrylic .confirmDialog {
+  --modal-ground: rgba(34, 34, 38, 0.95);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 /*
- * Contraste reactivo del translúcido (src/theme/backdropContrast.js). Cada zona recibe
- * data-backdrop según lo que hay detrás de la ventana y --backdrop-luma (0 negro, 1 blanco).
- * La legibilidad la da el velo de color (.backdropTint), que reproduce el gradiente del fondo
- * con la claridad corregida; por eso aquí no hay velos grises, solo capas neutras muy suaves
- * que oscurecen o aclaran sin quitar el color de debajo.
+ * Colour wash behind the translucent window, painted by src/theme/backdropTint.js.
+ * One cell is one pixel; it is padded on every side so the blur leaves no edge.
  */
 .backdropTint {
   position: fixed;
   z-index: -1;
-  /* Una celda = un píxel; se amplía con relleno a los lados para que el blur no deje bordes. */
   left: calc(-100vw * var(--tint-padding, 2) / var(--tint-cols, 32));
   top: calc(-100vh * var(--tint-padding, 2) / var(--tint-rows, 20));
   width: calc(100vw * (var(--tint-cols, 32) + 2 * var(--tint-padding, 2)) / var(--tint-cols, 32));
@@ -136,95 +495,17 @@ body.translucent .confirmDialog {
   will-change: contents;
 }
 
-body.translucent[data-backdrop="dark"],
-body.translucent [data-backdrop="dark"] {
-  --bg-main: transparent;
-  --sidebar-bg: rgba(0, 0, 0, 0.10);
-  --bg-hover: rgba(255, 255, 255, 0.12);
-  --text-main: #f7f7f7;
-  --link-active-bg: rgba(255, 255, 255, 0.22);
-  --link-active-text: #ffffff;
-  --panel-border: rgba(255, 255, 255, 0.16);
-  --ui-surface: rgba(0, 0, 0, 0.14);
-  --ui-surface-raised: rgba(0, 0, 0, 0.20);
-  --ui-control: rgba(255, 255, 255, 0.07);
-  --ui-muted: rgba(255, 255, 255, 0.72);
-  --text-secondary: var(--ui-muted);
-  --border-color: var(--panel-border);
-  color: var(--text-main);
-}
-
-body.translucent[data-backdrop="light"],
-body.translucent [data-backdrop="light"] {
-  --bg-main: transparent;
-  --sidebar-bg: rgba(255, 255, 255, 0.14);
-  --bg-hover: rgba(0, 0, 0, 0.07);
-  --text-main: #121417;
-  --link-active-bg: rgba(0, 0, 0, 0.78);
-  --link-active-text: #ffffff;
-  --panel-border: rgba(0, 0, 0, 0.12);
-  --panel-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
-  --ui-surface: rgba(255, 255, 255, 0.26);
-  --ui-surface-raised: rgba(255, 255, 255, 0.36);
-  --ui-control: rgba(0, 0, 0, 0.05);
-  --ui-popover: rgba(250, 250, 252, 0.94);
-  --ui-muted: rgba(0, 0, 0, 0.64);
-  --text-secondary: var(--ui-muted);
-  --border-color: var(--panel-border);
-  color: var(--text-main);
-}
-
-body.translucent .windowTitleBar {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-}
-
-/*
- * Acrylic: el material lo pinta Windows (DWM) detrás de la ventana, así que aquí no
- * hace falta backdrop-filter. Se apoyan en los estilos de componentes de body.translucent
- * (el body lleva ambas clases) y solo ajustan la paleta a un tinte más fino y legible.
- */
-body.translucent.acrylic {
-  --bg-main: rgba(255, 255, 255, 0.06);
-  --bg-page: transparent;
-  --sidebar-bg: rgba(0, 0, 0, 0.16);
-  --bg-hover: rgba(255, 255, 255, 0.09);
-  --text-main: #f3f3f3;
-  --link-active-bg: rgba(96, 165, 250, 0.85);
-  --link-active-text: #ffffff;
-  --panel-border: rgba(255, 255, 255, 0.09);
-  --panel-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
-  --glass-blur: none;
-  --ui-surface: rgba(255, 255, 255, 0.045);
-  --ui-surface-raised: rgba(255, 255, 255, 0.07);
-  --ui-control: rgba(255, 255, 255, 0.06);
-  --ui-popover: rgba(36, 36, 40, 0.94);
-  --ui-muted: rgba(255, 255, 255, 0.66);
-  --text-secondary: var(--ui-muted);
-}
-
-body.translucent.acrylic .editModal,
-body.translucent.acrylic .gcal-modal,
-body.translucent.acrylic .confirmDialog {
-  --modal-surface: rgba(32, 32, 36, 0.86);
-}
-
 html,
 body,
 #root {
   background: transparent;
 }
 
-body.light {
-  background: var(--bg-page);
-}
-
-body.dark {
-  background: var(--bg-page);
-}
-
+body.light,
+body.dark,
 body.truedark,
 body.custom {
-  background: var(--bg-page);
+  background: var(--ground);
 }
 
 body.translucent {
@@ -237,83 +518,12 @@ body.translucent {
   background: transparent;
 }
 
-.sideBar {
-  background-color: var(--sidebar-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-}
-
 body,
-#root,
-.homeFrame,
+.windowTitleBar,
 .sideBar,
-.mainContent,
-.pageContent,
-.settingsPage,
-.settingsCard {
+.appWindowFrame {
   transition:
     background-color 0.3s ease,
-    background 0.3s ease,
     color 0.3s ease,
-    border-color 0.3s ease,
-    box-shadow 0.3s ease,
-    backdrop-filter 0.3s ease,
-    -webkit-backdrop-filter 0.3s ease;
-}
-
-/* La paleta de modal se mantiene consistente sin anular los estilos internos. */
-.editModal,
-.gcal-modal,
-.confirmDialog {
-  --modal-surface: #28292f;
-  --modal-control: #32333b;
-  --modal-hover: #3a3b43;
-  --modal-border: rgba(255, 255, 255, 0.12);
-  --modal-text: #f7f7f8;
-  --modal-muted: rgba(255, 255, 255, 0.66);
-  --card-background: var(--modal-surface);
-  --bg-main: var(--modal-control);
-  --bg-hover: var(--modal-hover);
-  --border-color: var(--modal-border);
-  --panel-border: var(--modal-border);
-  --text-main: var(--modal-text);
-  --text-secondary: var(--modal-muted);
-  --ui-surface: var(--modal-surface);
-  --ui-surface-raised: var(--modal-surface);
-  --ui-control: var(--modal-control);
-  --ui-popover: var(--modal-surface);
-  --ui-muted: var(--modal-muted);
-  background: var(--modal-surface);
-  color: var(--modal-text);
-}
-
-body.dark .editModal,
-body.dark .gcal-modal,
-body.dark .confirmDialog {
-  --modal-surface: #2a2a2a;
-  --modal-control: #343434;
-  --modal-hover: #3d3d3d;
-}
-
-body.truedark .editModal,
-body.truedark .gcal-modal,
-body.truedark .confirmDialog {
-  --modal-surface: #0c0c0c;
-  --modal-control: #181818;
-  --modal-hover: #242424;
-}
-
-body.custom .editModal,
-body.custom .gcal-modal,
-body.custom .confirmDialog {
-  --modal-surface: color-mix(in srgb, var(--custom-theme-color) 16%, #181920);
-  --modal-control: color-mix(in srgb, var(--custom-theme-color) 22%, #22232b);
-  --modal-hover: color-mix(in srgb, var(--custom-theme-color) 28%, #282a34);
-}
-
-body.translucent .editModal,
-body.translucent .gcal-modal,
-body.translucent .confirmDialog {
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+    border-color 0.3s ease;
 }

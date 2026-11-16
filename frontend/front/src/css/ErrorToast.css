@@ -1,64 +1,87 @@
-/**
- * Estilos compartidos para toasts de error.
- * Los separamos para no acoplar feedback visual al módulo Block.
- */
+/* Shared error toast: a raised note with the negative colour on its edge, not a red slab. */
 .error-toast {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
+  position: fixed;
+  top: 52px;
+  right: 20px;
+  z-index: 2500;
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.875rem 1rem;
-  background: var(--danger-color);
-  color: white;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-  z-index: 30;
-  max-width: min(420px, calc(100% - 2rem));
-  animation: errorToastSlideIn 0.3s ease;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: min(420px, calc(100% - 40px));
+  padding: 12px 12px 12px 16px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--negative);
+  border-radius: 14px;
+  background: var(--popover-bg, var(--raised));
+  color: var(--text);
+  font-size: var(--fs-14);
+  line-height: 1.45;
+  box-shadow: var(--shadow-float);
+  backdrop-filter: var(--panel-blur);
+  -webkit-backdrop-filter: var(--panel-blur);
+  animation: errorToastIn 260ms var(--ease-out);
 }
 
 .error-toast span {
+  flex: 1;
+  padding-top: 2px;
   overflow-wrap: anywhere;
-}
-
-@media (max-width: 768px) {
-  .error-toast {
-    left: 1rem;
-    right: 1rem;
-    top: 1rem;
-    max-width: none;
-  }
-}
-
-@keyframes errorToastSlideIn {
-  from {
-    opacity: 0;
-    transform: translateX(100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
 }
 
 .error-toast-close {
   display: flex;
+  flex: none;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  background: rgba(255, 255, 255, 0.2);
+  width: 28px;
+  height: 28px;
   border: none;
-  border-radius: 4px;
-  color: white;
-  cursor: pointer;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
   font-size: 18px;
   line-height: 1;
-  transition: background var(--transition-fast);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) ease;
 }
 
 .error-toast-close:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--hover);
+  color: var(--text);
+}
+
+.error-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 420px;
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--pill-negative-bg);
+  color: var(--pill-negative-ink);
+}
+
+.error-close-button {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+@keyframes errorToastIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@media (max-width: 768px) {
+  .error-toast {
+    top: 64px;
+    left: 16px;
+    right: 16px;
+    max-width: none;
+  }
 }

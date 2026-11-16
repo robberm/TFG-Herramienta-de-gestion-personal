@@ -444,20 +444,20 @@ const EventModal = ({
   };
 
   const getCategoryColor = (cat) => {
-    if (!cat) return 'var(--event-work-color, #6264a7)';
+    if (!cat) return 'var(--event-work-color, #1b6e66)';
     const key = String(cat).toUpperCase();
     const map = {
-      REUNION: 'var(--event-reunion-color, #6264a7)',
-      PERSONAL: 'var(--event-personal-color, #78b6c8)',
-      PERFIL: 'var(--event-perfil-color, #f48942)',
-      STUDY: 'var(--event-study-color, #66bb6a)',
-      WORK: 'var(--event-work-color, #e11238)',
-      FOCUS: 'var(--event-focus-color, #7c3aed)',
-      HEALTH: 'var(--event-health-color, #6366f1)',
-      MANDATORY: 'var(--event-mandatory-color, #ff6347)',
+      REUNION: 'var(--event-reunion-color, #5b6b7a)',
+      PERSONAL: 'var(--event-personal-color, #3f8f4f)',
+      PERFIL: 'var(--event-perfil-color, #c4622d)',
+      STUDY: 'var(--event-study-color, #c27c0e)',
+      WORK: 'var(--event-work-color, #1b6e66)',
+      FOCUS: 'var(--event-focus-color, #3d4a5c)',
+      HEALTH: 'var(--event-health-color, #2f6fb3)',
+      MANDATORY: 'var(--event-mandatory-color, #c4382f)',
     };
 
-    return map[key] || 'var(--event-work-color, #6264a7)';
+    return map[key] || 'var(--event-work-color, #1b6e66)';
   };
 
   /**
@@ -501,13 +501,17 @@ const EventModal = ({
     <div className="gcal-modal-overlay" onClick={onClose}>
       <div className="gcal-modal" onClick={(e) => e.stopPropagation()}>
         <div className="gcal-modal-header">
-          {isSeries && (
+          {isSeries ? (
             <div className="gcal-series-heading">
               <strong>{t.calendarSeriesEditTitle}</strong>
               <span>{t.calendarSeriesEditHint}</span>
             </div>
+          ) : (
+            <h2 className="gcal-modal-title">
+              {formData.id ? t.calendarEditEventTitle : t.calendarNewEventTitle}
+            </h2>
           )}
-          <button className="gcal-close-btn" onClick={onClose} type="button">
+          <button className="gcal-close-btn" onClick={onClose} type="button" aria-label={t.commonClose}>
             <svg
               viewBox="0 0 24 24"
               fill="none"

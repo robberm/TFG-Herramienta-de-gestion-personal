@@ -7,7 +7,7 @@ import { resolveProfileImageUrl } from "../../utils/profileImage";
 import "../../css/UserMenu.css";
 import { useLanguage } from "../../context/languageContext";
 
-function UserMenu() {
+function UserMenu({ collapsed = false }) {
   const { t } = useLanguage();
   const [userMenuIsOpen, setUserMenuIsOpen] = useState(false);
   const [username, setUsername] = useState(
@@ -91,6 +91,9 @@ function UserMenu() {
         type="button"
         className="userMenuTrigger"
         onClick={() => setUserMenuIsOpen(!userMenuIsOpen)}
+        aria-haspopup="menu"
+        aria-expanded={userMenuIsOpen}
+        title={collapsed ? username : undefined}
       >
         <div className="userAvatar">
           {profileImage ? (
@@ -110,25 +113,26 @@ function UserMenu() {
         </div>
 
         <i
-          className={`fa fa-chevron-down userFlecha ${userMenuIsOpen ? "open" : ""}`}
+          className={`fa fa-chevron-up userFlecha ${userMenuIsOpen ? "open" : ""}`}
         ></i>
       </button>
 
       {userMenuIsOpen && (
-        <div className="userMenuPop">
+        <div className="userMenuPop" role="menu">
           <Link
             to="/settings"
             className="menuItem"
+            role="menuitem"
             onClick={() => setUserMenuIsOpen(false)}
           >
             <i className="fa fa-cog"></i>
             <span>{t.settings}</span>
           </Link>
 
-          <div className="menuItem logout" onClick={handleLogout}>
+          <button type="button" className="menuItem logout" role="menuitem" onClick={handleLogout}>
             <i className="fa fa-sign-out-alt"></i>
             <span>{t.signOut}</span>
-          </div>
+          </button>
         </div>
       )}
     </div>

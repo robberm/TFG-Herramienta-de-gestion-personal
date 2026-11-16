@@ -1,59 +1,74 @@
-/* ============================================
-   HOME - ASISTENTE DE IA
-   ============================================ */
-
+/* AI assistant on the dashboard: a chat thread inside a tonal panel. */
 .assistantPanel {
-  margin-top: 24px;
-  padding: 20px 22px;
-  border-radius: 16px;
-  border: 1px solid var(--border-color, #e9e5e0);
-  background-color: var(--bg-page);
-  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;
+  max-height: 520px;
+  padding: 20px;
 }
 
 .assistantHeader {
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
+  justify-content: space-between;
   gap: 12px;
   margin-bottom: 12px;
 }
 
 .assistantHeader h2 {
   margin: 0;
-  font-size: 20px;
-  color: var(--text-main);
+  font-size: var(--fs-14);
+  font-weight: 600;
+  color: var(--text);
 }
 
 .assistantSubtitle {
   display: block;
   margin-top: 2px;
-  font-size: 12px;
-  color: var(--text-secondary);
+  font-size: var(--fs-13);
+  color: var(--muted);
+}
+
+.assistantNotice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border: 1px dashed var(--control-border);
+  border-radius: var(--r-inner);
+}
+
+.assistantNotice p {
+  margin: 0;
+  font-size: var(--fs-14);
+  color: var(--muted);
 }
 
 .assistantMessages {
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: 8px;
-  max-height: 380px;
-  overflow-y: auto;
+  min-height: 120px;
   padding: 4px 2px;
+  overflow-y: auto;
 }
 
 .assistantEmpty {
-  margin: 8px 0;
-  font-size: 13px;
-  color: var(--text-secondary);
+  margin: auto 0;
+  font-size: var(--fs-14);
+  color: var(--muted);
+  text-align: center;
 }
 
 .assistantMessage {
-  max-width: 82%;
-  padding: 10px 12px;
-  border-radius: 12px;
-  font-size: 14px;
+  max-width: 86%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: var(--fs-14);
   line-height: 1.5;
-  color: var(--text-main);
+  animation: assistantMessageIn 220ms var(--ease-out);
 }
 
 .assistantMessage p {
@@ -64,26 +79,42 @@
 
 .assistantMessage.user {
   align-self: flex-end;
-  background: var(--link-active-bg);
-  color: var(--link-active-text);
+  border-bottom-right-radius: 6px;
+  background: var(--primary);
+  color: var(--primary-ink);
 }
 
 .assistantMessage.assistant {
   align-self: flex-start;
-  background: var(--ui-control);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 6px;
+  background: var(--raised);
+  color: var(--text);
 }
 
 .assistantMessage.thinking {
-  color: var(--text-secondary);
-  font-style: italic;
+  color: var(--muted);
 }
 
 .assistantRemembered {
-  margin: 6px 0 0;
+  margin: 8px 0 0;
   padding: 0;
   list-style: none;
-  font-size: 12px;
-  color: var(--text-secondary);
+  font-size: var(--fs-12);
+  color: var(--muted);
+}
+
+.assistantRemembered i {
+  color: var(--accent);
+}
+
+.assistantError {
+  margin: 8px 0 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--pill-negative-bg);
+  color: var(--pill-negative-ink);
+  font-size: var(--fs-13);
 }
 
 .assistantComposer {
@@ -95,47 +126,57 @@
 .assistantComposer input {
   flex: 1;
   min-width: 0;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid var(--panel-border);
-  background: var(--ui-control);
-  color: var(--text-main);
-  font: inherit;
-  font-size: 14px;
+  height: var(--control-h);
+  padding: 0 16px;
+  border: 1px solid var(--control-border);
+  border-radius: var(--r-chip);
+  background: var(--raised);
+  color: var(--text);
+  font-size: var(--fs-14);
+  outline: none;
+  transition:
+    border-color var(--dur-fast) ease,
+    box-shadow var(--dur-fast) ease;
+}
+
+.assistantComposer input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .assistantSend {
-  padding: 10px 16px;
+  flex: none;
+  height: var(--control-h);
+  padding: 0 18px;
   border: none;
-  border-radius: 10px;
-  background: var(--link-active-bg);
-  color: var(--link-active-text);
-  font-size: 14px;
-  font-weight: 600;
+  border-radius: var(--r-chip);
+  background: var(--primary);
+  color: var(--primary-ink);
+  font-size: var(--fs-14);
+  font-weight: 500;
   cursor: pointer;
+  transition:
+    background-color var(--dur-fast) ease,
+    opacity var(--dur-fast) ease,
+    transform var(--dur-press) var(--ease-out);
+}
+
+.assistantSend:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.assistantSend:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 .assistantSend:disabled {
-  opacity: 0.55;
-  cursor: default;
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
-.assistantNotice {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.assistantNotice p {
-  margin: 0;
-  font-size: 14px;
-  color: var(--text-secondary);
-}
-
-.assistantError {
-  margin: 8px 0 0;
-  font-size: 13px;
-  color: var(--event-mandatory-color);
+@keyframes assistantMessageIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
 }

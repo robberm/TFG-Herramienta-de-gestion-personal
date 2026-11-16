@@ -66,43 +66,49 @@ const Register = () => {
     }
   };
 
-  const colorRegisterTexto = {
-    color: "#FFFFFF", // Color blanco para el texto de la página de registro
-  };
-
   return (
-    <div className="register-form">
-      <h2 style={colorRegisterTexto}>{t.registerTitle}</h2>
-      <form onSubmit={handleRegister}>
-        <input
-          className="app-input"
-          name="username"
-          type="text"
-          placeholder={t.username}
-          value={registerUsername}
-          onChange={(e) => setRegisterUsername(e.target.value)} // Actualiza el estado
-          onKeyDown={handleKeyDown} // Manejo de la tecla Enter
-        />
-        <input
-          className="app-input"
-          id="password"
-          ref={passwordInputRef}
-          name="password"
-          type="password"
-          placeholder={t.loginPassword}
-          value={registerPw}
-          onChange={(e) => setRegisterPw(e.target.value)}
-          onKeyDown={handleKeyDown}
-          autoComplete="new-password"
-        />
-        <button className="app-button" type="submit">
+    <div className="register-form authForm">
+      <h2 className="srOnly">{t.registerTitle}</h2>
+      <form className="authFormFields" onSubmit={handleRegister} noValidate>
+        <label className="authField">
+          <span className="authFieldLabel">{t.username}</span>
+          <input
+            className="app-input"
+            name="username"
+            type="text"
+            autoComplete="username"
+            value={registerUsername}
+            onChange={(e) => setRegisterUsername(e.target.value)} // Actualiza el estado
+            onKeyDown={handleKeyDown} // Manejo de la tecla Enter
+          />
+        </label>
+        <label className="authField">
+          <span className="authFieldLabel">{t.loginPassword}</span>
+          <input
+            className="app-input"
+            id="password"
+            ref={passwordInputRef}
+            name="password"
+            type="password"
+            value={registerPw}
+            onChange={(e) => setRegisterPw(e.target.value)}
+            onKeyDown={handleKeyDown}
+            autoComplete="new-password"
+            aria-describedby="registerPasswordHelp"
+          />
+          <span className="authFieldHint" id="registerPasswordHelp">
+            {t.registerPasswordHelp}
+          </span>
+        </label>
+        {error && (
+          <div className="error" role="alert">
+            {error}
+          </div>
+        )}
+        <button className="app-button authSubmit" type="submit">
           {t.registerTitle}
         </button>
       </form>
-      <h4 style={colorRegisterTexto}>
-        {t.registerPasswordHelp}
-      </h4>
-      {error && <div className="error">{error}</div>}
     </div>
   );
 };

@@ -74,8 +74,13 @@ const RemindersPanel = ({ todayEvents, isLoadingTodayEvents }) => {
   }, [todayEvents]);
 
   return (
-    <div className="remindersSection">
-      <h2>{t.homeReminders}</h2>
+    <section className="remindersSection">
+      <header className="homePanelHeader">
+        <h2>{t.homeReminders}</h2>
+        {!isLoadingTodayEvents && reminderEvents.length > 0 && (
+          <span className="homePanelCount">{reminderEvents.length}</span>
+        )}
+      </header>
 
       {isLoadingTodayEvents ? (
         <div className="remindersEmptyState">{t.homeLoadingEvents}</div>
@@ -84,31 +89,44 @@ const RemindersPanel = ({ todayEvents, isLoadingTodayEvents }) => {
           {t.homeNoRemindersToday}
         </div>
       ) : (
-        <div className="remindersList">
+        <ul className="remindersList">
           {reminderEvents.map((event) => {
             const startDate = parseReminderDate(event.startTime);
             const endDate = parseReminderDate(event.endTime);
 
             return (
-              <div key={event.id} className="reminderCard">
+              <li
+                key={event.id}
+                className="reminderCard"
+                style={{
+                  "--reminder-color": `var(--event-${String(event.category || "work").toLowerCase()}-color)`,
+                }}
+              >
                 <div className="reminderCardTime">
-                  {event.isAllDay
-                    ? t.calendarAllDay
-                    : `${format(startDate, "HH:mm")} - ${format(endDate, "HH:mm")}`}
+                  {event.isAllDay ? (
+                    t.calendarAllDay
+                  ) : (
+                    <>
+                      <time>{format(startDate, "HH:mm")}</time>
+                      <span className="reminderCardEnd">{format(endDate, "HH:mm")}</span>
+                    </>
+                  )}
                 </div>
 
-                <div className="reminderCardTitle">{event.title}</div>
-                {event.location && (
-                  <div className="reminderCardLocation">
-                    <LocationIcon /> {event.location}
-                  </div>
-                )}
-              </div>
+                <div className="reminderCardBody">
+                  <div className="reminderCardTitle">{event.title}</div>
+                  {event.location && (
+                    <div className="reminderCardLocation">
+                      <LocationIcon /> {event.location}
+                    </div>
+                  )}
+                </div>
+              </li>
             );
           })}
-        </div>
+        </ul>
       )}
-    </div>
+    </section>
   );
 };
 
