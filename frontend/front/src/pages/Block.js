@@ -743,6 +743,7 @@ function Block() {
               options={[
                 { value: "NOTIFICATION", label: t.blockNotification },
                 { value: "SCREEN_BLOCK", label: t.blockScreen },
+                { value: "NONE", label: t.blockNoAction },
               ]}
               onChange={(value) => {
                 setFocusAction(value);

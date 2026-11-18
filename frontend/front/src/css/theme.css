@@ -18,7 +18,7 @@
 :root {
   /* Type */
   --font-sans: "Instrument Sans", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
-  --font-serif: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --font-display: "Bricolage Grotesque", "Instrument Sans", "Segoe UI Variable Display", system-ui, sans-serif;
   --fs-11: 11px;
   --fs-12: 12px;
   --fs-13: 13px;

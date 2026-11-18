@@ -56,8 +56,14 @@ body.translucent .appWindowFrame {
 
 /* ---------- Sidebar: open plane, on the page ground, labelled ---------- */
 
+/*
+ * Sidebar geometry: the toggle, every icon and the avatar share one 34px centre line in both
+ * states, so collapsing only animates the width and fades the words; nothing jumps.
+ * 68px collapsed = 10px padding + 48px column + 10px padding; icons sit at 10 + 15 + 9 = 34.
+ */
 .sideBar {
   position: relative;
+  z-index: 30;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -65,10 +71,11 @@ body.translucent .appWindowFrame {
   min-width: 232px;
   padding: 14px 10px 12px;
   background-color: var(--sidebar);
-  overflow: hidden;
+  /* Visible so the account menu can open past the sidebar; the rows clip their own text. */
+  overflow: visible;
   transition:
-    width 240ms var(--ease-in-out),
-    min-width 240ms var(--ease-in-out),
+    width 280ms var(--ease-drawer),
+    min-width 280ms var(--ease-drawer),
     background-color 0.3s ease;
 }
 
@@ -79,26 +86,16 @@ body.translucent .sideBar {
 .menuHeader {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  height: 36px;
-  padding: 0 4px 0 10px;
-  margin-bottom: 18px;
-}
-
-.sidebarBrand {
-  display: flex;
-  align-items: center;
   gap: 10px;
-  min-width: 0;
-  color: var(--text);
-}
-
-.sidebarBrandMark {
-  flex: none;
+  height: 36px;
+  padding: 0 0 0 8px;
+  margin-bottom: 18px;
+  overflow: hidden;
 }
 
 .sidebarBrandName {
+  overflow: hidden;
+  color: var(--text);
   font-size: var(--fs-16);
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -132,6 +129,7 @@ body.translucent .sideBar {
 
 .sidebarMobileToggle {
   display: none;
+  margin-left: auto;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -151,7 +149,8 @@ body.translucent .sideBar {
 
 .menuGroupLabel {
   display: block;
-  padding: 0 12px 8px;
+  overflow: hidden;
+  padding: 0 15px 8px;
   font-size: var(--fs-12);
   font-weight: 500;
   color: var(--faint);
@@ -162,9 +161,10 @@ body.translucent .sideBar {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 12px;
   height: 36px;
-  padding: 0 12px;
+  padding: 0 12px 0 15px;
+  overflow: hidden;
   border-radius: 10px;
   color: var(--muted);
   font-size: var(--fs-14);
@@ -215,37 +215,39 @@ body.translucent .sideBar {
   white-space: nowrap;
 }
 
-.sidebarFooter {
-  margin-top: auto;
-  padding-top: 12px;
-}
-
-/* Collapsed: icons only, the brand keeps its mark. */
-.sideBar.collapsed {
-  width: 68px;
-  min-width: 68px;
-}
-
-.sideBar.collapsed .menuHeader {
-  flex-direction: column;
-  height: auto;
-  gap: 10px;
-  padding: 0;
+/* Words fade with the width: out quickly when collapsing, in after the bar has opened. */
+.sidebarBrandName,
+.menuLabel,
+.menuGroupLabel {
+  opacity: 1;
+  transition: opacity 200ms ease 80ms;
 }
 
 .sideBar.collapsed .sidebarBrandName,
 .sideBar.collapsed .menuLabel,
 .sideBar.collapsed .menuGroupLabel {
-  display: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
 }
 
-.sideBar.collapsed .sidebarBrand {
-  justify-content: center;
+.sidebarFooter {
+  margin-top: auto;
+  padding-top: 12px;
 }
 
-.sideBar.collapsed a {
-  justify-content: center;
-  padding: 0;
+.sideBar.collapsed {
+  width: 68px;
+  min-width: 68px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sideBar,
+  .sidebarBrandName,
+  .menuLabel,
+  .menuGroupLabel {
+    transition: none;
+  }
 }
 
 /* ---------- Canvas ---------- */
@@ -301,8 +303,9 @@ body.translucent .sideBar {
     padding: 0 0 0 4px;
   }
 
+  .sideBar .sidebarBrandName,
   .sideBar.collapsed .sidebarBrandName {
-    display: inline;
+    opacity: 1;
   }
 
   .sidebarToggle {
@@ -345,6 +348,8 @@ body.translucent .sideBar {
   .sideBar.mobileOpen .menuLabel,
   .sideBar.mobileOpen .menuGroupLabel {
     display: inline-flex;
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .sideBar.mobileOpen a {

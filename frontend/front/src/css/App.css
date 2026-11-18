@@ -163,12 +163,11 @@ body.translucent .authScreen {
   position: relative;
   z-index: 1;
   margin: 0;
-  font-family: var(--font-serif);
-  font-size: var(--fs-48);
-  font-weight: 400;
-  line-height: 1.05;
-  letter-spacing: -0.015em;
-  animation: authFadeUp 700ms var(--ease-out) 80ms both;
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
 }
 
 .authLead {

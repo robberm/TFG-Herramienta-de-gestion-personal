@@ -79,4 +79,16 @@ public interface EventRepo extends JpaRepository<Event, Long> {
         ORDER BY e.startTime ASC
         """)
     List<Event> findPendingReminders(@Param("now") LocalDateTime now);
+
+    /**
+     * Evento con sus asignaciones ya cargadas: los reminders se ejecutan en un hilo del
+     * planificador, sin sesión de Hibernate abierta, y no pueden inicializar la colección LAZY.
+     */
+    @Query("""
+        SELECT DISTINCT e FROM Event e
+        LEFT JOIN FETCH e.assignments a
+        LEFT JOIN FETCH a.personalUser
+        WHERE e.id = :id
+        """)
+    java.util.Optional<Event> findByIdWithAssignments(@Param("id") Long id);
 }

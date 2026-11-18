@@ -873,9 +873,12 @@ const REMINDER_VISIBLE_MS = 12000;
 
 function createReminderWindow(reminder) {
   const display = screen.getPrimaryDisplay();
-  const width = 360;
-  const height = 220;
-  const margin = 18;
+  // La tarjeta va dentro de la ventana con un margen (PAD) para que su borde y su sombra
+  // no se corten en los bordes de una ventana transparente.
+  const PAD = 16;
+  const width = 360 + PAD * 2;
+  const height = 210 + PAD * 2;
+  const margin = 4;
 
   const x = Math.round(
     display.workArea.x + display.workArea.width - width - margin,
@@ -898,7 +901,8 @@ function createReminderWindow(reminder) {
     skipTaskbar: true,
     alwaysOnTop: true,
     show: false,
-    hasShadow: true,
+    // Sin sombra del sistema: en una ventana transparente dibuja un rectángulo alrededor.
+    hasShadow: false,
     focusable: true,
     icon: getAppIconPath(),
     webPreferences: {
@@ -932,111 +936,149 @@ function createReminderWindow(reminder) {
         <style>
           * {
             box-sizing: border-box;
-            font-family: "Segoe UI", sans-serif;
+            font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
           }
 
+          html,
           body {
             margin: 0;
-            height: 100vh;
-            display: flex;
-            align-items: flex-end;
+            height: 100%;
             background: transparent;
             overflow: hidden;
           }
 
-          .card {
-            width: 100%;
-            max-height: 100%;
-            padding: 18px;
-            border-radius: 18px;
-            background: rgba(22, 22, 22, 0.96);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 18px 42px rgba(0, 0, 0, 0.32);
+          body {
             display: flex;
-            flex-direction: column;
-            gap: 10px;
-            animation: reminder-in 320ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
+            align-items: flex-end;
+            padding: ${PAD}px;
           }
 
-          .card.is-break {
-            border-color: rgba(125, 211, 168, 0.45);
+          .card {
+            position: relative;
+            width: 100%;
+            max-height: 100%;
+            padding: 16px 48px 18px 20px;
+            border-radius: 16px;
+            background: #1c1c1c;
+            color: #f1f1ef;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 8px 14px rgba(0, 0, 0, 0.28);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            overflow: hidden;
+            animation: reminder-in 320ms cubic-bezier(0.32, 0.72, 0, 1) both;
+          }
+
+          /* Borde de acento a la izquierda, dentro de la tarjeta: nunca queda cortado. */
+          .card::before {
+            content: "";
+            position: absolute;
+            top: 14px;
+            bottom: 14px;
+            left: 0;
+            width: 3px;
+            border-radius: 0 3px 3px 0;
+            background: #5cbcaf;
           }
 
           .card.is-leaving {
-            animation: reminder-out 180ms ease-in both;
+            animation: reminder-out 180ms ease-out both;
           }
 
           .eyebrow {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: rgba(255,255,255,0.65);
+            font-size: 12px;
+            font-weight: 500;
+            color: #5cbcaf;
           }
 
           .title {
-            font-size: 20px;
+            font-size: 17px;
             font-weight: 600;
-            line-height: 1.2;
+            line-height: 1.3;
           }
 
           .time,
           .location,
           .description {
             font-size: 13px;
-            color: rgba(255,255,255,0.82);
+            line-height: 1.45;
+            color: #ababa7;
           }
 
-          .actions {
-            margin-top: auto;
+          .location {
             display: flex;
-            justify-content: flex-end;
+            align-items: center;
+            gap: 5px;
           }
 
-          button {
-            border: 1px solid rgba(255,255,255,0.14);
+          .location svg {
+            flex: none;
+            width: 12px;
+            height: 12px;
+          }
+
+          .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: grid;
+            place-items: center;
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            border: none;
+            border-radius: 8px;
             background: transparent;
-            color: white;
-            border-radius: 999px;
-            padding: 8px 14px;
+            color: #ababa7;
             cursor: pointer;
+            transition: background-color 140ms ease, color 140ms ease;
           }
 
-          button:hover {
-            background: rgba(255,255,255,0.08);
+          .close:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+          }
+
+          .close:active {
+            transform: scale(0.94);
+          }
+
+          .close svg {
+            width: 12px;
+            height: 12px;
           }
 
           .pulse {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #7dd3a8;
+            background: #5cbcaf;
             animation: reminder-pulse 1.2s ease-out 3;
           }
 
           @keyframes reminder-in {
             from {
               opacity: 0;
-              transform: translateY(18px) scale(0.97);
+              transform: translateY(16px);
             }
           }
 
           @keyframes reminder-out {
             to {
               opacity: 0;
-              transform: translateY(8px) scale(0.98);
+              transform: translateY(8px);
             }
           }
 
           @keyframes reminder-pulse {
             from {
-              box-shadow: 0 0 0 0 rgba(125, 211, 168, 0.7);
+              box-shadow: 0 0 0 0 rgba(92, 188, 175, 0.7);
             }
             to {
-              box-shadow: 0 0 0 12px rgba(125, 211, 168, 0);
+              box-shadow: 0 0 0 10px rgba(92, 188, 175, 0);
             }
           }
 
@@ -1051,14 +1093,14 @@ function createReminderWindow(reminder) {
       </head>
       <body>
         <div class="card${isBreak ? " is-break" : ""}" id="card">
+          <button class="close" type="button" onclick="dismiss()" aria-label="${closeLabel}" title="${closeLabel}">
+            <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+          </button>
           <div class="eyebrow">${isBreak ? '<span class="pulse"></span>' : ""}${eyebrow}</div>
           <div class="title">${title}</div>
           ${isBreak ? "" : `<div class="time">${isAllDay ? "Todo el día" : `Empieza a las ${startTime}`}</div>`}
-          ${location ? `<div class="location">📍 ${location}</div>` : ""}
+          ${location ? `<div class="location"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s-6-5.33-6-10a6 6 0 1 1 12 0c0 4.67-6 10-6 10Z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="11" r="2.2" stroke="currentColor" stroke-width="2"/></svg>${location}</div>` : ""}
           ${description ? `<div class="description">${description}</div>` : ""}
-          <div class="actions">
-            <button onclick="dismiss()">${closeLabel}</button>
-          </div>
         </div>
         <script>
           function dismiss() {

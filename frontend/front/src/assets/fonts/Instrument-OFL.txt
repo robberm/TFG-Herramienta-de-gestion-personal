@@ -1,5 +1,5 @@
 Instrument Sans — Copyright 2022 The Instrument Sans Project Authors (https://github.com/Instrument/instrument-sans)
-Instrument Serif — Copyright 2022 The Instrument Serif Project Authors (https://github.com/Instrument/instrument-serif)
+Bricolage Grotesque — Copyright 2022 The Bricolage Grotesque Project Authors (https://github.com/ateliertriay/bricolage)
 
 Both families are licensed under the SIL Open Font License, Version 1.1.
 Full licence text: https://openfontlicense.org/open-font-license-official-text/

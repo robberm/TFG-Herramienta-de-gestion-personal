@@ -6,6 +6,7 @@ import Register from "./pages/Register";
 import WindowTitleBar from "./components/layout/WindowTitleBar";
 import AuthOrbit from "./components/shared/AuthOrbit";
 import GmoMark from "./components/shared/GmoMark";
+import RevealHeadline from "./components/shared/RevealHeadline";
 import { useLanguage } from "./context/languageContext";
 import { app_name } from "./constants/textConstants";
 import { registerActiveSessionUser } from "./api/authApi";
@@ -61,9 +62,7 @@ function App() {
           <GmoMark size={48} className="authMark" />
         </div>
 
-        <h1 className="authTitle">
-          {t.appWelcomeTo} {app_name}
-        </h1>
+        <RevealHeadline className="authTitle" text={`${t.appWelcomeTo} ${app_name}`} />
         <p className="authLead">{t.appTagline}</p>
 
         <section className="authCard" aria-label={t.authModeLabel}>

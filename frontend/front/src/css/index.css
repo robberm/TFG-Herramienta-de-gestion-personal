@@ -10,18 +10,10 @@
 }
 
 @font-face {
-  font-family: "Instrument Serif";
-  src: url("../assets/fonts/InstrumentSerif-Regular-latin.woff2") format("woff2");
-  font-weight: 400;
+  font-family: "Bricolage Grotesque";
+  src: url("../assets/fonts/BricolageGrotesque-Variable-latin.woff2") format("woff2");
+  font-weight: 400 800;
   font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Instrument Serif";
-  src: url("../assets/fonts/InstrumentSerif-Italic-latin.woff2") format("woff2");
-  font-weight: 400;
-  font-style: italic;
   font-display: swap;
 }
 
@@ -182,6 +174,31 @@ a:focus:not(:focus-visible) {
 
   .ui-btn--ghost:hover:not(:disabled) {
     background: var(--hover);
+  }
+}
+
+/* Headline reveal: each word rises 0.35em and sharpens, 70ms apart. Played once (see RevealHeadline). */
+.revealHeadline {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  font-variation-settings: "opsz" 96;
+}
+
+.revealWord {
+  display: inline-block;
+}
+
+.revealHeadline.isAnimated .revealWord {
+  animation: revealWord 700ms var(--ease-out) both;
+  animation-delay: calc(var(--word-index, 0) * 70ms + 60ms);
+}
+
+@keyframes revealWord {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(0.35em);
   }
 }
 

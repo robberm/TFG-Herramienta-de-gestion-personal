@@ -3,6 +3,7 @@ import { format, parseISO } from "date-fns";
 import { enUS, es } from "date-fns/locale";
 import { useLanguage } from "../../context/languageContext";
 import { capitalizeCalendarLabel } from "../../utils/dateLabels";
+import RevealHeadline from "../../components/shared/RevealHeadline";
 
 const toDate = (value) => {
   if (value instanceof Date) return value;
@@ -49,9 +50,11 @@ const HomeHeader = ({ events = null }) => {
 
   return (
     <header className="homeHeader">
-      <h1 className="homeGreeting">
-        {greeting}, <span className="homeGreetingName">{username}</span>
-      </h1>
+      <RevealHeadline
+        className="homeGreeting"
+        text={`${greeting}, ${username}`}
+        onceKey="home-greeting"
+      />
       <p className="homeHeaderLine">
         <span>{dateLabel}</span>
         {summary && (

@@ -114,9 +114,10 @@ public class BlockingService {
 
         if (action == FocusAction.SCREEN_BLOCK) {
             startBlockingVisual(breakDurationSeconds);
-        } else {
+        } else if (action == FocusAction.NOTIFICATION) {
             notifyFocusBreak(breakDurationSeconds);
         }
+        // NONE: el descanso ocurre igual (apps y webs se desbloquean), pero sin avisos.
 
         this.nextActionAtEpochMs = breakEndsAtEpochMs + toMillis(getWorkDurationSeconds(config));
         publishFocusState();
@@ -156,7 +157,9 @@ public class BlockingService {
      */
     private void notifyBreakEnded() {
         IStorageService.Config config = storageService.loadConfig();
-        if (!pauseScheduledBlocks && isEffectiveFocusEnabled(config)) {
+        if (!pauseScheduledBlocks
+                && isEffectiveFocusEnabled(config)
+                && FocusAction.from(config.getFocusAction()) != FocusAction.NONE) {
             publishFocusNotification("BREAK_END", getBreakDurationSeconds(config));
         }
     }
@@ -310,7 +313,8 @@ public class BlockingService {
 
     private enum FocusAction {
         SCREEN_BLOCK,
-        NOTIFICATION;
+        NOTIFICATION,
+        NONE;
 
         static FocusAction from(String value) {
             if (value == null) {

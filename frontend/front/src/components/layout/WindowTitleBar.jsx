@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../../css/WindowTitleBar.css";
 import { app_name } from "../../constants/textConstants";
-import GmoMark from "../shared/GmoMark";
 
 const WindowTitleBar = () => {
   const [isMaximized, setIsMaximized] = useState(false);
@@ -44,7 +43,7 @@ const WindowTitleBar = () => {
     <header className="windowTitleBar">
       <div className="windowTitleBarDragArea" onDoubleClick={handleDoubleClick}>
         <div className="windowTitleBarBrand">
-          <GmoMark size={14} className="windowTitleBarMark" />
+          
           <span className="windowTitleBarTitle">{app_name}</span>
         </div>
       </div>

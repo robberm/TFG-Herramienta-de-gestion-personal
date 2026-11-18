@@ -228,17 +228,30 @@ public class ReminderScheduler {
      * @param offsetMinutes offset configurado para el reminder actual
      */
     private void executeReminder(Event event, Integer offsetMinutes) {
-        if (event == null || event.getId() == null || event.getUser() == null) {
+        if (event == null || event.getId() == null) {
             return;
         }
 
         Long loggedUserId = sessionStore.getLoggedUserId();
-
-        if (loggedUserId == null || !loggedUserId.equals(event.getUser().getId())) {
+        if (loggedUserId == null) {
             return;
         }
 
-        reminderService.sendReminder(reminderMapper.toDto(event, offsetMinutes));
+        // Se recarga con las asignaciones ya inicializadas: el evento programado está desconectado
+        // de la sesión y leer su colección LAZY lanzaba LazyInitializationException.
+        Event freshEvent = eventRepo.findByIdWithAssignments(event.getId()).orElse(null);
+        if (freshEvent == null) {
+            return;
+        }
+
+        boolean assignedToLoggedUser = freshEvent.getAssignments().stream()
+                .anyMatch(assignment -> assignment.getPersonalUser() != null
+                        && loggedUserId.equals(assignment.getPersonalUser().getId()));
+        if (!assignedToLoggedUser) {
+            return;
+        }
+
+        reminderService.sendReminder(reminderMapper.toDto(freshEvent, offsetMinutes));
     }
 
     /**
