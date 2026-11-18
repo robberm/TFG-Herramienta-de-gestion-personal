@@ -22,6 +22,9 @@ public class BlockingService {
     private static final int DEFAULT_WORK_DURATION_SECONDS = 20 * 60;
     private static final int DEFAULT_BREAK_DURATION_SECONDS = 20;
     private static final int MIN_WORK_BREAK_GAP_SECONDS = 5;
+    // Ni el trabajo ni el descanso bajan de 5 s: con valores menores los bloqueos se encadenaban
+    // sin dar tiempo a cambiar la configuración.
+    private static final int MIN_FOCUS_DURATION_SECONDS = 5;
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
     private final SimpMessageSendingOperations messagingTemplate;
@@ -254,7 +257,7 @@ public class BlockingService {
         boolean focusModeLockedByTag = isFocusModeLockedByTag();
 
         if (sanitizedWorkDurationSeconds - sanitizedBreakDurationSeconds < MIN_WORK_BREAK_GAP_SECONDS) {
-            sanitizedBreakDurationSeconds = Math.max(1, sanitizedWorkDurationSeconds - MIN_WORK_BREAK_GAP_SECONDS);
+            sanitizedBreakDurationSeconds = Math.max(MIN_FOCUS_DURATION_SECONDS, sanitizedWorkDurationSeconds - MIN_WORK_BREAK_GAP_SECONDS);
             if (sanitizedWorkDurationSeconds - sanitizedBreakDurationSeconds < MIN_WORK_BREAK_GAP_SECONDS) {
                 sanitizedWorkDurationSeconds = sanitizedBreakDurationSeconds + MIN_WORK_BREAK_GAP_SECONDS;
             }
@@ -290,7 +293,7 @@ public class BlockingService {
             return defaultValue;
         }
 
-        return duration;
+        return Math.max(MIN_FOCUS_DURATION_SECONDS, duration);
     }
 
     private int getWorkDurationSeconds(IStorageService.Config config) {

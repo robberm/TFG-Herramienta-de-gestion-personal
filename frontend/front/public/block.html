@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GMO · Descanso</title>
+    <style>
+      :root {
+        --ground: #0f1011;
+        --text: #f3f3f1;
+        --muted: #a9a9a5;
+        --track: #26282a;
+        --accent: #5cbcaf;
+        color-scheme: dark;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+
+      body {
+        display: grid;
+        place-items: center;
+        background: var(--ground);
+        color: var(--text);
+        font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+        cursor: default;
+        user-select: none;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 28px;
+        padding: 24px;
+        text-align: center;
+        animation: rise 600ms cubic-bezier(0.23, 1, 0.32, 1) both;
+      }
+
+      .ring {
+        position: relative;
+        width: 240px;
+        height: 240px;
+      }
+
+      .ring svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+      }
+
+      .ring circle {
+        fill: none;
+        stroke-width: 6;
+      }
+
+      .track {
+        stroke: var(--track);
+      }
+
+      .progress {
+        stroke: var(--accent);
+        stroke-linecap: round;
+        stroke-dasharray: 100;
+        stroke-dashoffset: 0;
+        animation: drain var(--seconds, 20s) linear forwards;
+      }
+
+      .time {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        font-size: 56px;
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 32px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+
+      p {
+        max-width: 34ch;
+        margin: -16px 0 0;
+        font-size: 16px;
+        line-height: 1.5;
+        color: var(--muted);
+      }
+
+      @keyframes drain {
+        to {
+          stroke-dashoffset: 100;
+        }
+      }
+
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        main,
+        .progress {
+          animation: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="ring" aria-hidden="true">
+        <svg viewBox="0 0 120 120">
+          <circle class="track" cx="60" cy="60" r="54" pathLength="100" />
+          <circle class="progress" cx="60" cy="60" r="54" pathLength="100" />
+        </svg>
+        <div class="time" id="time">0:20</div>
+      </div>
+      <h1 id="title">Tómate un descanso</h1>
+      <p id="message">Aléjate un momento de la pantalla. Vuelves al foco en cuanto termine la cuenta atrás.</p>
+    </main>
+
+    <script>
+      (function () {
+        var params = new URLSearchParams(window.location.search);
+        var seconds = Math.max(1, Math.round(Number(params.get("seconds")) || 20));
+        var english = !/^es/i.test(navigator.language || "es");
+
+        if (english) {
+          document.documentElement.lang = "en";
+          document.title = "GMO · Break";
+          document.getElementById("title").textContent = "Take a break";
+          document.getElementById("message").textContent =
+            "Step away from the screen for a moment. Focus resumes when the countdown ends.";
+        }
+
+        document.documentElement.style.setProperty("--seconds", seconds + "s");
+
+        var endsAt = Date.now() + seconds * 1000;
+        var timeEl = document.getElementById("time");
+
+        function render() {
+          var left = Math.max(0, Math.ceil((endsAt - Date.now()) / 1000));
+          var minutes = Math.floor(left / 60);
+          var rest = left % 60;
+          timeEl.textContent = minutes + ":" + (rest < 10 ? "0" : "") + rest;
+          if (left > 0) window.setTimeout(render, 250);
+        }
+
+        render();
+      })();
+    </script>
+  </body>
+</html>

@@ -130,9 +130,12 @@ const CategoryIcons = {
   ),
 };
 const MIN_WORK_BREAK_GAP_SECONDS = 5;
+// Ni el trabajo ni el descanso bajan de 5 s: con valores menores los bloqueos se encadenaban
+// sin dejar tiempo a cambiar la configuración.
+const MIN_FOCUS_DURATION_SECONDS = 5;
 
 const DurationSelector = ({ valueSeconds, onChange, label }) => {
-  const totalSeconds = Math.max(1, Number(valueSeconds || 1));
+  const totalSeconds = Math.max(MIN_FOCUS_DURATION_SECONDS, Number(valueSeconds || MIN_FOCUS_DURATION_SECONDS));
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
@@ -149,7 +152,7 @@ const DurationSelector = ({ valueSeconds, onChange, label }) => {
     );
     onChange(
       Math.max(
-        1,
+        MIN_FOCUS_DURATION_SECONDS,
         normalizedHours * 3600 + normalizedMinutes * 60 + normalizedSeconds,
       ),
     );
@@ -303,12 +306,12 @@ function Block() {
   );
 
   const normalizeDurations = useCallback((workSeconds, breakSeconds) => {
-    let nextWorkSeconds = Math.max(1, Math.round(Number(workSeconds || 1)));
-    let nextBreakSeconds = Math.max(1, Math.round(Number(breakSeconds || 1)));
+    let nextWorkSeconds = Math.max(MIN_FOCUS_DURATION_SECONDS, Math.round(Number(workSeconds || 0)));
+    let nextBreakSeconds = Math.max(MIN_FOCUS_DURATION_SECONDS, Math.round(Number(breakSeconds || 0)));
 
     if (nextWorkSeconds - nextBreakSeconds < MIN_WORK_BREAK_GAP_SECONDS) {
       nextBreakSeconds = Math.max(
-        1,
+        MIN_FOCUS_DURATION_SECONDS,
         nextWorkSeconds - MIN_WORK_BREAK_GAP_SECONDS,
       );
       if (nextWorkSeconds - nextBreakSeconds < MIN_WORK_BREAK_GAP_SECONDS) {

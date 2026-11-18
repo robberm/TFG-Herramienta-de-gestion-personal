@@ -773,9 +773,69 @@ function recreateMainWindow({ windowMode, route = "/" }) {
   });
 }
 
-function createBlockWindow(payload = {}) {
-  const durationSeconds = Math.max(1, Number(payload?.durationSeconds || 20));
+// Bloqueo de pantalla del descanso. Solo existe UNA ventana de bloqueo: si llega otro bloqueo
+// mientras está abierta se reutiliza y se reinicia su temporizador. Antes cada aviso creaba una
+// ventana nueva y pisaba la referencia, así que con descansos cortos quedaban ventanas huérfanas
+// a pantalla completa que nunca se cerraban.
+const MIN_BLOCK_SECONDS = 1;
+const MAX_BLOCK_SECONDS = 4 * 60 * 60;
+let blockCloseTimer = null;
+let blockInputProcess = null;
 
+function closeBlockWindow() {
+  if (blockCloseTimer) {
+    clearTimeout(blockCloseTimer);
+    blockCloseTimer = null;
+  }
+
+  if (blockWindow && !blockWindow.isDestroyed()) {
+    blockWindow.destroy();
+  }
+  blockWindow = null;
+}
+
+function startBlockInputLock(durationSeconds) {
+  if (process.platform !== "win32" || blockInputProcess) return;
+
+  const scriptPath = path.resolve(__dirname, "..", "..", "..", "tools", "blockScreen.ps1");
+  if (!fs.existsSync(scriptPath)) return;
+
+  // spawn directo (sin cmd.exe intermedio) para que kill() termine el propio PowerShell.
+  blockInputProcess = spawn(
+    "powershell",
+    ["-ExecutionPolicy", "Bypass", "-File", scriptPath, "-Seconds", String(durationSeconds)],
+    { windowsHide: true },
+  );
+  blockInputProcess.on("exit", () => {
+    blockInputProcess = null;
+  });
+  blockInputProcess.on("error", () => {
+    blockInputProcess = null;
+  });
+}
+
+function createBlockWindow(payload = {}) {
+  const requested = Number(payload?.durationSeconds);
+  const durationSeconds = Math.min(
+    MAX_BLOCK_SECONDS,
+    Math.max(MIN_BLOCK_SECONDS, Number.isFinite(requested) && requested > 0 ? Math.round(requested) : 20),
+  );
+  const blockPage = path.join(__dirname, "..", "public", "block.html");
+
+  if (blockWindow && !blockWindow.isDestroyed()) {
+    // Ya hay un bloqueo en pantalla: se reinicia la cuenta atrás en la misma ventana.
+    blockWindow.loadFile(blockPage, { query: { seconds: String(durationSeconds) } });
+  } else {
+    createFreshBlockWindow(blockPage, durationSeconds);
+  }
+
+  startBlockInputLock(durationSeconds);
+
+  if (blockCloseTimer) clearTimeout(blockCloseTimer);
+  blockCloseTimer = setTimeout(closeBlockWindow, durationSeconds * 1000);
+}
+
+function createFreshBlockWindow(blockPage, durationSeconds) {
   blockWindow = new BrowserWindow({
     fullscreen: true,
     frame: false,
@@ -791,29 +851,13 @@ function createBlockWindow(payload = {}) {
 
   blockWindow.setAlwaysOnTop(true, "screen-saver");
   blockWindow.setVisibleOnAllWorkspaces(true);
-  blockWindow.loadFile(path.join(__dirname, "..", "public", "block.html"));
+  blockWindow.loadFile(blockPage, { query: { seconds: String(durationSeconds) } });
 
-  if (process.platform === "win32") {
-    const scriptPath = path.resolve(
-      __dirname,
-      "..",
-      "..",
-      "..",
-      "tools",
-      "blockScreen.ps1",
-    );
-
-    if (fs.existsSync(scriptPath)) {
-      exec(`powershell -ExecutionPolicy Bypass -File "${scriptPath}"`);
-    }
-  }
-
-  setTimeout(() => {
-    if (blockWindow) {
-      blockWindow.close();
-      blockWindow = null;
-    }
-  }, durationSeconds * 1000);
+  // Si la página no carga, nunca se deja una ventana vacía a pantalla completa.
+  blockWindow.webContents.once("did-fail-load", closeBlockWindow);
+  blockWindow.on("closed", () => {
+    blockWindow = null;
+  });
 }
 
 function escapeHtml(value = "") {
@@ -1140,7 +1184,17 @@ app.on("activate", () => {
   }
 });
 
-ipcMain.on("start-block", createBlockWindow);
+// El primer argumento de ipcMain es el evento; el payload llega en el segundo.
+ipcMain.on("start-block", (_event, payload) => createBlockWindow(payload));
+// El backend avisa de que el bloqueo terminó antes de tiempo (descanso acabado o modo foco apagado).
+ipcMain.on("end-block", () => {
+  closeBlockWindow();
+  if (blockInputProcess) {
+    // Al terminar el proceso, Windows libera el BlockInput que tenía activo.
+    blockInputProcess.kill();
+    blockInputProcess = null;
+  }
+});
 
 ipcMain.on("window:minimize", () => {
   if (mainWindow && !mainWindow.isDestroyed()) {

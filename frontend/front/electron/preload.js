@@ -5,6 +5,7 @@ const isAutoStartSupported =
 
 contextBridge.exposeInMainWorld("electronAPI", {
   startBlock: (payload) => ipcRenderer.send("start-block", payload),
+  endBlock: () => ipcRenderer.send("end-block"),
 
   minimizeWindow: () => ipcRenderer.send("window:minimize"),
   toggleMaximizeWindow: () => ipcRenderer.send("window:toggle-maximize"),

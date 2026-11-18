@@ -76,6 +76,19 @@ const FocusModeListener = () => {
           }
         });
 
+        // Si el backend deja de bloquear (descanso terminado o modo foco apagado), la pantalla
+        // de bloqueo se cierra al momento en vez de esperar a su temporizador.
+        stompClient.subscribe("/topic/focus-state", (message) => {
+          try {
+            const state = JSON.parse(message.body);
+            if (state && state.isBlocking === false) {
+              window.electronAPI?.endBlock?.();
+            }
+          } catch (_error) {
+            // Mensaje no JSON: no es un estado de foco.
+          }
+        });
+
         stompClient.subscribe("/topic/focus-events", (message) => {
           try {
             const event = JSON.parse(message.body);
