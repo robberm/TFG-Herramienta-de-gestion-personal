@@ -67,21 +67,6 @@ body.translucent .authScreen {
 
 /* ---------- The orbit and the mark at its centre ---------- */
 
-.authHero {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  margin-bottom: 24px;
-}
-
-.authMark {
-  position: relative;
-  z-index: 1;
-  color: var(--text);
-  animation: authFadeUp 700ms var(--ease-out) both;
-}
-
 .authOrbit {
   position: absolute;
   top: 50%;
@@ -348,10 +333,6 @@ body.translucent .authScreen .app-input {
 }
 
 @media (max-height: 760px) {
-  .authHero {
-    margin-bottom: 16px;
-  }
-
   .authLead {
     margin-bottom: 20px;
   }
@@ -367,7 +348,6 @@ body.translucent .authScreen .app-input {
     animation: authArcFade 400ms ease both;
   }
 
-  .authMark,
   .authTitle,
   .authLead,
   .authCard {

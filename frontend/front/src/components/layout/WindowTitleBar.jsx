@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import "../../css/WindowTitleBar.css";
-import { app_name } from "../../constants/textConstants";
 
 const WindowTitleBar = () => {
   const [isMaximized, setIsMaximized] = useState(false);
@@ -44,7 +43,7 @@ const WindowTitleBar = () => {
       <div className="windowTitleBarDragArea" onDoubleClick={handleDoubleClick}>
         <div className="windowTitleBarBrand">
           
-          <span className="windowTitleBarTitle">{app_name}</span>
+          
         </div>
       </div>
 

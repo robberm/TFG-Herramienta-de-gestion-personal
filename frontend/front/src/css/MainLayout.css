@@ -74,8 +74,8 @@ body.translucent .appWindowFrame {
   /* Visible so the account menu can open past the sidebar; the rows clip their own text. */
   overflow: visible;
   transition:
-    width 280ms var(--ease-drawer),
-    min-width 280ms var(--ease-drawer),
+    width 360ms var(--ease-drawer),
+    min-width 360ms var(--ease-drawer),
     background-color 0.3s ease;
 }
 
@@ -91,15 +91,6 @@ body.translucent .sideBar {
   padding: 0 0 0 8px;
   margin-bottom: 18px;
   overflow: hidden;
-}
-
-.sidebarBrandName {
-  overflow: hidden;
-  color: var(--text);
-  font-size: var(--fs-16);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
 }
 
 .sidebarToggle,
@@ -129,7 +120,6 @@ body.translucent .sideBar {
 
 .sidebarMobileToggle {
   display: none;
-  margin-left: auto;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -215,20 +205,34 @@ body.translucent .sideBar {
   white-space: nowrap;
 }
 
-/* Words fade with the width: out quickly when collapsing, in after the bar has opened. */
-.sidebarBrandName,
+/*
+ * Words travel with the bar: when it opens they slide in from behind the icons while the width
+ * grows; when it closes they slide back and fade quickly. The icons never move.
+ */
 .menuLabel,
 .menuGroupLabel {
   opacity: 1;
-  transition: opacity 200ms ease 80ms;
+  transform: translateX(0);
+  transition:
+    opacity 260ms ease calc(40ms + var(--row-delay, 0ms)),
+    transform 420ms var(--ease-drawer) var(--row-delay, 0ms);
 }
 
-.sideBar.collapsed .sidebarBrandName,
+/* One row after another, 25ms apart, so the opening reads as a sweep down the bar. */
+.menuItems a:nth-of-type(1) { --row-delay: 0ms; }
+.menuItems a:nth-of-type(2) { --row-delay: 25ms; }
+.menuItems a:nth-of-type(3) { --row-delay: 50ms; }
+.menuItems a:nth-of-type(4) { --row-delay: 75ms; }
+.menuItems a:nth-of-type(5) { --row-delay: 100ms; }
+
 .sideBar.collapsed .menuLabel,
 .sideBar.collapsed .menuGroupLabel {
   opacity: 0;
+  transform: translateX(-24px);
   pointer-events: none;
-  transition: opacity 120ms ease;
+  transition:
+    opacity 120ms ease,
+    transform 220ms var(--ease-out);
 }
 
 .sidebarFooter {
@@ -243,10 +247,10 @@ body.translucent .sideBar {
 
 @media (prefers-reduced-motion: reduce) {
   .sideBar,
-  .sidebarBrandName,
   .menuLabel,
   .menuGroupLabel {
     transition: none;
+    transform: none;
   }
 }
 
@@ -301,11 +305,6 @@ body.translucent .sideBar {
     height: 36px;
     margin: 0;
     padding: 0 0 0 4px;
-  }
-
-  .sideBar .sidebarBrandName,
-  .sideBar.collapsed .sidebarBrandName {
-    opacity: 1;
   }
 
   .sidebarToggle {

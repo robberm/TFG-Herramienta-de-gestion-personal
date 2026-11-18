@@ -96,16 +96,26 @@
 }
 
 .userInfo {
-  transition: opacity 200ms ease 80ms;
+  transform: translateX(0);
+  transition:
+    opacity 260ms ease 60ms,
+    transform 420ms var(--ease-drawer);
 }
 
 .userMenuTrigger .userFlecha {
   transition:
     transform var(--dur) var(--ease-out),
-    opacity 200ms ease 80ms;
+    opacity 220ms ease 60ms;
 }
 
-.sideBar.collapsed .userInfo,
+.sideBar.collapsed .userInfo {
+  opacity: 0;
+  transform: translateX(-24px);
+  transition:
+    opacity 120ms ease,
+    transform 220ms var(--ease-out);
+}
+
 .sideBar.collapsed .userFlecha {
   opacity: 0;
 }

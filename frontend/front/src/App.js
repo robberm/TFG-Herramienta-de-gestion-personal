@@ -5,7 +5,6 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import WindowTitleBar from "./components/layout/WindowTitleBar";
 import AuthOrbit from "./components/shared/AuthOrbit";
-import GmoMark from "./components/shared/GmoMark";
 import RevealHeadline from "./components/shared/RevealHeadline";
 import { useLanguage } from "./context/languageContext";
 import { app_name } from "./constants/textConstants";
@@ -58,10 +57,6 @@ function App() {
     <div className="contenedor-app authScreen">
       <main className="authColumn">
         <AuthOrbit />
-        <div className="authHero">
-          <GmoMark size={48} className="authMark" />
-        </div>
-
         <RevealHeadline className="authTitle" text={`${t.appWelcomeTo} ${app_name}`} />
         <p className="authLead">{t.appTagline}</p>
 

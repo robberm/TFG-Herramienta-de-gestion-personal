@@ -5,7 +5,6 @@ import WindowTitleBar from "./WindowTitleBar";
 import { useLanguage } from "../../context/languageContext";
 import ReminderListener from "./ReminderListener";
 import ErrorBox from "../Error";
-import { app_name } from "../../constants/textConstants";
 import "../../css/MainLayout.css";
 
 const isElectronEnvironment =
@@ -205,7 +204,6 @@ const MainLayout = ({ children }) => {
               >
                 <MenuToggleIcon />
               </button>
-              <span className="sidebarBrandName">{app_name}</span>
               <button
                 type="button"
                 className="sidebarMobileToggle"

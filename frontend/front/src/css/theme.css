@@ -517,9 +517,10 @@ body.translucent {
   background: transparent;
 }
 
+/* .sideBar declares its own transition (width + colour) in MainLayout.css; listing it here
+   would override the width animation, since this file loads later. */
 body,
 .windowTitleBar,
-.sideBar,
 .appWindowFrame {
   transition:
     background-color 0.3s ease,
